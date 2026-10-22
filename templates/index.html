@@ -3,20 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Myanmar SRT & Video Studio</title>
+  <title>Myanmar SRT Golden Studio</title>
   <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
   <style id="dynamic-font-style"></style>
   <style>
+    :root {
+      --gold-light: #fde047;
+      --gold-main: #d4af37;
+      --gold-dark: #aa7c11;
+      --silver-light: #f1f5f9;
+      --silver-main: #94a3b8;
+      --silver-dark: #334155;
+    }
     body {
-      background-color: #0f172a;
-      color: #f8fafc;
+      background: radial-gradient(circle at top, #1e222d 0%, #090b10 100%);
+      color: #e2e8f0;
       font-family: system-ui, -apple-system, sans-serif;
       overscroll-behavior-y: contain;
     }
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: #1e293b; }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #0f131a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #d4af37, #64748b); border-radius: 3px; }
 
+    /* Luxury Silver & Gold Classes */
+    .silver-card {
+      background: linear-gradient(145deg, rgba(30, 35, 48, 0.92), rgba(15, 18, 26, 0.96));
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .gold-border {
+      border: 1px solid rgba(212, 175, 55, 0.65) !important;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+    .gold-btn {
+      background: linear-gradient(135deg, #f59e0b 0%, #d4af37 50%, #b45309 100%);
+      color: #090b10;
+      font-weight: 800;
+      border: 1px solid #fde047;
+      box-shadow: 0 3px 14px rgba(212, 175, 55, 0.35);
+    }
+    .gold-btn:hover:not(:disabled) {
+      filter: brightness(1.1);
+      box-shadow: 0 0 18px rgba(253, 224, 71, 0.55);
+    }
+    .gold-btn:disabled {
+      background: linear-gradient(135deg, #334155, #1e293b);
+      color: #64748b;
+      border-color: #475569;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+    .silver-btn {
+      background: linear-gradient(145deg, #334155, #1e293b);
+      color: #e2e8f0;
+      border: 1px solid rgba(203, 213, 225, 0.35);
+    }
+    .silver-btn:active {
+      border-color: #fde047;
+      color: #fde047;
+    }
+    .gold-text {
+      background: linear-gradient(90deg, #fef08a, #d4af37, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Draggable Overlays inside Video */
     .draggable-item {
       position: absolute;
       transform: translate(-50%, -50%);
@@ -30,20 +82,19 @@
       line-height: 1.35;
       padding: 4px 10px;
       border-radius: 6px;
-      border: 1px dashed rgba(255, 255, 255, 0.35);
-      transition: border-color 0.15s;
+      border: 1px dashed rgba(212, 175, 55, 0.55);
     }
     .draggable-item:active, .draggable-item.active-drag {
-      border: 1.5px solid #38bdf8;
-      box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+      border: 1.5px solid #fde047;
+      box-shadow: 0 0 14px rgba(253, 224, 71, 0.6);
     }
     #canvas-viewport {
       position: relative;
       overflow: hidden;
-      background: #020617;
+      background: #04060a;
       margin: 0 auto;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-      border: 1.5px solid #334155;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.85);
+      border: 1.5px solid rgba(212, 175, 55, 0.45);
       border-radius: 10px;
       touch-action: none;
     }
@@ -56,58 +107,95 @@
       max-width: none;
       max-height: none;
     }
-    .sub-active-row {
-      border-left: 4px solid #38bdf8 !important;
-      background-color: rgba(56, 189, 248, 0.12) !important;
+
+    /* Heartbeat ECG Line Animation */
+    .step-node {
+      transition: all 0.3s ease;
+      border: 1px solid #475569;
+      background: #151923;
+      color: #94a3b8;
     }
+    .step-node.active {
+      border-color: #fde047;
+      background: linear-gradient(135deg, rgba(212,175,55,0.28), rgba(170,124,17,0.1));
+      color: #fef08a;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+      transform: scale(1.04);
+    }
+    .step-node.done {
+      border-color: #d4af37;
+      background: linear-gradient(135deg, #d4af37, #9a6f0a);
+      color: #090b10;
+      font-weight: 800;
+    }
+    .heart-line-svg {
+      width: 28px;
+      height: 16px;
+      stroke: #475569;
+      stroke-width: 2;
+      fill: none;
+      transition: stroke 0.3s;
+    }
+    .heart-line-svg.pulsing {
+      stroke: #fde047;
+      filter: drop-shadow(0 0 4px #f59e0b);
+      stroke-dasharray: 60;
+      animation: ecgPulse 1s linear infinite;
+    }
+    .heart-line-svg.done {
+      stroke: #d4af37;
+      filter: drop-shadow(0 0 3px rgba(212, 175, 55, 0.6));
+    }
+    @keyframes ecgPulse {
+      0% { stroke-dashoffset: 60; }
+      100% { stroke-dashoffset: 0; }
+    }
+
+    /* Emoji Bounce Animation */
+    @keyframes stickerBounce {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.15); }
+    }
+    .emoji-sticker {
+      display: inline-block;
+      animation: stickerBounce 0.9s ease-in-out infinite;
+    }
+    .sub-active-row {
+      border-left: 4px solid #fde047 !important;
+      background: rgba(212, 175, 55, 0.14) !important;
+    }
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
   </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden">
 
   <!-- ================= TOP STICKY VIDEO CANVAS AREA ================= -->
-  <div class="w-full bg-slate-950 border-b border-slate-800 z-30 shrink-0 pt-2 pb-2 px-2 flex flex-col items-center">
+  <div class="w-full bg-[#090c12]/95 border-b border-slate-800 z-30 shrink-0 pt-1.5 pb-2 px-2 flex flex-col items-center">
     
-    <!-- Top Mini Bar: Aspect Ratio & Video Zoom Reset -->
-    <div class="w-full max-w-md flex items-center justify-between mb-1.5 text-xs">
-      <div class="flex items-center space-x-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
-        <button onclick="setAspectRatio('9:16')" id="btn-9-16" class="px-2.5 py-1 rounded bg-sky-600 text-white font-semibold">9:16</button>
-        <button onclick="setAspectRatio('16:9')" id="btn-16-9" class="px-2.5 py-1 rounded text-slate-300 hover:bg-slate-800">16:9</button>
-        <button onclick="setAspectRatio('1:1')" id="btn-1-1" class="px-2.5 py-1 rounded text-slate-300 hover:bg-slate-800">1:1</button>
-      </div>
-
-      <div class="flex items-center space-x-1.5">
-        <span class="text-slate-400 text-[11px]">Zoom: <b id="zoom-val">1.0x</b></span>
-        <input type="range" id="vid-zoom-slider" min="0.3" max="3.0" step="0.05" value="1.0" 
-          class="w-16 accent-sky-500" oninput="onSliderZoom(this.value)" />
-        <button onclick="resetVideoTransform()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-[11px] text-slate-300">Reset</button>
-      </div>
-    </div>
-
     <!-- Interactive Video Viewport -->
-    <div id="canvas-viewport" style="width: 210px; height: 340px;">
+    <div id="canvas-viewport" style="width: 195px; height: 315px;">
       <video id="main-video" playsinline webkit-playsinline></video>
 
-      <!-- Change Video Mini Button (top-right inside video box when video/url is loaded) -->
+      <!-- Change Video Mini Button -->
       <button id="btn-change-source" onclick="showSourceOverlay()" 
-        class="hidden absolute top-2 right-2 z-30 bg-slate-900/85 hover:bg-slate-800 text-sky-400 border border-slate-700 px-2 py-1 rounded-md text-[10px] font-bold shadow">
-        🔄 ဗီဒီယိုလဲမည်
+        class="hidden absolute top-2 right-2 z-30 silver-btn px-2 py-0.5 rounded text-[10px] font-bold shadow">
+        🔄 လဲမည်
       </button>
 
       <!-- UPLOAD VIDEO & YOUTUBE URL OVERLAY INSIDE VIDEO BOX -->
-      <div id="source-picker-overlay" class="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-3 text-center space-y-2.5">
-        <label class="cursor-pointer w-full bg-slate-900 hover:bg-slate-800 border border-dashed border-sky-500/60 rounded-xl p-2.5 flex flex-col items-center justify-center transition">
+      <div id="source-picker-overlay" class="absolute inset-0 z-30 bg-[#07090e]/95 backdrop-blur-sm flex flex-col items-center justify-center p-2.5 text-center space-y-2">
+        <label class="cursor-pointer w-full silver-card hover:border-amber-400/70 rounded-xl p-2.5 flex flex-col items-center justify-center transition">
           <span class="text-xl mb-0.5">📁</span>
-          <span class="text-[11px] font-bold text-sky-400">ဖုန်းထဲမှ Video ရွေးရန်</span>
+          <span class="text-[11px] font-bold gold-text">ဖုန်းထဲမှ Video ရွေးရန်</span>
           <span id="selected-file-label" class="text-[10px] text-slate-400 truncate max-w-full mt-0.5">.mp4, .mov နှိပ်၍ရွေးပါ</span>
           <input type="file" id="input-video-file" accept="video/*" class="hidden" onchange="onSourceInputChanged('file')" />
         </label>
 
-        <div class="text-[10px] text-slate-500 font-bold">— သို့မဟုတ် —</div>
+        <div class="text-[9px] text-slate-500 font-bold tracking-widest">— OR YOUTUBE LINK —</div>
 
-        <div class="w-full space-y-1">
-          <input type="url" id="input-yt-url" placeholder="🔗 YouTube URL ထည့်ရန်..." oninput="onSourceInputChanged('url')"
-            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white placeholder-slate-400 focus:outline-none focus:border-sky-500" />
-        </div>
+        <input type="url" id="input-yt-url" placeholder="🔗 YouTube URL ထည့်ရန်..." oninput="onSourceInputChanged('url')"
+          class="w-full bg-[#0f131d] border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-amber-100 placeholder-slate-500 focus:outline-none focus:border-amber-400" />
       </div>
 
       <!-- Draggable Logo -->
@@ -125,110 +213,136 @@
       <div id="overlay-my" class="draggable-item" style="left: 50%; top: 87%;">မြန်မာစာတန်းထိုး</div>
     </div>
 
-    <!-- GENERATE SUBTITLES BUTTON DIRECTLY BELOW VIDEO BOX (Disabled until video/URL added) -->
-    <div class="w-full max-w-md mt-2 px-1">
+    <!-- VIDEO BOTTOM BAR: TITLE BTN + LOGO BTN + SHORT GENERATE BTN -->
+    <div class="w-full max-w-md mt-2 grid grid-cols-12 gap-1.5 px-1">
+      <button onclick="quickTriggerTitle()" class="col-span-3 silver-btn py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center space-x-1 shadow">
+        <span>🏷️</span><span>Title</span>
+      </button>
+
+      <button onclick="document.getElementById('input-logo-file').click()" class="col-span-3 silver-btn py-1.5 rounded-lg text-[11px] font-bold flex items-center justify-center space-x-1 shadow">
+        <span>🖼️</span><span>Logo</span>
+      </button>
+
       <button onclick="startProcessMedia()" id="btn-start-process" disabled
-        class="w-full py-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold rounded-xl text-xs shadow-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
-        🚀 AI ဖြင့် English + မြန်မာ စာတန်းထိုး စတင်ထုတ်ယူမည်
+        class="col-span-6 gold-btn py-1.5 rounded-lg text-xs flex items-center justify-center space-x-1">
+        <span>⚡</span><span>စာတန်းထိုးထုတ်မည်</span>
       </button>
     </div>
 
-    <!-- Video Playback Controls -->
+    <!-- HEART LINE (ECG PULSE) 4-STEP PIPELINE CONNECTOR -->
+    <div class="w-full max-w-md mt-2 px-1 flex items-center justify-between">
+      <div id="step-node-1" class="step-node px-2 py-1 rounded-md text-[10px] flex items-center space-x-1">
+        <span>📁</span><span>Media</span>
+      </div>
+
+      <svg id="heart-line-1" class="heart-line-svg" viewBox="0 0 40 20">
+        <path d="M0 10 L10 10 L14 3 L19 17 L24 6 L28 13 L31 10 L40 10" />
+      </svg>
+
+      <div id="step-node-2" class="step-node px-2 py-1 rounded-md text-[10px] flex items-center space-x-1">
+        <span>🎧</span><span>Audio</span>
+      </div>
+
+      <svg id="heart-line-2" class="heart-line-svg" viewBox="0 0 40 20">
+        <path d="M0 10 L10 10 L14 3 L19 17 L24 6 L28 13 L31 10 L40 10" />
+      </svg>
+
+      <div id="step-node-3" class="step-node px-2 py-1 rounded-md text-[10px] flex items-center space-x-1">
+        <span>🎙️</span><span>Eng SRT</span>
+      </div>
+
+      <svg id="heart-line-3" class="heart-line-svg" viewBox="0 0 40 20">
+        <path d="M0 10 L10 10 L14 3 L19 17 L24 6 L28 13 L31 10 L40 10" />
+      </svg>
+
+      <div id="step-node-4" class="step-node px-2 py-1 rounded-md text-[10px] flex items-center space-x-1">
+        <span>🇲🇲</span><span>Burma</span>
+      </div>
+    </div>
+
+    <!-- Video Playback Mini Bar -->
     <div class="w-full max-w-md mt-1.5 flex items-center space-x-2 px-1">
-      <button id="play-btn" onclick="togglePlay()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-bold shrink-0">
+      <button id="play-btn" onclick="togglePlay()" class="px-2.5 py-0.5 silver-btn rounded text-[11px] font-bold shrink-0">
         ▶ Play
       </button>
       <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" 
-        class="w-full accent-sky-500 h-1.5 bg-slate-800 rounded-lg" oninput="seekVideo(this.value)" />
-      <span id="time-display" class="text-[11px] text-slate-400 font-mono shrink-0">00:00</span>
+        class="w-full accent-amber-400 h-1 bg-slate-800 rounded-lg" oninput="seekVideo(this.value)" />
+      <span id="time-display" class="text-[10px] text-slate-400 font-mono shrink-0">00:00</span>
     </div>
 
-    <!-- Real-time Progress Bar (Hidden when idle) -->
-    <div id="progress-container" class="w-full max-w-md mt-1.5 hidden bg-slate-900 border border-sky-500/40 rounded-lg p-2">
-      <div class="flex justify-between text-xs mb-1">
-        <span id="progress-step" class="font-bold text-sky-400">Processing...</span>
-        <span id="progress-pct" class="font-mono text-slate-300">0%</span>
+    <!-- REAL LIVE LOADING BAR WITH ANIMATED STICKER EMOJI -->
+    <div id="progress-container" class="w-full max-w-md mt-1.5 hidden silver-card gold-border rounded-xl p-2">
+      <div class="flex items-center justify-between text-xs mb-1">
+        <div class="flex items-center space-x-1.5">
+          <span id="progress-emoji" class="text-base emoji-sticker">🎧 🔄</span>
+          <span id="progress-step" class="font-bold gold-text">Processing...</span>
+        </div>
+        <span id="progress-pct" class="font-mono text-amber-300 font-extrabold text-xs">0%</span>
       </div>
-      <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-        <div id="progress-bar" class="bg-sky-500 h-full transition-all duration-300" style="width: 0%;"></div>
+      <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-700">
+        <div id="progress-bar" class="h-full transition-all duration-200" 
+          style="width: 0%; background: linear-gradient(90deg, #d4af37, #fde047, #f59e0b);"></div>
       </div>
-      <p id="progress-msg" class="text-[11px] text-slate-300 mt-1"></p>
+      <p id="progress-msg" class="text-[10px] text-slate-300 mt-1 truncate"></p>
     </div>
   </div>
 
-  <!-- ================= BOTTOM SCROLLABLE CONTROLS AREA ================= -->
-  <div class="flex-1 overflow-y-auto px-3 py-2.5 space-y-3 max-w-md mx-auto w-full">
+  <!-- ================= BOTTOM SCROLLABLE DROPDOWN SETTINGS & EDITOR ================= -->
+  <div class="flex-1 overflow-y-auto px-3 py-2.5 space-y-2 max-w-md mx-auto w-full pb-10">
 
-    <!-- Navigation Tabs -->
-    <div class="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
-      <button onclick="switchTab('tab-subs')" id="tabbtn-subs" class="py-2 rounded-lg bg-sky-600 text-white">၁။ စာတန်းထိုးပြင်</button>
-      <button onclick="switchTab('tab-style')" id="tabbtn-style" class="py-2 rounded-lg text-slate-400">၂။ ဒီဇိုင်း/Font</button>
-      <button onclick="switchTab('tab-export')" id="tabbtn-export" class="py-2 rounded-lg text-slate-400">၃။ ဒေါင်းလုဒ်</button>
+    <!-- Live Dual Subtitle Monitor -->
+    <div class="silver-card rounded-xl px-3 py-1.5 text-center">
+      <div id="live-bar-en" class="text-[11px] text-slate-300 truncate">English live caption...</div>
+      <div id="live-bar-my" class="text-xs text-amber-300 font-semibold truncate mt-0.5">မြန်မာစာတန်းထိုး အချိန်နှင့်တပြေးညီ...</div>
     </div>
 
-    <!-- TAB 1: SUBTITLES LIVE EDITOR -->
-    <div id="tab-subs" class="space-y-2.5">
-      <!-- Live Fixed Dual Language Monitor -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-center">
-        <div id="live-bar-en" class="text-xs text-slate-200 truncate">English live caption...</div>
-        <div id="live-bar-my" class="text-sm text-amber-300 font-medium truncate mt-0.5">မြန်မာစာတန်းထိုး အချိန်နှင့်တပြေးညီ...</div>
-      </div>
-
-      <!-- Optional API Keys Override -->
-      <details class="text-xs text-slate-400 bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-        <summary class="cursor-pointer font-medium text-slate-300">🔑 API Keys ပြင်ဆင်ရန် (Server တွင် မထည့်ထားပါက)</summary>
-        <div class="mt-2 space-y-2">
-          <input type="password" id="custom-groq-key" placeholder="Groq API Key (gsk_...)" 
-            class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
-          <input type="password" id="custom-gemini-key" placeholder="Gemini API Key (AIza...)" 
-            class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
-        </div>
-      </details>
-
-      <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800">
-        <span class="text-xs font-bold text-sky-400">စာတန်းထိုးများ ပြင်ဆင်ရန် (<span id="sub-count">0</span> ကြောင်း)</span>
-        <button onclick="addNewSubtitleRow()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">
-          + စာကြောင်းအသစ်ထည့်
-        </button>
-      </div>
-
-      <div id="subtitles-list" class="space-y-2 pb-8">
-        <p class="text-xs text-slate-500 text-center py-6">အပေါ်ရှိ Video Box ထဲတွင် ဗီဒီယို သို့မဟုတ် YouTube Link ထည့်ပြီး စာတန်းထိုးထုတ်ယူပါ။</p>
-      </div>
-    </div>
-
-    <!-- TAB 2: STYLING, CUSTOM FONT, LOGO & TITLE -->
-    <div id="tab-style" class="space-y-3 hidden pb-8">
-      
-      <!-- Custom Font (.ttf) Upload -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2">
-        <h4 class="text-xs font-bold text-sky-400">၁။ စိတ်ကြိုက် မြန်မာ Font (.ttf) ထည့်သွင်းရန်</h4>
-        <input type="file" id="input-font-file" accept=".ttf,.otf" onchange="uploadCustomFont(this)"
-          class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-amber-400" />
-        <p id="font-status" class="text-[11px] text-slate-400">လက်ရှိ Font: <b class="text-white">Noto Sans Myanmar (Default)</b></p>
-      </div>
-
-      <!-- Myanmar Subtitle Styling -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2.5">
+    <!-- DROPDOWN 1: ASPECT RATIO & CANVAS ZOOM -->
+    <details class="silver-card rounded-xl overflow-hidden">
+      <summary class="px-3 py-2.5 text-xs font-bold flex items-center justify-between cursor-pointer select-none">
+        <span class="flex items-center space-x-2"><span>📐</span><span class="gold-text">၁။ Aspect Ratio & Video Zoom</span></span>
+        <span class="text-amber-400 text-[10px]">▼ ဖွင့်ရန်</span>
+      </summary>
+      <div class="p-3 border-t border-slate-800 space-y-2.5 text-xs">
         <div class="flex items-center justify-between">
-          <h4 class="text-xs font-bold text-amber-400">၂။ မြန်မာ စာတန်းထိုး ဒီဇိုင်း (Myanmar Box)</h4>
-          <label class="flex items-center space-x-1 text-xs">
-            <input type="checkbox" id="my-show" checked onchange="updateOverlayStyles()" class="accent-sky-500" />
-            <span>ပြသမည်</span>
-          </label>
+          <span class="text-slate-400">Aspect Ratio ရွေးရန်:</span>
+          <div class="flex space-x-1">
+            <button onclick="setAspectRatio('9:16')" id="btn-9-16" class="px-2.5 py-1 rounded gold-btn text-[11px]">9:16</button>
+            <button onclick="setAspectRatio('16:9')" id="btn-16-9" class="px-2.5 py-1 rounded silver-btn text-[11px]">16:9</button>
+            <button onclick="setAspectRatio('1:1')" id="btn-1-1" class="px-2.5 py-1 rounded silver-btn text-[11px]">1:1</button>
+          </div>
         </div>
-        <div class="grid grid-cols-2 gap-2 text-xs">
+        <div class="flex items-center justify-between space-x-2">
+          <span class="text-slate-400 shrink-0">Screen Zoom: <b id="zoom-val" class="text-amber-300">1.0x</b></span>
+          <input type="range" id="vid-zoom-slider" min="0.3" max="3.0" step="0.05" value="1.0" 
+            class="w-full accent-amber-400" oninput="onSliderZoom(this.value)" />
+          <button onclick="resetVideoTransform()" class="px-2 py-1 silver-btn rounded text-[10px] shrink-0">Reset</button>
+        </div>
+      </div>
+    </details>
+
+    <!-- DROPDOWN 2: MYANMAR SUBTITLE SETTING -->
+    <details class="silver-card rounded-xl overflow-hidden">
+      <summary class="px-3 py-2.5 text-xs font-bold flex items-center justify-between cursor-pointer select-none">
+        <span class="flex items-center space-x-2"><span>🇲🇲</span><span class="gold-text">၂။ မြန်မာ စာတန်းထိုး ဒီဇိုင်း (Burma Box)</span></span>
+        <span class="text-amber-400 text-[10px]">▼ ဖွင့်ရန်</span>
+      </summary>
+      <div class="p-3 border-t border-slate-800 space-y-2.5 text-xs">
+        <label class="flex items-center space-x-2">
+          <input type="checkbox" id="my-show" checked onchange="updateOverlayStyles()" class="accent-amber-400" />
+          <span>မြန်မာစာတန်းထိုး ပြသမည်</span>
+        </label>
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="text-slate-400 block mb-1">Font Size: <b id="my-size-val">30</b>px</label>
+            <label class="text-slate-400 block mb-1">Font Size: <b id="my-size-val" class="text-amber-300">30</b>px</label>
             <input type="range" id="my-size" min="14" max="64" value="30" oninput="updateOverlayStyles()" class="w-full accent-amber-400" />
           </div>
           <div>
-            <label class="text-slate-400 block mb-1">BG အကြည်နှုန်း: <b id="my-op-val">0.6</b></label>
+            <label class="text-slate-400 block mb-1">နောက်ခံ အကြည်နှုန်း: <b id="my-op-val" class="text-amber-300">0.6</b></label>
             <input type="range" id="my-bg-opacity" min="0" max="1" step="0.05" value="0.6" oninput="updateOverlayStyles()" class="w-full accent-amber-400" />
           </div>
           <div class="flex items-center space-x-2">
             <label class="text-slate-400">စာလုံးအရောင်:</label>
-            <input type="color" id="my-color" value="#ffff00" oninput="updateOverlayStyles()" class="w-8 h-6 rounded border-0 bg-transparent" />
+            <input type="color" id="my-color" value="#fde047" oninput="updateOverlayStyles()" class="w-8 h-6 rounded border-0 bg-transparent" />
           </div>
           <div class="flex items-center space-x-2">
             <label class="text-slate-400">နောက်ခံအရောင်:</label>
@@ -236,24 +350,27 @@
           </div>
         </div>
       </div>
+    </details>
 
-      <!-- English Subtitle Styling -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2.5">
-        <div class="flex items-center justify-between">
-          <h4 class="text-xs font-bold text-sky-400">၃။ English စာတန်းထိုး ဒီဇိုင်း (English Box)</h4>
-          <label class="flex items-center space-x-1 text-xs">
-            <input type="checkbox" id="en-show" checked onchange="updateOverlayStyles()" class="accent-sky-500" />
-            <span>ပြသမည်</span>
-          </label>
-        </div>
-        <div class="grid grid-cols-2 gap-2 text-xs">
+    <!-- DROPDOWN 3: ENGLISH SUBTITLE SETTING -->
+    <details class="silver-card rounded-xl overflow-hidden">
+      <summary class="px-3 py-2.5 text-xs font-bold flex items-center justify-between cursor-pointer select-none">
+        <span class="flex items-center space-x-2"><span>🔤</span><span class="gold-text">၃။ English စာတန်းထိုး ဒီဇိုင်း (Eng Box)</span></span>
+        <span class="text-amber-400 text-[10px]">▼ ဖွင့်ရန်</span>
+      </summary>
+      <div class="p-3 border-t border-slate-800 space-y-2.5 text-xs">
+        <label class="flex items-center space-x-2">
+          <input type="checkbox" id="en-show" checked onchange="updateOverlayStyles()" class="accent-amber-400" />
+          <span>English စာတန်းထိုး ပြသမည်</span>
+        </label>
+        <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="text-slate-400 block mb-1">Font Size: <b id="en-size-val">24</b>px</label>
-            <input type="range" id="en-size" min="12" max="56" value="24" oninput="updateOverlayStyles()" class="w-full accent-sky-400" />
+            <label class="text-slate-400 block mb-1">Font Size: <b id="en-size-val" class="text-amber-300">24</b>px</label>
+            <input type="range" id="en-size" min="12" max="56" value="24" oninput="updateOverlayStyles()" class="w-full accent-amber-400" />
           </div>
           <div>
-            <label class="text-slate-400 block mb-1">BG အကြည်နှုန်း: <b id="en-op-val">0.6</b></label>
-            <input type="range" id="en-bg-opacity" min="0" max="1" step="0.05" value="0.6" oninput="updateOverlayStyles()" class="w-full accent-sky-400" />
+            <label class="text-slate-400 block mb-1">နောက်ခံ အကြည်နှုန်း: <b id="en-op-val" class="text-amber-300">0.6</b></label>
+            <input type="range" id="en-bg-opacity" min="0" max="1" step="0.05" value="0.6" oninput="updateOverlayStyles()" class="w-full accent-amber-400" />
           </div>
           <div class="flex items-center space-x-2">
             <label class="text-slate-400">စာလုံးအရောင်:</label>
@@ -265,82 +382,129 @@
           </div>
         </div>
       </div>
+    </details>
 
-      <!-- Add Title Text -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2.5">
-        <h4 class="text-xs font-bold text-rose-400">၄။ Title Text (ခေါင်းစဉ်စာသား ထည့်ရန်)</h4>
-        <input type="text" id="title-text" placeholder="ခေါင်းစဉ်စာသား ရိုက်ထည့်ပါ..." oninput="updateOverlayStyles()"
-          class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white" />
-        <div class="grid grid-cols-2 gap-2 text-xs">
+    <!-- DROPDOWN 4: CUSTOM FONT (.TTF) -->
+    <details class="silver-card rounded-xl overflow-hidden">
+      <summary class="px-3 py-2.5 text-xs font-bold flex items-center justify-between cursor-pointer select-none">
+        <span class="flex items-center space-x-2"><span>✒️</span><span class="gold-text">၄။ စိတ်ကြိုက် မြန်မာ Font (.ttf) တင်ရန်</span></span>
+        <span class="text-amber-400 text-[10px]">▼ ဖွင့်ရန်</span>
+      </summary>
+      <div class="p-3 border-t border-slate-800 space-y-2 text-xs">
+        <input type="file" id="input-font-file" accept=".ttf,.otf" onchange="uploadCustomFont(this)"
+          class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-amber-300" />
+        <p id="font-status" class="text-[11px] text-slate-400">လက်ရှိ Font: <b class="text-amber-300">Noto Sans Myanmar</b></p>
+      </div>
+    </details>
+
+    <!-- DROPDOWN 5: TITLE & LOGO SETTINGS -->
+    <details id="dropdown-title-logo" class="silver-card rounded-xl overflow-hidden">
+      <summary class="px-3 py-2.5 text-xs font-bold flex items-center justify-between cursor-pointer select-none">
+        <span class="flex items-center space-x-2"><span>🏷️</span><span class="gold-text">၅။ Title စာသား နှင့် Logo အရွယ်အစား</span></span>
+        <span class="text-amber-400 text-[10px]">▼ ဖွင့်ရန်</span>
+      </summary>
+      <div class="p-3 border-t border-slate-800 space-y-3 text-xs">
+        <div class="space-y-2">
+          <label class="text-amber-300 font-semibold block">Title Text (ခေါင်းစဉ်စာသား):</label>
+          <input type="text" id="title-text" placeholder="ခေါင်းစဉ်စာသား ရိုက်ထည့်ပါ..." oninput="updateOverlayStyles()"
+            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white" />
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="text-slate-400 block mb-1">Size: <b id="ti-size-val">34</b>px</label>
+              <input type="range" id="ti-size" min="16" max="72" value="34" oninput="updateOverlayStyles()" class="w-full accent-amber-400" />
+            </div>
+            <div>
+              <label class="text-slate-400 block mb-1">BG Opacity: <b id="ti-op-val">0.85</b></label>
+              <input type="range" id="ti-bg-opacity" min="0" max="1" step="0.05" value="0.85" oninput="updateOverlayStyles()" class="w-full accent-amber-400" />
+            </div>
+            <div class="flex items-center space-x-2">
+              <label class="text-slate-400">စာသားရောင်:</label>
+              <input type="color" id="ti-color" value="#ffffff" oninput="updateOverlayStyles()" class="w-8 h-6 rounded border-0 bg-transparent" />
+            </div>
+            <div class="flex items-center space-x-2">
+              <label class="text-slate-400">နောက်ခံရောင်:</label>
+              <input type="color" id="ti-bg-color" value="#d4af37" oninput="updateOverlayStyles()" class="w-8 h-6 rounded border-0 bg-transparent" />
+            </div>
+          </div>
+        </div>
+        <hr class="border-slate-800" />
+        <div class="space-y-2">
+          <label class="text-amber-300 font-semibold block">Logo ပုံ နှင့် Size ချိန်ရန်:</label>
+          <input type="file" id="input-logo-file" accept="image/*" onchange="uploadLogoFile(this)"
+            class="w-full text-xs text-slate-300 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-amber-300" />
           <div>
-            <label class="text-slate-400 block mb-1">Title Size: <b id="ti-size-val">34</b>px</label>
-            <input type="range" id="ti-size" min="16" max="72" value="34" oninput="updateOverlayStyles()" class="w-full accent-rose-500" />
-          </div>
-          <div>
-            <label class="text-slate-400 block mb-1">BG အကြည်နှုန်း: <b id="ti-op-val">0.8</b></label>
-            <input type="range" id="ti-bg-opacity" min="0" max="1" step="0.05" value="0.8" oninput="updateOverlayStyles()" class="w-full accent-rose-500" />
-          </div>
-          <div class="flex items-center space-x-2">
-            <label class="text-slate-400">စာလုံးအရောင်:</label>
-            <input type="color" id="ti-color" value="#ffffff" oninput="updateOverlayStyles()" class="w-8 h-6 rounded border-0 bg-transparent" />
-          </div>
-          <div class="flex items-center space-x-2">
-            <label class="text-slate-400">နောက်ခံအရောင်:</label>
-            <input type="color" id="ti-bg-color" value="#e11d48" oninput="updateOverlayStyles()" class="w-8 h-6 rounded border-0 bg-transparent" />
+            <label class="text-slate-400 block mb-1">Logo Size: <b id="logo-size-val">18</b>%</label>
+            <input type="range" id="logo-size" min="5" max="50" value="18" oninput="updateOverlayStyles()" class="w-full accent-amber-400" />
           </div>
         </div>
       </div>
+    </details>
 
-      <!-- Add Logo Overlay -->
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2.5">
-        <h4 class="text-xs font-bold text-emerald-400">၅။ Add Logo (လိုဂိုပုံ ထည့်သွင်းရန်)</h4>
-        <input type="file" id="input-logo-file" accept="image/*" onchange="uploadLogoFile(this)"
-          class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-emerald-400" />
-        <div class="text-xs">
-          <label class="text-slate-400 block mb-1">Logo အရွယ်အစား (Size): <b id="logo-size-val">18</b>%</label>
-          <input type="range" id="logo-size" min="5" max="50" value="18" oninput="updateOverlayStyles()" class="w-full accent-emerald-500" />
+    <!-- DROPDOWN 6: SUBTITLE LINES LIVE EDITOR -->
+    <details id="dropdown-subs-editor" class="silver-card rounded-xl overflow-hidden" open>
+      <summary class="px-3 py-2.5 text-xs font-bold flex items-center justify-between cursor-pointer select-none">
+        <span class="flex items-center space-x-2"><span>📝</span><span class="gold-text">၆။ စာတန်းထိုးများ စစ်ဆေး/ပြင်ဆင်ရန် (<span id="sub-count">0</span>)</span></span>
+        <span class="text-amber-400 text-[10px]">▼ ဖွင့်ရန်</span>
+      </summary>
+      <div class="p-2.5 border-t border-slate-800 space-y-2">
+        <div class="flex justify-end">
+          <button onclick="addNewSubtitleRow()" class="px-2.5 py-1 silver-btn rounded-lg text-[11px] font-semibold text-amber-300">
+            + စာကြောင်းအသစ်ထည့်
+          </button>
+        </div>
+        <div id="subtitles-list" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+          <p class="text-xs text-slate-500 text-center py-4">ဗီဒီယိုတင်ပြီး စာတန်းထိုးထုတ်ယူပါက ဤနေရာတွင် ပေါ်လာပါမည်။</p>
         </div>
       </div>
-    </div>
+    </details>
 
-    <!-- TAB 3: EXPORT SRT & RENDER FINAL VIDEO -->
-    <div id="tab-export" class="space-y-3 hidden pb-8">
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
-        <h3 class="text-sm font-bold text-sky-400">SRT ဖိုင် နှင့် ဗီဒီယို ဒေါင်းလုဒ်ဆွဲရန်</h3>
-
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="downloadSRT('my')" class="py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-amber-300 font-semibold border border-slate-700">
+    <!-- DROPDOWN 7: DOWNLOAD SRT & RENDER FINAL MP4 VIDEO -->
+    <details id="dropdown-export" class="silver-card gold-border rounded-xl overflow-hidden" open>
+      <summary class="px-3 py-2.5 text-xs font-bold flex items-center justify-between cursor-pointer select-none">
+        <span class="flex items-center space-x-2"><span>🎬</span><span class="gold-text">၇။ SRT ဒေါင်းလုဒ် & Final Video ထုတ်ယူရန်</span></span>
+        <span class="text-amber-400 text-[10px]">▼ ဖွင့်ရန်</span>
+      </summary>
+      <div class="p-3 border-t border-slate-800 space-y-3">
+        <div class="grid grid-cols-3 gap-1.5">
+          <button onclick="downloadSRT('my')" class="py-1.5 silver-btn rounded-lg text-[11px] text-amber-300 font-semibold">
             📥 မြန်မာ .SRT
           </button>
-          <button onclick="downloadSRT('en')" class="py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-sky-300 font-semibold border border-slate-700">
-            📥 English .SRT
+          <button onclick="downloadSRT('en')" class="py-1.5 silver-btn rounded-lg text-[11px] text-slate-200 font-semibold">
+            📥 Eng .SRT
           </button>
-          <button onclick="downloadSRT('dual')" class="py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs text-emerald-300 font-semibold border border-slate-700">
+          <button onclick="downloadSRT('dual')" class="py-1.5 silver-btn rounded-lg text-[11px] text-amber-200 font-semibold">
             📥 ၂ ဘာသာ .SRT
           </button>
         </div>
 
-        <hr class="border-slate-800" />
-
-        <p class="text-xs text-slate-400">
-          ရွေးချယ်ထားသော Aspect Ratio၊ စာတန်းထိုး ဒီဇိုင်း၊ Custom Font၊ Title နှင့် Logo အားလုံးကို ဗီဒီယိုထဲသို့ တစ်ခါတည်း မြှုပ်နှံ (Hardcode Burn-in) ပေးပါမည်။
-        </p>
-
         <button onclick="startRenderFinalVideo()" id="btn-render-video"
-          class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs shadow-lg">
-          🎬 ဗီဒီယိုထဲ စာတန်းထိုးထည့်ပြီး MP4 ထုတ်ယူမည်
+          class="w-full py-2.5 gold-btn rounded-xl text-xs shadow-lg flex items-center justify-center space-x-1.5">
+          <span>🎬</span><span>ဗီဒီယိုထဲ စာတန်းထိုးမြှုပ်ပြီး MP4 ထုတ်မည်</span>
         </button>
 
-        <!-- Final Video Download Box -->
-        <div id="final-download-box" class="hidden bg-emerald-950/50 border border-emerald-500/50 rounded-xl p-3 text-center space-y-2">
-          <p class="text-xs text-emerald-300 font-bold">✅ ဗီဒီယို Render ပြီးစီးပါပြီ!</p>
-          <a id="final-download-link" href="#" download="myanmar_subtitled_video.mp4"
-            class="inline-block w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-lg text-xs">
+        <div id="final-download-box" class="hidden bg-slate-950 border border-amber-400 rounded-xl p-3 text-center space-y-2">
+          <p class="text-xs text-amber-300 font-bold">🎉 ဗီဒီယို Render ၁၀၀% ပြီးစီးပါပြီ!</p>
+          <a id="final-download-link" href="#" download="golden_subtitled_video.mp4"
+            class="inline-block w-full py-2 gold-btn rounded-lg text-xs">
             ⬇ ဖုန်းထဲသို့ Video ဒေါင်းလုဒ်ဆွဲရန် နှိပ်ပါ
           </a>
         </div>
       </div>
-    </div>
+    </details>
+
+    <!-- DROPDOWN 8: API KEYS OVERRIDE -->
+    <details class="silver-card rounded-xl overflow-hidden">
+      <summary class="px-3 py-2 text-[11px] font-semibold flex items-center justify-between cursor-pointer text-slate-400">
+        <span>🔑 API Keys ပြင်ဆင်ရန် (Optional)</span>
+        <span>▼</span>
+      </summary>
+      <div class="p-3 border-t border-slate-800 space-y-2">
+        <input type="password" id="custom-groq-key" placeholder="Groq API Key (gsk_...)" 
+          class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
+        <input type="password" id="custom-gemini-key" placeholder="Gemini API Key (AIza...)" 
+          class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
+      </div>
+    </details>
 
   </div>
 
@@ -375,6 +539,28 @@
     const btnChangeSource = document.getElementById("btn-change-source");
     const btnStartProcess = document.getElementById("btn-start-process");
 
+    // Update Heartbeat Pipeline UI (Stages 1 to 4)
+    function updateHeartLinePipeline(currentStage, status) {
+      for (let i = 1; i <= 4; i++) {
+        const node = document.getElementById(`step-node-${i}`);
+        node.classList.remove("active", "done");
+        if (status === "completed" || i < currentStage) {
+          node.classList.add("done");
+        } else if (i === currentStage && status === "processing") {
+          node.classList.add("active");
+        }
+      }
+      for (let i = 1; i <= 3; i++) {
+        const line = document.getElementById(`heart-line-${i}`);
+        line.classList.remove("pulsing", "done");
+        if (status === "completed" || i < currentStage) {
+          line.classList.add("done");
+        } else if (i === currentStage - 1 || (currentStage === 1 && i === 1)) {
+          line.classList.add("pulsing");
+        }
+      }
+    }
+
     // Source Input Validation Inside Video Box
     function onSourceInputChanged(type) {
       const fileInput = document.getElementById("input-video-file");
@@ -386,7 +572,6 @@
         const file = fileInput.files[0];
         document.getElementById("selected-file-label").innerText = file.name;
         ytUrlInput.value = "";
-        // Local preview right away inside video box
         video.src = URL.createObjectURL(file);
         video.load();
         sourceOverlay.classList.add("hidden");
@@ -396,8 +581,13 @@
         document.getElementById("selected-file-label").innerText = ".mp4, .mov နှိပ်၍ရွေးပါ";
       }
 
-      // Enable or disable Generate button
-      btnStartProcess.disabled = !(hasFile || hasUrl);
+      const ready = (hasFile || hasUrl);
+      btnStartProcess.disabled = !ready;
+      if (ready) {
+        document.getElementById("step-node-1").classList.add("active");
+      } else {
+        document.getElementById("step-node-1").classList.remove("active", "done");
+      }
     }
 
     function showSourceOverlay() {
@@ -405,48 +595,43 @@
       sourceOverlay.classList.remove("hidden");
     }
 
-    // 1. Tab Navigation
-    function switchTab(tabId) {
-      ["tab-subs", "tab-style", "tab-export"].forEach(id => {
-        document.getElementById(id).classList.add("hidden");
-      });
-      ["tabbtn-subs", "tabbtn-style", "tabbtn-export"].forEach(id => {
-        const btn = document.getElementById(id);
-        btn.classList.remove("bg-sky-600", "text-white");
-        btn.classList.add("text-slate-400");
-      });
-
-      document.getElementById(tabId).classList.remove("hidden");
-      const activeBtn = document.getElementById("tabbtn-" + tabId.split("-")[1]);
-      activeBtn.classList.add("bg-sky-600", "text-white");
-      activeBtn.classList.remove("text-slate-400");
+    // Quick Title Button Below Video
+    function quickTriggerTitle() {
+      const titleInput = document.getElementById("title-text");
+      const current = titleInput.value || "ခေါင်းစဉ်စာသား";
+      const entered = prompt("ဗီဒီယိုပေါ်တွင် ထားမည့် Title ခေါင်းစဉ်စာသား ရိုက်ထည့်ပါ -", current);
+      if (entered !== null) {
+        titleInput.value = entered.trim();
+        updateOverlayStyles();
+        document.getElementById("dropdown-title-logo").open = true;
+      }
     }
 
-    // 2. Aspect Ratio & Viewport Sizing
+    // Aspect Ratio & Viewport Sizing
     function setAspectRatio(ratio) {
       state.aspectRatio = ratio;
       ["9:16", "16:9", "1:1"].forEach(r => {
         const b = document.getElementById("btn-" + r.replace(":", "-"));
         b.className = (r === ratio)
-          ? "px-2.5 py-1 rounded bg-sky-600 text-white font-semibold"
-          : "px-2.5 py-1 rounded text-slate-300 hover:bg-slate-800";
+          ? "px-2.5 py-1 rounded gold-btn text-[11px]"
+          : "px-2.5 py-1 rounded silver-btn text-[11px]";
       });
 
       if (ratio === "9:16") {
         state.outWidth = 720; state.outHeight = 1280;
-        viewport.style.width = "190px"; viewport.style.height = "338px";
+        viewport.style.width = "185px"; viewport.style.height = "315px";
       } else if (ratio === "16:9") {
         state.outWidth = 1280; state.outHeight = 720;
-        viewport.style.width = "320px"; viewport.style.height = "180px";
+        viewport.style.width = "310px"; viewport.style.height = "175px";
       } else {
         state.outWidth = 720; state.outHeight = 720;
-        viewport.style.width = "240px"; viewport.style.height = "240px";
+        viewport.style.width = "235px"; viewport.style.height = "235px";
       }
       applyVideoTransform();
       updateOverlayStyles();
     }
 
-    // 3. Video Zoom & Pan
+    // Video Zoom & Pan
     function onSliderZoom(val) {
       state.vidScale = parseFloat(val);
       document.getElementById("zoom-val").innerText = state.vidScale.toFixed(2) + "x";
@@ -538,7 +723,7 @@
 
     viewport.addEventListener("touchend", () => { initialPinchDist = null; });
 
-    // 4. Touch Drag & Drop for Overlays
+    // Touch Drag & Drop for Overlays
     function makeDraggable(el, key) {
       let dragging = false;
       el.addEventListener("pointerdown", (e) => {
@@ -571,7 +756,6 @@
     makeDraggable(overlayTitle, "title");
     makeDraggable(overlayLogo, "logo");
 
-    // 5. Styling & Custom Font Preview
     function hexToRgba(hex, alpha) {
       const r = parseInt(hex.slice(1, 3), 16);
       const g = parseInt(hex.slice(3, 5), 16);
@@ -651,7 +835,7 @@
             src: url('${data.font_url}');
           }
         `;
-        document.getElementById("font-status").innerHTML = `လက်ရှိ Font: <b class="text-amber-400">${data.family_name}</b>`;
+        document.getElementById("font-status").innerHTML = `လက်ရှိ Font: <b class="text-amber-300">${data.family_name}</b>`;
         updateOverlayStyles();
       } catch (err) {
         alert(err.message);
@@ -674,7 +858,6 @@
       }
     }
 
-    // 6. Video Player & Real-time Subtitle Sync
     function togglePlay() {
       if (!video.src) return;
       if (video.paused) {
@@ -721,8 +904,8 @@
       if (activeEl) activeEl.classList.add("sub-active-row");
     }
 
-    // 7. Process Video & Poll Real-time Progress
-    async function startProcessMedia() {
+    // Start Process Media with Real Upload Progress (XHR) + Job Polling
+    function startProcessMedia() {
       const fileInput = document.getElementById("input-video-file");
       const ytUrl = document.getElementById("input-yt-url").value.trim();
       const groqKey = document.getElementById("custom-groq-key").value.trim();
@@ -734,31 +917,59 @@
       }
 
       const fd = new FormData();
-      if (fileInput.files && fileInput.files[0]) {
-        fd.append("video_file", fileInput.files[0]);
-      }
+      const hasFile = fileInput.files && fileInput.files[0];
+      if (hasFile) fd.append("video_file", fileInput.files[0]);
       if (ytUrl) fd.append("youtube_url", ytUrl);
       if (groqKey) fd.append("custom_groq_key", groqKey);
       if (geminiKey) fd.append("custom_gemini_key", geminiKey);
 
       btnStartProcess.disabled = true;
-      showProgress("Starting...", 5, "လုပ်ငန်းစဉ် စတင်နေပါသည်...");
+      updateHeartLinePipeline(1, "processing");
 
-      try {
-        const res = await fetch("/api/process-media", { method: "POST", body: fd });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.detail || "Process failed");
-        pollJob(data.job_id, onMediaProcessed);
-      } catch (err) {
-        alert(err.message);
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "/api/process-media", true);
+
+      // Real Upload % for Video File
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable && hasFile) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          const mbLoaded = (e.loaded / (1024 * 1024)).toFixed(1);
+          const mbTotal = (e.total / (1024 * 1024)).toFixed(1);
+          showProgress("📁 ⬆️", "Uploading Video", pct, `ဗီဒီယိုဖိုင် တင်နေသည် (${mbLoaded}MB / ${mbTotal}MB - ${pct}%)`);
+        }
+      };
+
+      xhr.onload = () => {
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            pollJob(data.job_id, onMediaProcessed);
+          } else {
+            throw new Error(data.detail || "Process failed");
+          }
+        } catch (err) {
+          alert(err.message);
+          hideProgress();
+          btnStartProcess.disabled = false;
+        }
+      };
+
+      xhr.onerror = () => {
+        alert("Network upload error");
         hideProgress();
         btnStartProcess.disabled = false;
+      };
+
+      if (!hasFile) {
+        showProgress("🔗 📥", "YouTube Connecting", 2, "YouTube သို့ စတင်ချိတ်ဆက်နေပါသည်...");
       }
+      xhr.send(fd);
     }
 
-    function showProgress(step, pct, msg) {
+    function showProgress(emoji, step, pct, msg) {
       const box = document.getElementById("progress-container");
       box.classList.remove("hidden");
+      document.getElementById("progress-emoji").innerText = emoji || "⚡";
       document.getElementById("progress-step").innerText = step;
       document.getElementById("progress-pct").innerText = pct + "%";
       document.getElementById("progress-bar").style.width = pct + "%";
@@ -774,11 +985,14 @@
         try {
           const res = await fetch(`/api/job/${jobId}`);
           const job = await res.json();
-          showProgress(job.step, job.progress, job.message);
+          showProgress(job.emoji, job.step, job.progress, job.message);
+          if (job.stage && job.stage <= 4) {
+            updateHeartLinePipeline(job.stage, job.status);
+          }
 
           if (job.status === "completed") {
             clearInterval(timer);
-            setTimeout(hideProgress, 1200);
+            setTimeout(hideProgress, 1800);
             onSuccess(job.data);
           } else if (job.status === "error") {
             clearInterval(timer);
@@ -790,11 +1004,12 @@
         } catch (e) {
           clearInterval(timer);
         }
-      }, 1000);
+      }, 700);
     }
 
     function onMediaProcessed(data) {
       btnStartProcess.disabled = false;
+      updateHeartLinePipeline(4, "completed");
       state.videoFilename = data.video_filename;
       state.subtitles = data.subtitles || [];
       video.src = data.video_url;
@@ -803,40 +1018,39 @@
       btnChangeSource.classList.remove("hidden");
       renderSubtitlesEditor();
       updateOverlayStyles();
-      switchTab("tab-subs");
+      document.getElementById("dropdown-subs-editor").open = true;
     }
 
-    // 8. Interactive Subtitle Editor List
     function renderSubtitlesEditor() {
       const container = document.getElementById("subtitles-list");
       document.getElementById("sub-count").innerText = state.subtitles.length;
       if (!state.subtitles.length) {
-        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">စာတန်းထိုး မရှိသေးပါ။</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">စာတန်းထိုး မရှိသေးပါ။</p>`;
         return;
       }
 
       container.innerHTML = state.subtitles.map((sub, idx) => `
-        <div id="sub-row-${sub.id}" class="sub-row-card bg-slate-900 border border-slate-800 rounded-xl p-2.5 space-y-1.5">
-          <div class="flex items-center justify-between text-[11px] text-slate-400">
-            <div class="flex items-center space-x-1.5">
-              <span class="bg-slate-800 px-1.5 py-0.5 rounded text-sky-400 font-mono">#${idx + 1}</span>
+        <div id="sub-row-${sub.id}" class="sub-row-card bg-[#0d111a] border border-slate-800 rounded-xl p-2 space-y-1.5">
+          <div class="flex items-center justify-between text-[10px] text-slate-400">
+            <div class="flex items-center space-x-1">
+              <span class="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">#${idx + 1}</span>
               <input type="number" step="0.1" value="${sub.start}" onchange="updateSubField(${idx}, 'start', this.value)"
-                class="w-16 bg-slate-950 border border-slate-800 rounded px-1.5 py-0.5 text-center font-mono text-white" />
+                class="w-14 bg-slate-950 border border-slate-800 rounded px-1 py-0.5 text-center font-mono text-white" />
               <span>→</span>
               <input type="number" step="0.1" value="${sub.end}" onchange="updateSubField(${idx}, 'end', this.value)"
-                class="w-16 bg-slate-950 border border-slate-800 rounded px-1.5 py-0.5 text-center font-mono text-white" />
+                class="w-14 bg-slate-950 border border-slate-800 rounded px-1 py-0.5 text-center font-mono text-white" />
             </div>
             <div class="flex items-center space-x-1">
-              <button onclick="jumpToTime(${sub.start})" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded">▶ နားထောင်</button>
+              <button onclick="jumpToTime(${sub.start})" class="px-2 py-0.5 silver-btn text-amber-300 rounded">▶ နားထောင်</button>
               <button onclick="deleteSubRow(${idx})" class="px-1.5 py-0.5 bg-rose-950/60 text-rose-400 rounded">✕</button>
             </div>
           </div>
           <input type="text" value="${escapeHtml(sub.en)}" oninput="updateSubField(${idx}, 'en', this.value)"
             placeholder="English subtitle..."
-            class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-200" />
+            class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-200" />
           <input type="text" value="${escapeHtml(sub.my)}" oninput="updateSubField(${idx}, 'my', this.value)"
             placeholder="မြန်မာစာတန်းထိုး..."
-            class="w-full bg-slate-950 border border-amber-500/30 rounded-lg px-2.5 py-1.5 text-xs text-amber-300 font-medium" />
+            class="w-full bg-slate-950 border border-amber-500/40 rounded-lg px-2 py-1 text-xs text-amber-300 font-medium" />
         </div>
       `).join("");
     }
@@ -877,7 +1091,6 @@
       renderSubtitlesEditor();
     }
 
-    // 9. Export SRT File
     function toSrtTime(sec) {
       const hrs = Math.floor(sec / 3600).toString().padStart(2, "0");
       const mins = Math.floor((sec % 3600) / 60).toString().padStart(2, "0");
@@ -907,7 +1120,6 @@
       a.click();
     }
 
-    // 10. Render Final Burn-in Video via FFmpeg
     async function startRenderFinalVideo() {
       if (!state.videoFilename) {
         alert("ဗီဒီယို အရင်တင်ပေးပါ။");
@@ -959,7 +1171,7 @@
         } : null
       };
 
-      showProgress("Starting Render", 10, "FFmpeg ဖြင့် ဗီဒီယိုထဲ စာတန်းထိုးများ မြှုပ်နှံနေပါသည်...");
+      showProgress("🎬 🔥", "Starting FFmpeg Render", 1, "FFmpeg ဖြင့် ဗီဒီယိုထဲ စာတန်းထိုးများ စတင်မြှုပ်နှံနေပါသည်...");
 
       try {
         const res = await fetch("/api/render-video", {
