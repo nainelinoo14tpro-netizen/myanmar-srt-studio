@@ -9,8 +9,6 @@ from typing import List, Optional, Dict, Any
 from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.requests import Request
 from pydantic import BaseModel
 
 import yt_dlp
@@ -31,8 +29,6 @@ for d in [UPLOAD_DIR, OUTPUT_DIR, FONTS_DIR, TEMPLATES_DIR]:
 app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 app.mount("/outputs", StaticFiles(directory=str(OUTPUT_DIR)), name="outputs")
 app.mount("/fonts", StaticFiles(directory=str(FONTS_DIR)), name="fonts")
-
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 JOBS: Dict[str, Dict[str, Any]] = {}
 
@@ -86,8 +82,14 @@ def get_font_family_name(font_path: Path) -> str:
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def index():
+    # templates/index.html သို့မဟုတ် root ရှိ index.html ကို တိုက်ရိုက်ဖတ်ပေးခြင်း (Jinja2 error လုံးဝမတက်စေရန်)
+    html_file = TEMPLATES_DIR / "index.html"
+    if not html_file.exists():
+        html_file = BASE_DIR / "index.html"
+    if html_file.exists():
+        return HTMLResponse(content=html_file.read_text(encoding="utf-8"), status_code=200)
+    return HTMLResponse(content="<h3>index.html ဖိုင် မတွေ့ပါ။ templates/index.html ကို စစ်ဆေးပေးပါ။</h3>", status_code=404)
 
 
 @app.get("/api/job/{job_id}")
