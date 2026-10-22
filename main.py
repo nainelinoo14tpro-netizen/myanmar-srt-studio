@@ -37,7 +37,7 @@ app.mount("/fonts", StaticFiles(directory=str(FONTS_DIR)), name="fonts")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
 # Real-time Job Status သိမ်းဆည်းရန်
- JOBS: Dict[str, Dict[str, Any]] = {}
+JOBS: Dict[str, Dict[str, Any]] = {}
 
 # API Keys ရယူခြင်း
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
@@ -63,7 +63,6 @@ def hex_to_ass_color(hex_color: str, opacity: float = 1.0) -> str:
     r = hex_color[0:2]
     g = hex_color[2:4]
     b = hex_color[4:6]
-    # ASS alpha: 00 is opaque, FF is fully transparent
     alpha = int((1.0 - max(0.0, min(1.0, opacity))) * 255)
     alpha_hex = f"{alpha:02X}"
     return f"&H{alpha_hex}{b}{g}{r}"
@@ -115,7 +114,6 @@ async def upload_font(font_file: UploadFile = File(...)):
     with open(font_path, "wb") as f:
         shutil.copyfileobj(font_file.file, f)
     
-    # System font cache တွင် ချက်ချင်း သိစေရန် copy ကူးပြီး fc-cache run ခြင်း
     sys_font_dir = Path("/usr/share/fonts/truetype/custom")
     sys_font_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy(str(font_path), str(sys_font_dir / font_id))
@@ -140,7 +138,6 @@ async def upload_logo(logo_file: UploadFile = File(...)):
 
 def process_pipeline_task(job_id: str, video_path: Path, groq_key: str, gemini_key: str):
     try:
-        # အဆင့် ၁ - အသံဖိုင် ခွဲထုတ်ခြင်း
         update_job(job_id, "Audio Extraction", 15, "ဗီဒီယိုထဲမှ အသံဖိုင် (Audio) ကို ခွဲထုတ်နေပါသည်...")
         audio_path = UPLOAD_DIR / f"{job_id}.mp3"
         cmd_audio = [
@@ -150,7 +147,6 @@ def process_pipeline_task(job_id: str, video_path: Path, groq_key: str, gemini_k
         ]
         subprocess.run(cmd_audio, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
-        # အဆင့် ၂ - Groq API ဖြင့် English STT ထုတ်ခြင်း
         update_job(job_id, "Groq Speech-to-Text", 40, "Groq AI (Whisper) ဖြင့် English စာသားနှင့် အချိန်မှတ်များ ထုတ်ယူနေပါသည်...")
         g_client = Groq(api_key=groq_key)
         with open(audio_path, "rb") as af:
@@ -178,12 +174,10 @@ def process_pipeline_task(job_id: str, video_path: Path, groq_key: str, gemini_k
                     "my": ""
                 })
 
-        # အဆင့် ၃ - Gemini API ဖြင့် မြန်မာဘာသာပြန်ခြင်း
         update_job(job_id, "Gemini Translation", 70, "Gemini AI ဖြင့် English စာသားများကို မြန်မာဘာသာသို့ ပြန်ဆိုနေပါသည်...")
         genai.configure(api_key=gemini_key)
         model = genai.GenerativeModel("gemini-1.5-flash")
 
-        # Batch ခွဲ၍ ပို့ခြင်း
         batch_size = 40
         for i in range(0, len(subtitles), batch_size):
             batch = subtitles[i:i + batch_size]
@@ -208,7 +202,6 @@ def process_pipeline_task(job_id: str, video_path: Path, groq_key: str, gemini_k
             pct = 70 + int(((i + len(batch)) / max(1, len(subtitles))) * 25)
             update_job(job_id, "Gemini Translation", min(95, pct), f"မြန်မာဘာသာပြန်ဆိုနေသည် ({i + len(batch)}/{len(subtitles)})...")
 
-        # ယာယီ အသံဖိုင်ဖျက်ခြင်း
         if audio_path.exists():
             audio_path.unlink()
 
@@ -273,9 +266,9 @@ async def start_process_media(
 
 class RenderRequest(BaseModel):
     video_filename: str
-    aspect_ratio: str  # "9:16", "16:9", "1:1"
+    aspect_ratio: str
     vid_scale: float = 1.0
-    vid_offset_x: float = 0.0  # normalized -1.0 to 1.0
+    vid_offset_x: float = 0.0
     vid_offset_y: float = 0.0
     font_family: str = "Noto Sans Myanmar"
     subtitles: List[Dict[str, Any]]
@@ -292,7 +285,6 @@ def render_video_task(job_id: str, req: RenderRequest):
         if not input_video.exists():
             raise FileNotFoundError("မူရင်း ဗီဒီယိုဖိုင် မရှိတော့ပါ။")
 
-        # ၁။ Aspect Ratio အလိုက် ပုံသေ Resolution သတ်မှတ်ခြင်း
         if req.aspect_ratio == "9:16":
             out_w, out_h = 720, 1280
         elif req.aspect_ratio == "1:1":
@@ -300,7 +292,6 @@ def render_video_task(job_id: str, req: RenderRequest):
         else:
             out_w, out_h = 1280, 720
 
-        # ၂။ ASS Subtitle File တည်ဆောက်ခြင်း (Eng Box, Myanmar Box, Title Text ၃ ခုလုံးအတွက်)
         ass_path = UPLOAD_DIR / f"sub_{job_id}.ass"
         font_name = req.font_family or "Noto Sans Myanmar"
 
@@ -335,14 +326,12 @@ Style: TitleStyle,{font_name},{ti_size},{ti_color},{ti_color},{ti_bg},{ti_bg},-1
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
-        # Coordinates (0.0 to 1.0 percentage from Frontend -> exact ASS pixel coordinates)
         en_x = int(float(en_s.get("x_pct", 0.5)) * out_w)
         en_y = int(float(en_s.get("y_pct", 0.78)) * out_h)
 
         my_x = int(float(my_s.get("x_pct", 0.5)) * out_w)
         my_y = int(float(my_s.get("y_pct", 0.88)) * out_h)
 
-        # Title Text ပါဝင်ပါက ထည့်သွင်းခြင်း
         title_text = (ti_s.get("text") or "").strip()
         if title_text:
             ti_x = int(float(ti_s.get("x_pct", 0.5)) * out_w)
@@ -350,7 +339,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             safe_title = title_text.replace("\n", "\\N")
             ass_content += f"Dialogue: 2,0:00:00.00,9:59:59.00,TitleStyle,,0,0,0,,{{\\pos({ti_x},{ti_y})}}{safe_title}\n"
 
-        # Subtitles တစ်ကြောင်းချင်းစီ ထည့်သွင်းခြင်း
         for sub in req.subtitles:
             st = seconds_to_ass_time(float(sub.get("start", 0)))
             et = seconds_to_ass_time(float(sub.get("end", 0)))
@@ -365,13 +353,11 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         with open(ass_path, "w", encoding="utf-8") as f:
             f.write(ass_content)
 
-        # ၃။ FFmpeg Filter Complex တည်ဆောက်ခြင်း (Zoom, Pan, Canvas Pad, Logo, Subtitles)
         update_job(job_id, "FFmpeg Rendering", 45, "FFmpeg ဖြင့် ဗီဒီယိုထဲသို့ စာတန်းထိုး၊ Logo နှင့် ဒီဇိုင်းများ မြှုပ်နှံနေပါသည်...")
 
         scale_factor = max(0.2, min(4.0, float(req.vid_scale)))
         scaled_w = int(out_w * scale_factor)
         scaled_h = int(out_h * scale_factor)
-        # Even numbers for ffmpeg
         scaled_w += scaled_w % 2
         scaled_h += scaled_h % 2
 
@@ -381,7 +367,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         output_filename = f"final_{job_id}.mp4"
         output_path = OUTPUT_DIR / output_filename
 
-        # Base canvas + video zoom/position filter
         ass_escaped = str(ass_path).replace("\\", "/").replace(":", "\\:")
         fonts_dir_escaped = str(FONTS_DIR).replace("\\", "/").replace(":", "\\:")
 
@@ -394,7 +379,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         inputs = ["-i", str(input_video)]
         last_node = "[canvas]"
 
-        # Logo ပါဝင်ပါက Overlay ထပ်တင်ခြင်း
         if req.logo_config and req.logo_config.get("logo_id"):
             logo_file = UPLOAD_DIR / req.logo_config["logo_id"]
             if logo_file.exists():
@@ -405,7 +389,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 vf_chain += f";[1:v]scale={logo_w}:-1[logo];{last_node}[logo]overlay={logo_x}:{logo_y}[with_logo]"
                 last_node = "[with_logo]"
 
-        # ASS Subtitle Burn-in
         vf_chain += f";{last_node}ass='{ass_escaped}':fontsdir='{fonts_dir_escaped}'[outv]"
 
         cmd_render = [
