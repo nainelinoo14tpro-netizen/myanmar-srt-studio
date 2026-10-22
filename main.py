@@ -2,13 +2,12 @@ import os
 import json
 import uuid
 import shutil
-import asyncio
 import subprocess
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 
 from fastapi import FastAPI, UploadFile, File, Form, BackgroundTasks, HTTPException
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
@@ -20,7 +19,6 @@ import google.generativeai as genai
 
 app = FastAPI(title="Myanmar SRT Studio")
 
-# Folders ပြင်ဆင်ခြင်း
 BASE_DIR = Path(__file__).resolve().parent
 UPLOAD_DIR = BASE_DIR / "uploads"
 OUTPUT_DIR = BASE_DIR / "outputs"
@@ -36,10 +34,8 @@ app.mount("/fonts", StaticFiles(directory=str(FONTS_DIR)), name="fonts")
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
-# Real-time Job Status သိမ်းဆည်းရန်
 JOBS: Dict[str, Dict[str, Any]] = {}
 
-# API Keys ရယူခြင်း
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
@@ -56,7 +52,6 @@ def update_job(job_id: str, step: str, progress: int, message: str, status: str 
 
 
 def hex_to_ass_color(hex_color: str, opacity: float = 1.0) -> str:
-    """HTML Hex (#RRGGBB) နှင့် Opacity ကို ASS Subtitle Color (&HAABBGGRR) သို့ ပြောင်းခြင်း"""
     hex_color = hex_color.lstrip("#")
     if len(hex_color) != 6:
         hex_color = "FFFFFF"
@@ -69,7 +64,6 @@ def hex_to_ass_color(hex_color: str, opacity: float = 1.0) -> str:
 
 
 def seconds_to_ass_time(seconds: float) -> str:
-    """စက္ကန့်ကို ASS format (H:MM:SS.cc) သို့ ပြောင်းခြင်း"""
     hrs = int(seconds // 3600)
     mins = int((seconds % 3600) // 60)
     secs = int(seconds % 60)
@@ -80,7 +74,6 @@ def seconds_to_ass_time(seconds: float) -> str:
 
 
 def get_font_family_name(font_path: Path) -> str:
-    """fc-scan သုံးပြီး .ttf ဖိုင်ထဲမှ အစစ်အမှန် Font Family Name ကို ရှာဖွေခြင်း"""
     try:
         res = subprocess.run(
             ["fc-scan", "--format", "%{family}", str(font_path)],
@@ -162,9 +155,9 @@ def process_pipeline_task(job_id: str, video_path: Path, groq_key: str, gemini_k
 
         subtitles = []
         for idx, seg in enumerate(segments):
-            s_start = seg.get("start", 0.0) if isinstance(seg, dict) else seg.start
-            s_end = seg.get("end", 0.0) if isinstance(seg, dict) else seg.end
-            s_text = (seg.get("text", "") if isinstance(seg, dict) else seg.text).strip()
+            s_start = seg.get("start", 0.0) if isinstance(seg, dict) else getattr(seg, "start", 0.0)
+            s_end = seg.get("end", 0.0) if isinstance(seg, dict) else getattr(seg, "end", 0.0)
+            s_text = (seg.get("text", "") if isinstance(seg, dict) else getattr(seg, "text", "")).strip()
             if s_text:
                 subtitles.append({
                     "id": idx + 1,
@@ -246,16 +239,26 @@ async def start_process_media(
         def dl_and_process():
             try:
                 ydl_opts = {
-                    "format": "bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best",
+                    "format": "best[ext=mp4][height<=720]/bestvideo[height<=720]+bestaudio/best",
                     "outtmpl": str(video_path),
                     "merge_output_format": "mp4",
+                    "noplaylist": True,
                     "quiet": True,
+                    "extractor_args": {
+                        "youtube": {
+                            "player_client": ["android", "ios", "web"]
+                        }
+                    }
                 }
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download([youtube_url])
                 process_pipeline_task(job_id, video_path, groq_key, gemini_key)
             except Exception as e:
-                update_job(job_id, "Error", 0, f"YouTube Download Error: {str(e)}", status="error")
+                update_job(
+                    job_id, "Error", 0,
+                    f"YouTube Server Block ဖြစ်နေပါသည် (ဖုန်းထဲမှ Video File တိုက်ရိုက်ရွေးတင်ပေးပါ): {str(e)}",
+                    status="error"
+                )
 
         background_tasks.add_task(dl_and_process)
     else:
