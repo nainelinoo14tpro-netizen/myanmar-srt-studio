@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Myanmar SRT & Video Studio</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
   <style id="dynamic-font-style"></style>
   <style>
     body {
@@ -13,12 +13,10 @@
       font-family: system-ui, -apple-system, sans-serif;
       overscroll-behavior-y: contain;
     }
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: #1e293b; }
     ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
 
-    /* Draggable Overlay Items */
     .draggable-item {
       position: absolute;
       transform: translate(-50%, -50%);
@@ -42,10 +40,11 @@
     #canvas-viewport {
       position: relative;
       overflow: hidden;
-      background: #000;
+      background: #020617;
       margin: 0 auto;
       box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-      border: 1px solid #334155;
+      border: 1.5px solid #334155;
+      border-radius: 10px;
       touch-action: none;
     }
     #main-video {
@@ -76,17 +75,40 @@
         <button onclick="setAspectRatio('1:1')" id="btn-1-1" class="px-2.5 py-1 rounded text-slate-300 hover:bg-slate-800">1:1</button>
       </div>
 
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center space-x-1.5">
         <span class="text-slate-400 text-[11px]">Zoom: <b id="zoom-val">1.0x</b></span>
         <input type="range" id="vid-zoom-slider" min="0.3" max="3.0" step="0.05" value="1.0" 
-          class="w-20 accent-sky-500" oninput="onSliderZoom(this.value)" />
+          class="w-16 accent-sky-500" oninput="onSliderZoom(this.value)" />
         <button onclick="resetVideoTransform()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-[11px] text-slate-300">Reset</button>
       </div>
     </div>
 
     <!-- Interactive Video Viewport -->
-    <div id="canvas-viewport" style="width: 210px; height: 373px;">
+    <div id="canvas-viewport" style="width: 210px; height: 340px;">
       <video id="main-video" playsinline webkit-playsinline></video>
+
+      <!-- Change Video Mini Button (top-right inside video box when video/url is loaded) -->
+      <button id="btn-change-source" onclick="showSourceOverlay()" 
+        class="hidden absolute top-2 right-2 z-30 bg-slate-900/85 hover:bg-slate-800 text-sky-400 border border-slate-700 px-2 py-1 rounded-md text-[10px] font-bold shadow">
+        🔄 ဗီဒီယိုလဲမည်
+      </button>
+
+      <!-- UPLOAD VIDEO & YOUTUBE URL OVERLAY INSIDE VIDEO BOX -->
+      <div id="source-picker-overlay" class="absolute inset-0 z-30 bg-slate-950/90 backdrop-blur-sm flex flex-col items-center justify-center p-3 text-center space-y-2.5">
+        <label class="cursor-pointer w-full bg-slate-900 hover:bg-slate-800 border border-dashed border-sky-500/60 rounded-xl p-2.5 flex flex-col items-center justify-center transition">
+          <span class="text-xl mb-0.5">📁</span>
+          <span class="text-[11px] font-bold text-sky-400">ဖုန်းထဲမှ Video ရွေးရန်</span>
+          <span id="selected-file-label" class="text-[10px] text-slate-400 truncate max-w-full mt-0.5">.mp4, .mov နှိပ်၍ရွေးပါ</span>
+          <input type="file" id="input-video-file" accept="video/*" class="hidden" onchange="onSourceInputChanged('file')" />
+        </label>
+
+        <div class="text-[10px] text-slate-500 font-bold">— သို့မဟုတ် —</div>
+
+        <div class="w-full space-y-1">
+          <input type="url" id="input-yt-url" placeholder="🔗 YouTube URL ထည့်ရန်..." oninput="onSourceInputChanged('url')"
+            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-[11px] text-white placeholder-slate-400 focus:outline-none focus:border-sky-500" />
+        </div>
+      </div>
 
       <!-- Draggable Logo -->
       <div id="overlay-logo" class="draggable-item hidden" style="left: 85%; top: 12%; padding: 0; border: none;">
@@ -97,15 +119,23 @@
       <div id="overlay-title" class="draggable-item hidden" style="left: 50%; top: 10%; font-weight: bold;"></div>
 
       <!-- Draggable English Subtitle Box -->
-      <div id="overlay-en" class="draggable-item" style="left: 50%; top: 76%;">English Subtitle</div>
+      <div id="overlay-en" class="draggable-item" style="left: 50%; top: 74%;">English Subtitle</div>
 
       <!-- Draggable Myanmar Subtitle Box -->
-      <div id="overlay-my" class="draggable-item" style="left: 50%; top: 88%;">မြန်မာစာတန်းထိုး</div>
+      <div id="overlay-my" class="draggable-item" style="left: 50%; top: 87%;">မြန်မာစာတန်းထိုး</div>
     </div>
 
-    <!-- Video Playback Controls & Live Dual Display Bar -->
-    <div class="w-full max-w-md mt-2 flex items-center space-x-2 px-1">
-      <button id="play-btn" onclick="togglePlay()" class="px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-bold shrink-0">
+    <!-- GENERATE SUBTITLES BUTTON DIRECTLY BELOW VIDEO BOX (Disabled until video/URL added) -->
+    <div class="w-full max-w-md mt-2 px-1">
+      <button onclick="startProcessMedia()" id="btn-start-process" disabled
+        class="w-full py-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold rounded-xl text-xs shadow-lg transition disabled:opacity-40 disabled:cursor-not-allowed">
+        🚀 AI ဖြင့် English + မြန်မာ စာတန်းထိုး စတင်ထုတ်ယူမည်
+      </button>
+    </div>
+
+    <!-- Video Playback Controls -->
+    <div class="w-full max-w-md mt-1.5 flex items-center space-x-2 px-1">
+      <button id="play-btn" onclick="togglePlay()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-bold shrink-0">
         ▶ Play
       </button>
       <input type="range" id="seek-bar" value="0" min="0" max="100" step="0.1" 
@@ -113,14 +143,8 @@
       <span id="time-display" class="text-[11px] text-slate-400 font-mono shrink-0">00:00</span>
     </div>
 
-    <!-- Live Fixed Dual Language Monitor Below Video -->
-    <div class="w-full max-w-md mt-1.5 bg-slate-900/90 border border-slate-800 rounded-lg px-2.5 py-1.5 text-center">
-      <div id="live-bar-en" class="text-xs text-slate-200 truncate">English live caption...</div>
-      <div id="live-bar-my" class="text-sm text-amber-300 font-medium truncate mt-0.5">မြန်မာစာတန်းထိုး အချိန်နှင့်တပြေးညီ...</div>
-    </div>
-
     <!-- Real-time Progress Bar (Hidden when idle) -->
-    <div id="progress-container" class="w-full max-w-md mt-2 hidden bg-slate-900 border border-sky-500/40 rounded-lg p-2">
+    <div id="progress-container" class="w-full max-w-md mt-1.5 hidden bg-slate-900 border border-sky-500/40 rounded-lg p-2">
       <div class="flex justify-between text-xs mb-1">
         <span id="progress-step" class="font-bold text-sky-400">Processing...</span>
         <span id="progress-pct" class="font-mono text-slate-300">0%</span>
@@ -133,61 +157,34 @@
   </div>
 
   <!-- ================= BOTTOM SCROLLABLE CONTROLS AREA ================= -->
-  <div class="flex-1 overflow-y-auto px-3 py-3 space-y-3 max-w-md mx-auto w-full">
+  <div class="flex-1 overflow-y-auto px-3 py-2.5 space-y-3 max-w-md mx-auto w-full">
 
     <!-- Navigation Tabs -->
-    <div class="grid grid-cols-4 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
-      <button onclick="switchTab('tab-source')" id="tabbtn-source" class="py-2 rounded-lg bg-sky-600 text-white">၁။ ဗီဒီယိုတင်ရန်</button>
-      <button onclick="switchTab('tab-subs')" id="tabbtn-subs" class="py-2 rounded-lg text-slate-400">၂။ စာတန်းထိုးပြင်</button>
-      <button onclick="switchTab('tab-style')" id="tabbtn-style" class="py-2 rounded-lg text-slate-400">၃။ ဒီဇိုင်း/Font</button>
-      <button onclick="switchTab('tab-export')" id="tabbtn-export" class="py-2 rounded-lg text-slate-400">၄။ ဒေါင်းလုဒ်</button>
+    <div class="grid grid-cols-3 gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-semibold">
+      <button onclick="switchTab('tab-subs')" id="tabbtn-subs" class="py-2 rounded-lg bg-sky-600 text-white">၁။ စာတန်းထိုးပြင်</button>
+      <button onclick="switchTab('tab-style')" id="tabbtn-style" class="py-2 rounded-lg text-slate-400">၂။ ဒီဇိုင်း/Font</button>
+      <button onclick="switchTab('tab-export')" id="tabbtn-export" class="py-2 rounded-lg text-slate-400">၃။ ဒေါင်းလုဒ်</button>
     </div>
 
-    <!-- TAB 1: SOURCE UPLOAD & YOUTUBE URL -->
-    <div id="tab-source" class="space-y-3">
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
-        <h3 class="text-sm font-bold text-sky-400">ဖုန်းထဲမှ ဗီဒီယို သို့မဟုတ် YouTube URL ထည့်ပါ</h3>
-
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">ဖုန်းထဲမှ Video File ရွေးရန် (.mp4, .mov)</label>
-          <input type="file" id="input-video-file" accept="video/*" 
-            class="w-full text-xs text-slate-300 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-slate-800 file:text-sky-400 hover:file:bg-slate-700" />
-        </div>
-
-        <div class="text-center text-xs text-slate-500 font-bold">— သို့မဟုတ် —</div>
-
-        <div>
-          <label class="block text-xs text-slate-400 mb-1">YouTube Video / Shorts URL</label>
-          <input type="url" id="input-yt-url" placeholder="https://www.youtube.com/watch?v=..." 
-            class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500" />
-        </div>
-
-        <!-- Optional API Keys Override -->
-        <details class="text-xs text-slate-400 bg-slate-950/60 p-2 rounded-lg border border-slate-800/80">
-          <summary class="cursor-pointer font-medium text-slate-300">API Keys ထည့်ရန် (Server တွင် မထည့်ထားပါက)</summary>
-          <div class="mt-2 space-y-2">
-            <input type="password" id="custom-groq-key" placeholder="Groq API Key (gsk_...)" 
-              class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
-            <input type="password" id="custom-gemini-key" placeholder="Gemini API Key (AIza...)" 
-              class="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
-          </div>
-        </details>
-
-        <button onclick="startProcessMedia()" id="btn-start-process"
-          class="w-full py-2.5 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold rounded-xl text-xs shadow-lg">
-          🚀 AI ဖြင့် English + မြန်မာ စာတန်းထိုး စတင်ထုတ်ယူမည်
-        </button>
+    <!-- TAB 1: SUBTITLES LIVE EDITOR -->
+    <div id="tab-subs" class="space-y-2.5">
+      <!-- Live Fixed Dual Language Monitor -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-3 py-2 text-center">
+        <div id="live-bar-en" class="text-xs text-slate-200 truncate">English live caption...</div>
+        <div id="live-bar-my" class="text-sm text-amber-300 font-medium truncate mt-0.5">မြန်မာစာတန်းထိုး အချိန်နှင့်တပြေးညီ...</div>
       </div>
 
-      <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3 text-xs text-slate-400 space-y-1">
-        <p class="font-semibold text-slate-300">💡 အသုံးပြုပုံ လမ်းညွှန် -</p>
-        <p>• အပေါ်ဘက်ရှိ ဗီဒီယိုဘောင်ထဲတွင် စာတန်းထိုး Box များ၊ Title နှင့် Logo တို့ကို လက်ဖြင့် တိုက်ရိုက် ဖိဆွဲ၍ စိတ်ကြိုက်နေရာ ရွှေ့နိုင်ပါသည်။</p>
-        <p>• ဗီဒီယိုနောက်ခံကို လက်ဖြင့် ဖိဆွဲပြီး ဘယ်/ညာ/အပေါ်/အောက် ရွှေ့နိုင်သလို Zoom ဆွဲချုံ့/ချဲ့ နိုင်ပါသည်။</p>
-      </div>
-    </div>
+      <!-- Optional API Keys Override -->
+      <details class="text-xs text-slate-400 bg-slate-900 p-2.5 rounded-xl border border-slate-800">
+        <summary class="cursor-pointer font-medium text-slate-300">🔑 API Keys ပြင်ဆင်ရန် (Server တွင် မထည့်ထားပါက)</summary>
+        <div class="mt-2 space-y-2">
+          <input type="password" id="custom-groq-key" placeholder="Groq API Key (gsk_...)" 
+            class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
+          <input type="password" id="custom-gemini-key" placeholder="Gemini API Key (AIza...)" 
+            class="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white" />
+        </div>
+      </details>
 
-    <!-- TAB 2: SUBTITLES LIVE EDITOR -->
-    <div id="tab-subs" class="space-y-2 hidden">
       <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800">
         <span class="text-xs font-bold text-sky-400">စာတန်းထိုးများ ပြင်ဆင်ရန် (<span id="sub-count">0</span> ကြောင်း)</span>
         <button onclick="addNewSubtitleRow()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-semibold">
@@ -196,11 +193,11 @@
       </div>
 
       <div id="subtitles-list" class="space-y-2 pb-8">
-        <p class="text-xs text-slate-500 text-center py-8">ဗီဒီယိုတင်ပြီး စာတန်းထိုးထုတ်ယူပြီးပါက ဤနေရာတွင် ပေါ်လာပါမည်။</p>
+        <p class="text-xs text-slate-500 text-center py-6">အပေါ်ရှိ Video Box ထဲတွင် ဗီဒီယို သို့မဟုတ် YouTube Link ထည့်ပြီး စာတန်းထိုးထုတ်ယူပါ။</p>
       </div>
     </div>
 
-    <!-- TAB 3: STYLING, CUSTOM FONT, LOGO & TITLE -->
+    <!-- TAB 2: STYLING, CUSTOM FONT, LOGO & TITLE -->
     <div id="tab-style" class="space-y-3 hidden pb-8">
       
       <!-- Custom Font (.ttf) Upload -->
@@ -306,7 +303,7 @@
       </div>
     </div>
 
-    <!-- TAB 4: EXPORT SRT & RENDER FINAL VIDEO -->
+    <!-- TAB 3: EXPORT SRT & RENDER FINAL VIDEO -->
     <div id="tab-export" class="space-y-3 hidden pb-8">
       <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-3">
         <h3 class="text-sm font-bold text-sky-400">SRT ဖိုင် နှင့် ဗီဒီယို ဒေါင်းလုဒ်ဆွဲရန်</h3>
@@ -349,21 +346,20 @@
 
   <!-- ================= JAVASCRIPT LOGIC ================= -->
   <script>
-    // Global State
     let state = {
       videoFilename: "",
       aspectRatio: "9:16",
       outWidth: 720,
       outHeight: 1280,
       vidScale: 1.0,
-      vidOffsetX: 0.0, // normalized (-1 to 1)
+      vidOffsetX: 0.0,
       vidOffsetY: 0.0,
       fontFamily: "Noto Sans Myanmar",
       logoId: null,
       subtitles: [],
       positions: {
-        en: { x_pct: 0.5, y_pct: 0.76 },
-        my: { x_pct: 0.5, y_pct: 0.88 },
+        en: { x_pct: 0.5, y_pct: 0.74 },
+        my: { x_pct: 0.5, y_pct: 0.87 },
         title: { x_pct: 0.5, y_pct: 0.10 },
         logo: { x_pct: 0.85, y_pct: 0.12 }
       }
@@ -375,13 +371,46 @@
     const overlayMy = document.getElementById("overlay-my");
     const overlayTitle = document.getElementById("overlay-title");
     const overlayLogo = document.getElementById("overlay-logo");
+    const sourceOverlay = document.getElementById("source-picker-overlay");
+    const btnChangeSource = document.getElementById("btn-change-source");
+    const btnStartProcess = document.getElementById("btn-start-process");
+
+    // Source Input Validation Inside Video Box
+    function onSourceInputChanged(type) {
+      const fileInput = document.getElementById("input-video-file");
+      const ytUrlInput = document.getElementById("input-yt-url");
+      const hasFile = fileInput.files && fileInput.files.length > 0;
+      const hasUrl = ytUrlInput.value.trim().length > 0;
+
+      if (type === "file" && hasFile) {
+        const file = fileInput.files[0];
+        document.getElementById("selected-file-label").innerText = file.name;
+        ytUrlInput.value = "";
+        // Local preview right away inside video box
+        video.src = URL.createObjectURL(file);
+        video.load();
+        sourceOverlay.classList.add("hidden");
+        btnChangeSource.classList.remove("hidden");
+      } else if (type === "url" && hasUrl) {
+        fileInput.value = "";
+        document.getElementById("selected-file-label").innerText = ".mp4, .mov နှိပ်၍ရွေးပါ";
+      }
+
+      // Enable or disable Generate button
+      btnStartProcess.disabled = !(hasFile || hasUrl);
+    }
+
+    function showSourceOverlay() {
+      video.pause();
+      sourceOverlay.classList.remove("hidden");
+    }
 
     // 1. Tab Navigation
     function switchTab(tabId) {
-      ["tab-source", "tab-subs", "tab-style", "tab-export"].forEach(id => {
+      ["tab-subs", "tab-style", "tab-export"].forEach(id => {
         document.getElementById(id).classList.add("hidden");
       });
-      ["tabbtn-source", "tabbtn-subs", "tabbtn-style", "tabbtn-export"].forEach(id => {
+      ["tabbtn-subs", "tabbtn-style", "tabbtn-export"].forEach(id => {
         const btn = document.getElementById(id);
         btn.classList.remove("bg-sky-600", "text-white");
         btn.classList.add("text-slate-400");
@@ -417,7 +446,7 @@
       updateOverlayStyles();
     }
 
-    // 3. Video Zoom & Pan (Touch + Pinch Zoom on Canvas Background)
+    // 3. Video Zoom & Pan
     function onSliderZoom(val) {
       state.vidScale = parseFloat(val);
       document.getElementById("zoom-val").innerText = state.vidScale.toFixed(2) + "x";
@@ -461,7 +490,6 @@
       document.getElementById("seek-bar").max = video.duration || 100;
     });
 
-    // Pinch Zoom & Pan on Viewport Background
     let isPanningVideo = false;
     let panStartX = 0, panStartY = 0;
     let initialPinchDist = null;
@@ -510,7 +538,7 @@
 
     viewport.addEventListener("touchend", () => { initialPinchDist = null; });
 
-    // 4. Touch Drag & Drop for Overlays (English, Myanmar, Title, Logo)
+    // 4. Touch Drag & Drop for Overlays
     function makeDraggable(el, key) {
       let dragging = false;
       el.addEventListener("pointerdown", (e) => {
@@ -554,7 +582,6 @@
     function updateOverlayStyles() {
       const scaleRatio = viewport.clientHeight / state.outHeight;
 
-      // Myanmar Style
       const myShow = document.getElementById("my-show").checked;
       const mySize = parseInt(document.getElementById("my-size").value);
       const myColor = document.getElementById("my-color").value;
@@ -569,7 +596,6 @@
       overlayMy.style.backgroundColor = hexToRgba(myBg, myOp);
       overlayMy.style.fontFamily = `'${state.fontFamily}', sans-serif`;
 
-      // English Style
       const enShow = document.getElementById("en-show").checked;
       const enSize = parseInt(document.getElementById("en-size").value);
       const enColor = document.getElementById("en-color").value;
@@ -584,7 +610,6 @@
       overlayEn.style.backgroundColor = hexToRgba(enBg, enOp);
       overlayEn.style.fontFamily = `'${state.fontFamily}', sans-serif`;
 
-      // Title Style
       const tiText = document.getElementById("title-text").value.trim();
       const tiSize = parseInt(document.getElementById("ti-size").value);
       const tiColor = document.getElementById("ti-color").value;
@@ -604,7 +629,6 @@
         overlayTitle.classList.add("hidden");
       }
 
-      // Logo Style
       const logoSizePct = parseInt(document.getElementById("logo-size").value);
       document.getElementById("logo-size-val").innerText = logoSizePct;
       overlayLogo.style.width = logoSizePct + "%";
@@ -705,7 +729,7 @@
       const geminiKey = document.getElementById("custom-gemini-key").value.trim();
 
       if ((!fileInput.files || !fileInput.files[0]) && !ytUrl) {
-        alert("ဖုန်းထဲမှ ဗီဒီယိုဖိုင် ရွေးပါ သို့မဟုတ် YouTube URL ထည့်ပေးပါ။");
+        alert("ဗီဒီယိုဖိုင် သို့မဟုတ် YouTube URL ထည့်ပေးပါ။");
         return;
       }
 
@@ -717,7 +741,7 @@
       if (groqKey) fd.append("custom_groq_key", groqKey);
       if (geminiKey) fd.append("custom_gemini_key", geminiKey);
 
-      document.getElementById("btn-start-process").disabled = true;
+      btnStartProcess.disabled = true;
       showProgress("Starting...", 5, "လုပ်ငန်းစဉ် စတင်နေပါသည်...");
 
       try {
@@ -728,7 +752,7 @@
       } catch (err) {
         alert(err.message);
         hideProgress();
-        document.getElementById("btn-start-process").disabled = false;
+        btnStartProcess.disabled = false;
       }
     }
 
@@ -760,7 +784,7 @@
             clearInterval(timer);
             alert(job.message);
             hideProgress();
-            document.getElementById("btn-start-process").disabled = false;
+            btnStartProcess.disabled = false;
             document.getElementById("btn-render-video").disabled = false;
           }
         } catch (e) {
@@ -770,11 +794,13 @@
     }
 
     function onMediaProcessed(data) {
-      document.getElementById("btn-start-process").disabled = false;
+      btnStartProcess.disabled = false;
       state.videoFilename = data.video_filename;
       state.subtitles = data.subtitles || [];
       video.src = data.video_url;
       video.load();
+      sourceOverlay.classList.add("hidden");
+      btnChangeSource.classList.remove("hidden");
       renderSubtitlesEditor();
       updateOverlayStyles();
       switchTab("tab-subs");
@@ -958,7 +984,6 @@
       }
     }
 
-    // Initialize Default Styles
     updateOverlayStyles();
   </script>
 </body>
