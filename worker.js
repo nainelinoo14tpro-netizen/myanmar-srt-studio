@@ -43,7 +43,7 @@ export default {
         });
       }
 
-      // 2. Gemini Translation Engine (Original Spoken Language -> English & Myanmar)
+      // 2. Gemini 3.8 Flash Translation Engine (Original -> English & Myanmar)
       if (url.pathname === "/api/translate" && request.method === "POST") {
         const { segments, category, lineCount } = await request.json();
 
@@ -62,26 +62,25 @@ export default {
           ? "မြန်မာစာတန်းထိုးကို ၁ ကြောင်းတည်း အတိုချုပ် အဓိပ္ပာယ်ပြည့်အောင် ရေးပါ။" 
           : "မြန်မာစာတန်းထိုးကို အများဆုံး ၂ ကြောင်းခွဲ၍ ဖတ်ရလွယ်အောင် ရေးပါ။";
 
-        const systemPrompt = `You are an expert subtitle localization specialist.
-Translate the following transcribed segments into English and Myanmar (Burmese).
-Instructions:
+        const systemPrompt = `You are a professional subtitle localization translator.
+Translate the input segments array into a 3-language localized JSON format.
+Rules:
 1. "original": Keep the spoken transcription exactly as provided.
-2. "english": Translate the spoken text into fluent, natural English.
-3. "myanmar": Translate into high-quality Burmese language matching tone: "${chosenTone}" and constraint: "${linesInstruction}".
+2. "english": Provide natural, fluent English translation (if already English, keep it clean).
+3. "myanmar": Provide natural Burmese (Myanmar) translation matching tone "${chosenTone}" and constraint "${linesInstruction}".
 
 Input segments:
 ${JSON.stringify(segments)}
 
-Output format:
 Return ONLY a valid JSON array of objects with keys: "id", "start", "end", "original", "english", "myanmar".
-Do NOT output markdown code fences. Output raw JSON only.`;
+Do NOT output markdown fences. Return pure JSON.`;
 
-        // Try gemini-2.5-flash first, then gemini-3.8-flash as fallback
-        const models = ["gemini-2.5-flash", "gemini-3.8-flash"];
+        // Gemini 3.8 Flash ကို အဓိကထား၍ ခေါ်ယူခြင်း
+        const targetModels = ["gemini-3.8-flash", "gemini-flash-latest"];
         let rawResponseText = null;
         let lastError = null;
 
-        for (const model of models) {
+        for (const model of targetModels) {
           try {
             const geminiRes = await fetch(
               `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`,
@@ -90,7 +89,9 @@ Do NOT output markdown code fences. Output raw JSON only.`;
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-                  generationConfig: { responseMimeType: "application/json" }
+                  generationConfig: {
+                    responseMimeType: "application/json"
+                  }
                 })
               }
             );
@@ -108,7 +109,7 @@ Do NOT output markdown code fences. Output raw JSON only.`;
         }
 
         if (!rawResponseText) {
-          throw new Error("Gemini Translation Error: " + (lastError || "Could not generate translation"));
+          throw new Error("Gemini Translation Error: " + (lastError || "Failed to generate translation"));
         }
 
         rawResponseText = rawResponseText.replace(/```json/gi, '').replace(/```/g, '').trim();
@@ -119,7 +120,7 @@ Do NOT output markdown code fences. Output raw JSON only.`;
         });
       }
 
-      return new Response(JSON.stringify({ status: "Silver Studio Worker v4 Ready" }), {
+      return new Response(JSON.stringify({ status: "Silver Studio Worker Active" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
 
