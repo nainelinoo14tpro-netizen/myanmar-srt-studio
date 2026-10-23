@@ -43,7 +43,7 @@ export default {
         });
       }
 
-      // 2. Gemini Translation (Original -> English + Burmese 3-Way Translation)
+      // 2. Gemini Translation Engine (Original Spoken Language -> English & Myanmar)
       if (url.pathname === "/api/translate" && request.method === "POST") {
         const { segments, category, lineCount } = await request.json();
 
@@ -62,66 +62,64 @@ export default {
           ? "မြန်မာစာတန်းထိုးကို ၁ ကြောင်းတည်း အတိုချုပ် အဓိပ္ပာယ်ပြည့်အောင် ရေးပါ။" 
           : "မြန်မာစာတန်းထိုးကို အများဆုံး ၂ ကြောင်းခွဲ၍ ဖတ်ရလွယ်အောင် ရေးပါ။";
 
-        const systemPrompt = `You are a professional subtitle translator.
-Translate the input segments array into a localized 3-language JSON format.
-For each segment:
-1. "original": Keep the original spoken text exactly as transcribed.
-2. "english": Provide high-quality, natural English translation (if already English, keep it clean).
-3. "myanmar": Provide natural Burmese (Myanmar) translation matching tone "${chosenTone}" and constraint "${linesInstruction}".
+        const systemPrompt = `You are an expert subtitle localization specialist.
+Translate the following transcribed segments into English and Myanmar (Burmese).
+Instructions:
+1. "original": Keep the spoken transcription exactly as provided.
+2. "english": Translate the spoken text into fluent, natural English.
+3. "myanmar": Translate into high-quality Burmese language matching tone: "${chosenTone}" and constraint: "${linesInstruction}".
 
 Input segments:
 ${JSON.stringify(segments)}
 
-Return ONLY a valid JSON array matching this format:
-[
-  {
-    "id": 1,
-    "start": 0.5,
-    "end": 3.2,
-    "original": "Spoken text",
-    "english": "English text",
-    "myanmar": "မြန်မာပြန်စာသား"
-  }
-]`;
+Output format:
+Return ONLY a valid JSON array of objects with keys: "id", "start", "end", "original", "english", "myanmar".
+Do NOT output markdown code fences. Output raw JSON only.`;
 
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_API_KEY}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-              generationConfig: {
-                responseMimeType: "application/json"
+        // Try gemini-2.0-flash first, then gemini-1.5-flash as fallback
+        const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+        let rawResponseText = null;
+        let lastError = null;
+
+        for (const model of models) {
+          try {
+            const geminiRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
+                  generationConfig: { responseMimeType: "application/json" }
+                })
               }
-            })
-          }
-        );
+            );
 
-        const geminiData = await geminiRes.json();
-        const rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "[]";
-        
-        let parsedResult = [];
-        try {
-          parsedResult = JSON.parse(rawText);
-        } catch (e) {
-          // Fallback if parsing issues occur
-          parsedResult = segments.map((s, idx) => ({
-            id: idx + 1,
-            start: s.start,
-            end: s.end,
-            original: s.text,
-            english: s.text,
-            myanmar: s.text
-          }));
+            const geminiData = await geminiRes.json();
+            if (geminiData.candidates?.[0]?.content?.parts?.[0]?.text) {
+              rawResponseText = geminiData.candidates[0].content.parts[0].text;
+              break;
+            } else if (geminiData.error) {
+              lastError = geminiData.error.message;
+            }
+          } catch (err) {
+            lastError = err.message;
+          }
         }
+
+        if (!rawResponseText) {
+          throw new Error("Gemini Translation Error: " + (lastError || "Could not generate translation"));
+        }
+
+        rawResponseText = rawResponseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+        const parsedResult = JSON.parse(rawResponseText);
 
         return new Response(JSON.stringify({ result: parsedResult }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       }
 
-      return new Response(JSON.stringify({ status: "Silver Studio Worker v3 Active" }), {
+      return new Response(JSON.stringify({ status: "Silver Studio Worker v4 Ready" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
 
