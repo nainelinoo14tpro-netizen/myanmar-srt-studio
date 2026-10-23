@@ -13,12 +13,9 @@
       --bg-dark: #090d14;
       --bg-surface: #101622;
       --bg-card: #161e2e;
-      --silver-glow: rgba(226, 232, 240, 0.15);
       --silver-main: #e2e8f0;
-      --silver-muted: #94a3b8;
       --silver-border: #2d3748;
       --accent-cyan: #38bdf8;
-      --accent-emerald: #34d399;
       --karaoke-base: #94a3b8;
       --karaoke-active: #fbbf24;
       --mm-sub-color: #ffffff;
@@ -44,7 +41,7 @@
       padding-bottom: 90px;
     }
 
-    /* Top App Header */
+    /* Top App Header (Worker ခလုတ် ဖယ်ရှားထားပြီး ဖြစ်သည်) */
     .top-header {
       background: linear-gradient(180deg, #161e2e 0%, #0d121c 100%);
       border-bottom: 1px solid var(--silver-border);
@@ -76,26 +73,21 @@
       font-weight: 700;
     }
 
-    .header-btns {
-      display: flex;
-      gap: 6px;
-    }
-
     .btn-header {
       background: #1e293b;
       border: 1px solid #334155;
       color: #f1f5f9;
-      padding: 6px 10px;
+      padding: 6px 12px;
       border-radius: 8px;
       font-size: 11px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       cursor: pointer;
     }
 
-    /* Fixed Video Viewport Area */
+    /* Video Viewport Stage */
     .video-viewport-area {
       position: relative;
       background: #020617;
@@ -117,16 +109,16 @@
       pointer-events: none;
     }
 
-    /* Aspect Framing Stage */
     .crop-stage {
       position: relative;
       height: 330px;
-      width: 185px; /* Default 9:16 */
+      width: 330px; /* Default adjust on video load */
       background: #000;
       overflow: hidden;
       border-radius: 10px;
       box-shadow: 0 0 0 1px #475569, 0 10px 25px rgba(0,0,0,0.8);
       touch-action: none;
+      transition: width 0.25s ease, height 0.25s ease;
     }
 
     .media-canvas {
@@ -146,7 +138,6 @@
 
     .media-canvas video {
       display: block;
-      max-width: none;
       pointer-events: none;
       object-fit: contain;
     }
@@ -161,11 +152,7 @@
       display: none;
     }
 
-    #logoOverlay {
-      top: 10px;
-      left: 10px;
-    }
-
+    #logoOverlay { top: 10px; left: 10px; }
     #titleOverlay {
       top: 10px;
       right: 10px;
@@ -177,7 +164,6 @@
       background: rgba(15, 23, 42, 0.7);
       border: 1px dashed rgba(255, 255, 255, 0.3);
     }
-
     #blurOverlay {
       top: 40%;
       left: 20%;
@@ -189,7 +175,7 @@
       border-radius: 6px;
     }
 
-    /* Live Subtitle Container at bottom */
+    /* Live Subtitles */
     .live-sub-container {
       position: absolute;
       bottom: 12px;
@@ -220,13 +206,12 @@
       line-height: 1.2;
       display: inline-block;
       text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-      /* Karaoke Fill Effect */
       background: linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) 0%, var(--karaoke-base) 0%, var(--karaoke-base) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    /* Timeline Scrubber & Quick Pan Controls */
+    /* Scrubber & Player Controls */
     .player-mini-bar {
       background: #090e17;
       padding: 6px 12px;
@@ -276,7 +261,7 @@
       background: #1e293b;
       border: 1px solid #334155;
       color: #94a3b8;
-      padding: 4px 10px;
+      padding: 5px 11px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 700;
@@ -290,7 +275,7 @@
       border-color: #f8fafc;
     }
 
-    /* Feature Action Bar (Logo, Title, Blur) */
+    /* Feature Action Bar */
     .overlay-action-bar {
       padding: 10px 12px;
       background: #111827;
@@ -313,12 +298,6 @@
       align-items: center;
       gap: 3px;
       cursor: pointer;
-      position: relative;
-    }
-
-    .btn-action-tab.active {
-      border-color: #38bdf8;
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
     }
 
     .status-dot {
@@ -333,7 +312,7 @@
       box-shadow: 0 0 5px #34d399;
     }
 
-    /* Common Card / Panel Styling */
+    /* Panels & Toggles */
     .panel-card {
       background: #131c2e;
       border: 1px solid #233148;
@@ -343,9 +322,7 @@
       display: none;
     }
 
-    .panel-card.show {
-      display: block;
-    }
+    .panel-card.show { display: block; }
 
     .panel-header {
       display: flex;
@@ -360,12 +337,8 @@
       font-size: 12px;
       font-weight: 700;
       color: #e2e8f0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
-    /* Modern Toggle Switch */
     .toggle-wrap {
       display: flex;
       align-items: center;
@@ -395,13 +368,8 @@
       transition: transform 0.2s;
     }
 
-    .toggle-wrap input:checked + .switch-track {
-      background: #38bdf8;
-    }
-
-    .toggle-wrap input:checked + .switch-track .switch-thumb {
-      transform: translateX(16px);
-    }
+    .toggle-wrap input:checked + .switch-track { background: #38bdf8; }
+    .toggle-wrap input:checked + .switch-track .switch-thumb { transform: translateX(16px); }
 
     .control-row {
       display: flex;
@@ -462,7 +430,7 @@
       color: #fff;
       border: none;
       width: 100%;
-      padding: 10px;
+      padding: 11px;
       border-radius: 8px;
       font-weight: 700;
       font-size: 13px;
@@ -479,7 +447,7 @@
       cursor: not-allowed;
     }
 
-    /* SRT Editor List & Auto Scroll Area */
+    /* SRT Editor List */
     .editor-section {
       margin: 12px 12px 20px;
       background: #0e1522;
@@ -494,7 +462,6 @@
       align-items: center;
       margin-bottom: 10px;
       gap: 6px;
-      flex-wrap: wrap;
     }
 
     .btn-download-srt {
@@ -514,7 +481,6 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      padding-right: 4px;
       scroll-behavior: smooth;
     }
 
@@ -559,7 +525,7 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    /* Modal Styling */
+    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -591,12 +557,11 @@
       <span class="badge-silver">SRT PRO</span>
     </div>
     <div class="header-btns">
-      <button class="btn-header" onclick="openModal('workerModal')">⚙️ Worker</button>
-      <button class="btn-header" onclick="openModal('videoModal')">📹 Video</button>
+      <button class="btn-header" onclick="openModal('videoModal')">📹 Video ထည့်ရန်</button>
     </div>
   </header>
 
-  <!-- Fixed Top Video Viewport -->
+  <!-- Video Viewport -->
   <div class="video-viewport-area">
     <div class="viewport-grid-bg"></div>
 
@@ -606,7 +571,7 @@
         <video id="mainVideo" playsinline preload="auto" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
       </div>
 
-      <!-- Draggable Overlays -->
+      <!-- Overlays -->
       <div id="logoOverlay" class="drag-overlay">
         <img id="logoImg" src="" style="width: 45px; display: block; border-radius: 4px;">
       </div>
@@ -617,7 +582,7 @@
 
       <div id="blurOverlay" class="drag-overlay"></div>
 
-      <!-- Bottom Live Subtitles -->
+      <!-- Live Subtitles -->
       <div class="live-sub-container">
         <div id="liveSubMM" class="live-sub-mm">မြန်မာစာတန်းထိုး နေရာ</div>
         <div id="liveSubENG" class="live-sub-eng">English Live Karaoke Subtitle</div>
@@ -625,7 +590,7 @@
     </div>
   </div>
 
-  <!-- Player Scrubber & Zoom Bar -->
+  <!-- Mini Player Controls -->
   <div class="player-mini-bar">
     <button class="btn-play-pause" id="btnPlayPause" onclick="togglePlay()">Play</button>
     <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
@@ -633,26 +598,26 @@
     <button class="btn-play-pause" onclick="resetVideoPosition()" title="Reset Pan">↺</button>
   </div>
 
-  <!-- Aspect Ratio Selector Bar -->
+  <!-- Aspect Ratio Bar ("မူရင်း" အပါအဝင်) -->
   <div class="aspect-bar">
-    <div class="aspect-chip active" onclick="setAspect('9:16', 185, 330, this)">9:16 (TikTok)</div>
+    <div class="aspect-chip active" onclick="setAspect('original', null, null, this)">★ မူရင်း (Original Full)</div>
+    <div class="aspect-chip" onclick="setAspect('9:16', 185, 330, this)">9:16 (TikTok)</div>
     <div class="aspect-chip" onclick="setAspect('4:5', 264, 330, this)">4:5 (IG Post)</div>
     <div class="aspect-chip" onclick="setAspect('1:1', 330, 330, this)">1:1 (Square)</div>
-    <div class="aspect-chip" onclick="setAspect('16:9', 340, 191, this)">16:9 (Landscape)</div>
-    <div class="aspect-chip" onclick="setAspect('21:9', 350, 150, this)">21:9 (Cinema)</div>
+    <div class="aspect-chip" onclick="setAspect('16:9', 350, 197, this)">16:9 (Landscape)</div>
   </div>
 
-  <!-- Feature Action Bar (Logo, Title, Blur) -->
+  <!-- Feature Action Bar -->
   <div class="overlay-action-bar">
-    <button class="btn-action-tab" id="tabBtnLogo" onclick="togglePanel('logoPanel')">
+    <button class="btn-action-tab" onclick="togglePanel('logoPanel')">
       <div class="status-dot" id="dotLogo"></div>
       <span>+ Add Logo</span>
     </button>
-    <button class="btn-action-tab" id="tabBtnTitle" onclick="togglePanel('titlePanel')">
+    <button class="btn-action-tab" onclick="togglePanel('titlePanel')">
       <div class="status-dot" id="dotTitle"></div>
       <span>+ Title Text</span>
     </button>
-    <button class="btn-action-tab" id="tabBtnBlur" onclick="togglePanel('blurPanel')">
+    <button class="btn-action-tab" onclick="togglePanel('blurPanel')">
       <div class="status-dot" id="dotBlur"></div>
       <span>+ Add Blur</span>
     </button>
@@ -677,7 +642,7 @@
     </div>
   </div>
 
-  <!-- Title Text Setting Panel -->
+  <!-- Title Setting Panel -->
   <div class="panel-card" id="titlePanel">
     <div class="panel-header">
       <span class="panel-title">✏️ Title Text Settings</span>
@@ -686,7 +651,7 @@
         <div class="switch-track"><div class="switch-thumb"></div></div>
       </label>
     </div>
-    <input type="text" class="control-input" id="titleTextInput" value="ခေါင်းစဉ်စာသား" oninput="document.getElementById('titleTextDisplay').innerText = this.value" placeholder="စာသားရိုက်ထည့်ပါ">
+    <input type="text" class="control-input" id="titleTextInput" value="ခေါင်းစဉ်စာသား" oninput="document.getElementById('titleTextDisplay').innerText = this.value">
     <div class="control-row">
       <span>စာလုံးအရောင်</span>
       <input type="color" value="#ffffff" onchange="document.getElementById('titleOverlay').style.color = this.value">
@@ -695,7 +660,7 @@
     </div>
   </div>
 
-  <!-- Blur Box Setting Panel -->
+  <!-- Blur Setting Panel -->
   <div class="panel-card" id="blurPanel">
     <div class="panel-header">
       <span class="panel-title">💧 Blur Box Settings</span>
@@ -710,7 +675,7 @@
     </div>
   </div>
 
-  <!-- Subtitle Styles & Custom Font Card -->
+  <!-- Subtitle & Font Styling Card -->
   <div class="panel-card show" style="display:block; margin-top:10px;">
     <div class="panel-header">
       <span class="panel-title">🎨 Subtitle & Karaoke Styles</span>
@@ -742,7 +707,7 @@
     </div>
 
     <!-- Category (7 Types) -->
-    <div class="category-pills" id="catGroup">
+    <div class="category-pills">
       <div class="cat-btn active" onclick="selectCat('song', this)">Song</div>
       <div class="cat-btn" onclick="selectCat('movie', this)">Movie</div>
       <div class="cat-btn" onclick="selectCat('news', this)">News</div>
@@ -758,7 +723,7 @@
     <div id="genStatus" style="font-size:11px; color:#94a3b8; text-align:center; margin-top:8px;"></div>
   </div>
 
-  <!-- Real-time SRT Auto-Scroll Editor -->
+  <!-- SRT Auto-Scroll Editor -->
   <div class="editor-section">
     <div class="editor-toolbar">
       <span style="font-size:12px; font-weight:700;">📝 Interactive SRT Editor</span>
@@ -769,23 +734,7 @@
       </div>
     </div>
 
-    <!-- Subtitle Item Rows -->
-    <div class="srt-scroll-box" id="srtScrollBox">
-      <!-- Auto generated subtitle rows appear here -->
-    </div>
-  </div>
-
-  <!-- Worker Settings Modal -->
-  <div class="modal-overlay" id="workerModal">
-    <div class="modal-content">
-      <h3 style="font-size:13px; margin-bottom:10px;">Cloudflare Worker Settings</h3>
-      <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Deploy ထားသော Worker URL ကို ထည့်ပါ:</p>
-      <input type="text" id="workerUrlInput" class="control-input" placeholder="https://myanmar-srt-studio.workers.dev">
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
-        <button class="btn-header" onclick="closeModal('workerModal')">Cancel</button>
-        <button class="btn-generate" style="width:80px; padding:6px;" onclick="saveWorkerUrl()">Save</button>
-      </div>
-    </div>
+    <div class="srt-scroll-box" id="srtScrollBox"></div>
   </div>
 
   <!-- Video Source Modal -->
@@ -797,7 +746,7 @@
         <input type="file" id="localVideoFile" accept="video/*" class="control-input" style="margin-top:4px;" onchange="handleLocalVideo(this)">
       </div>
       <div style="margin-bottom:12px;">
-        <span style="font-size:11px; color:#94a3b8;">YouTube URL (Direct MP4 Stream):</span>
+        <span style="font-size:11px; color:#94a3b8;">Direct Video URL (MP4 Stream):</span>
         <input type="text" id="ytUrlInput" class="control-input" placeholder="Video URL paste လုပ်ပါ" style="margin-top:4px;">
       </div>
       <div style="display:flex; justify-content:flex-end; gap:8px;">
@@ -808,10 +757,17 @@
   </div>
 
   <script>
+    // ========================================================
+    // 1. CLOUDFLARE WORKER URL (ဒီနေရာတွင် မိမိ Worker URL ကို တိုက်ရိုက် ထည့်ထားပါသည်)
+    // ========================================================
+    const WORKER_URL = "https://myanmar-srt-studio.nainelinoo14tpro.workers.dev";
+
     // App State
     let selectedCategory = 'song';
     let currentActiveIndex = -1;
     let videoFileBlob = null;
+    let currentAspectMode = 'original';
+
     let srtData = [
       { id: 1, start: 0.5, end: 3.5, startStr: '00:00:00,500', endStr: '00:00:03,500', mm: 'Silver Studio မှ ကြိုဆိုပါသည်', eng: 'Welcome to Silver Studio' },
       { id: 2, start: 3.8, end: 7.2, startStr: '00:00:03,800', endStr: '00:00:07,200', mm: 'အချိန်ကိုက် စာတန်းထိုးများကို စိတ်ကြိုက် ပြင်ဆင်နိုင်ပါသည်', eng: 'You can customize synced subtitles easily' }
@@ -824,14 +780,10 @@
     const timeDisplay = document.getElementById('timeDisplay');
     const btnPlayPause = document.getElementById('btnPlayPause');
 
-    // Pan & Drag Tracking
     let panX = 0, panY = 0, zoomScale = 1.0;
     let isDragging = false, startX = 0, startY = 0;
 
-    // Load saved Worker URL
     window.addEventListener('DOMContentLoaded', () => {
-      const savedUrl = localStorage.getItem('SILVER_WORKER_URL');
-      if (savedUrl) document.getElementById('workerUrlInput').value = savedUrl;
       renderSRTEditor();
       setupPanDrag();
       setupOverlayDrag('logoOverlay');
@@ -839,7 +791,47 @@
       setupOverlayDrag('blurOverlay');
     });
 
-    // Touch & Mouse Pan Engine for Video Canvas
+    // မူရင်းဗီဒီယို Load ဖြစ်သည်နှင့် အချိုးကျ အပြည့်အဝ ချိန်ညှိပေးခြင်း
+    video.addEventListener('loadedmetadata', () => {
+      fitVideoToStage();
+    });
+
+    function fitVideoToStage() {
+      const vWidth = video.videoWidth || 640;
+      const vHeight = video.videoHeight || 360;
+      const stageHeight = 330;
+
+      if (currentAspectMode === 'original') {
+        const stageWidth = Math.round((vWidth / vHeight) * stageHeight);
+        cropStage.style.height = stageHeight + 'px';
+        cropStage.style.width = Math.min(360, Math.max(160, stageWidth)) + 'px';
+      }
+
+      // Video Element Size ကို Stage နှင့် အချိုးကျ သတ်မှတ်ခြင်း
+      video.style.height = stageHeight + 'px';
+      video.style.width = 'auto';
+
+      resetVideoPosition();
+    }
+
+    // Aspect Ratio ရွေးချယ်မှု စနစ်
+    function setAspect(ratio, w, h, el) {
+      document.querySelectorAll('.aspect-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentAspectMode = ratio;
+
+      if (ratio === 'original') {
+        fitVideoToStage();
+      } else {
+        cropStage.style.width = w + 'px';
+        cropStage.style.height = h + 'px';
+        video.style.height = h + 'px';
+        video.style.width = 'auto';
+        resetVideoPosition();
+      }
+    }
+
+    // Touch & Mouse Pan
     function setupPanDrag() {
       cropStage.addEventListener('pointerdown', (e) => {
         if (e.target.closest('.drag-overlay') || e.target.closest('.live-sub-container')) return;
@@ -875,7 +867,7 @@
       applyVideoTransform();
     }
 
-    // Draggable Overlays (Logo, Title, Blur)
+    // Overlay Drags
     function setupOverlayDrag(elementId) {
       const el = document.getElementById(elementId);
       let isOverlayDrag = false, oX = 0, oY = 0;
@@ -892,7 +884,7 @@
         if (!isOverlayDrag) return;
         el.style.left = (e.clientX - oX) + 'px';
         el.style.top = (e.clientY - oY) + 'px';
-        el.style.right = 'auto'; // release auto alignment
+        el.style.right = 'auto';
       });
 
       const endOverlayDrag = (e) => {
@@ -905,15 +897,6 @@
       el.addEventListener('pointercancel', endOverlayDrag);
     }
 
-    // Aspect Ratio Sizing
-    function setAspect(ratio, w, h, el) {
-      document.querySelectorAll('.aspect-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      cropStage.style.width = w + 'px';
-      cropStage.style.height = h + 'px';
-    }
-
-    // Toggle Settings Panels
     function togglePanel(panelId) {
       const panel = document.getElementById(panelId);
       const isOpen = panel.classList.contains('show');
@@ -923,7 +906,6 @@
       if (!isOpen) panel.classList.add('show');
     }
 
-    // On/Off Overlays
     function onToggleOverlay(type) {
       if (type === 'logo') {
         const on = document.getElementById('toggleLogo').checked;
@@ -940,7 +922,6 @@
       }
     }
 
-    // Logo File Upload
     function handleLogoUpload(input) {
       if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -953,7 +934,6 @@
       }
     }
 
-    // Custom Font (.ttf) Uploader
     async function handleFontUpload(input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
@@ -966,7 +946,6 @@
       alert('Custom Font အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ!');
     }
 
-    // Video Player & Realtime Karaoke Progress Engine
     function togglePlay() {
       if (video.paused) {
         video.play();
@@ -983,7 +962,6 @@
       scrubber.value = (cur / dur) * 100;
       timeDisplay.innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
 
-      // Find Active Subtitle
       const activeIdx = srtData.findIndex(item => cur >= item.start && cur <= item.end);
 
       if (activeIdx !== -1) {
@@ -991,13 +969,11 @@
         document.getElementById('liveSubMM').innerText = item.mm;
         document.getElementById('liveSubENG').innerText = item.eng;
 
-        // Karaoke Color Wipe Progress
         const progress = Math.min(100, Math.max(0, ((cur - item.start) / (item.end - item.start)) * 100));
         document.getElementById('liveSubENG').style.background = 
           `linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) ${progress}%, var(--karaoke-base) ${progress}%, var(--karaoke-base) 100%)`;
         document.getElementById('liveSubENG').style.webkitBackgroundClip = 'text';
 
-        // Auto-scroll Editor Row
         if (currentActiveIndex !== activeIdx) {
           currentActiveIndex = activeIdx;
           highlightAndScrollEditor(activeIdx);
@@ -1022,7 +998,6 @@
       return `${m}:${s}`;
     }
 
-    // Interactive SRT Editor
     function renderSRTEditor() {
       const container = document.getElementById('srtScrollBox');
       container.innerHTML = '';
@@ -1064,21 +1039,18 @@
       document.querySelectorAll('.srt-row-item').forEach(r => r.classList.remove('active'));
     }
 
-    // Category Tone Selector
     function selectCat(cat, el) {
       selectedCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
       el.classList.add('active');
     }
 
-    // Client-side In-Browser Audio Extractor & WAV Compressor (16kHz Mono)
+    // In-Browser Audio Extractor (16kHz Mono WAV)
     async function compressAudioToWav(fileOrBlob) {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
       const arrayBuffer = await fileOrBlob.arrayBuffer();
       const decoded = await audioCtx.decodeAudioData(arrayBuffer);
-      
-      // Convert to 16kHz Mono PCM WAV
-      const channelData = decoded.getChannelData(0); // Mono channel
+      const channelData = decoded.getChannelData(0);
       const wavBuffer = encodeWAV(channelData, 16000);
       return new Blob([wavBuffer], { type: 'audio/wav' });
     }
@@ -1094,15 +1066,14 @@
       writeString(view, 8, 'WAVE');
       writeString(view, 12, 'fmt ');
       view.setUint32(16, 16, true);
-      view.setUint16(20, 1, true); // PCM
-      view.setUint16(22, 1, true); // Mono
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
       view.setUint32(24, sampleRate, true);
       view.setUint32(28, sampleRate * 2, true);
       view.setUint16(32, 2, true);
       view.setUint16(34, 16, true);
       writeString(view, 36, 'data');
       view.setUint32(40, samples.length * 2, true);
-      
       let offset = 44;
       for (let i = 0; i < samples.length; i++, offset += 2) {
         let s = Math.max(-1, Math.min(1, samples[i]));
@@ -1111,15 +1082,8 @@
       return view;
     }
 
-    // Call Cloudflare Worker APIs
+    // Direct Cloudflare Worker API Call
     async function startSubGeneration() {
-      const workerUrl = localStorage.getItem('SILVER_WORKER_URL');
-      if (!workerUrl) {
-        alert('Worker URL ထည့်သွင်းထားခြင်း မရှိသေးပါ။ အပေါ်ရှိ ⚙️ Worker ခလုတ်ကို နှိပ်၍ URL အရင် ထည့်ပေးပါခင်ဗျာ။');
-        openModal('workerModal');
-        return;
-      }
-
       const statusEl = document.getElementById('genStatus');
       const btn = document.getElementById('btnGenSub');
       btn.disabled = true;
@@ -1128,39 +1092,37 @@
         let audioBlobToSend = null;
 
         if (videoFileBlob) {
-          statusEl.innerText = '⏳ ဗီဒီယိုထဲမှ အသံကို သီးသန့်ချုံ့ထုတ်နေပါသည် (In-Browser Compress)...';
+          statusEl.innerText = '⏳ ဗီဒီယိုထဲမှ အသံကို ဖောက်ထုတ်ချုံ့ယူနေပါသည်...';
           audioBlobToSend = await compressAudioToWav(videoFileBlob);
         } else {
-          // Fetch current sample video audio
           statusEl.innerText = '⏳ အသံဖိုင် စီမံနေပါသည်...';
           const resp = await fetch(video.src);
           const blob = await resp.blob();
           audioBlobToSend = await compressAudioToWav(blob);
         }
 
-        // 1. Groq Whisper API Call
+        // 1. Groq Whisper
         statusEl.innerText = '⚡ Groq Whisper ဖြင့် English SRT ထုတ်ယူနေပါသည်...';
         const formData = new FormData();
         formData.append('file', audioBlobToSend, 'audio.wav');
 
-        const groqRes = await fetch(`${workerUrl.replace(/\/$/, '')}/api/transcribe`, {
+        const groqRes = await fetch(`${WORKER_URL.replace(/\/$/, '')}/api/transcribe`, {
           method: 'POST',
           body: formData
         });
         const groqData = await groqRes.json();
         if (groqData.error) throw new Error(groqData.error);
 
-        // Convert Groq verbose_json segments to raw SRT
         let engSRTText = '';
         const rawSegments = groqData.segments || [];
         rawSegments.forEach((seg, i) => {
           engSRTText += `${i + 1}\n${toSRTTime(seg.start)} --> ${toSRTTime(seg.end)}\n${seg.text.trim()}\n\n`;
         });
 
-        // 2. Gemini Translation Call
+        // 2. Gemini Translation
         statusEl.innerText = '✨ Gemini AI ဖြင့် မြန်မာစာတန်းထိုး ပြန်ဆိုနေပါသည်...';
         const lineCount = document.getElementById('lineCountSelect').value;
-        const geminiRes = await fetch(`${workerUrl.replace(/\/$/, '')}/api/translate`, {
+        const geminiRes = await fetch(`${WORKER_URL.replace(/\/$/, '')}/api/translate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1172,12 +1134,11 @@
         const geminiData = await geminiRes.json();
         if (geminiData.error) throw new Error(geminiData.error);
 
-        // Parse translated SRT and update UI
         parseAndUpdateSubtitles(rawSegments, geminiData.translatedSRT);
         statusEl.innerText = '✅ စာတန်းထိုး အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ!';
       } catch (err) {
         alert('Error: ' + err.message);
-        statusEl.innerText = '❌ ပြဿနာဖြစ်ပွားခဲ့သည်: ' + err.message;
+        statusEl.innerText = '❌ ပြဿနာ: ' + err.message;
       } finally {
         btn.disabled = false;
       }
@@ -1220,7 +1181,6 @@
       renderSRTEditor();
     }
 
-    // Export & Download SRT
     function exportSRT(type) {
       let content = '';
       srtData.forEach(item => {
@@ -1237,17 +1197,9 @@
       a.click();
     }
 
-    // Modal Helpers
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function saveWorkerUrl() {
-      const url = document.getElementById('workerUrlInput').value.trim();
-      localStorage.setItem('SILVER_WORKER_URL', url);
-      closeModal('workerModal');
-      alert('Worker URL ကို သိမ်းဆည်းပြီးပါပြီ!');
-    }
 
-    // Video Handling
     function handleLocalVideo(input) {
       if (input.files && input.files[0]) {
         videoFileBlob = input.files[0];
