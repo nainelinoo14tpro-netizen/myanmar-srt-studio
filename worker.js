@@ -76,8 +76,8 @@ Output format:
 Return ONLY a valid JSON array of objects with keys: "id", "start", "end", "original", "english", "myanmar".
 Do NOT output markdown code fences. Output raw JSON only.`;
 
-        // Try gemini-2.0-flash first, then gemini-1.5-flash as fallback
-        const models = ["gemini-2.0-flash", "gemini-1.5-flash"];
+        // Try gemini-2.5-flash first, then gemini-3.8-flash as fallback
+        const models = ["gemini-2.5-flash", "gemini-3.8-flash"];
         let rawResponseText = null;
         let lastError = null;
 
