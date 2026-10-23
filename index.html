@@ -41,49 +41,59 @@
       padding-bottom: 90px;
     }
 
-    /* Top App Header (Worker ခလုတ် ဖယ်ရှားထားပြီး ဖြစ်သည်) */
-    .top-header {
-      background: linear-gradient(180deg, #161e2e 0%, #0d121c 100%);
-      border-bottom: 1px solid var(--silver-border);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    /* 1. STICKY TOP FIXED VIDEO CONTAINER (အပေါ်ဆုံးတွင် အသေကပ်နေမည့် အပိုင်း) */
+    .sticky-top-section {
       position: sticky;
       top: 0;
       z-index: 1000;
+      background: #020617;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .top-header {
+      background: linear-gradient(180deg, #161e2e 0%, #0d121c 100%);
+      border-bottom: 1px solid var(--silver-border);
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .brand-title {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-weight: 800;
-      font-size: 14px;
-      letter-spacing: 0.5px;
+      font-size: 13px;
       color: #f8fafc;
     }
 
     .badge-silver {
       background: linear-gradient(135deg, #f1f5f9, #94a3b8);
       color: #0f172a;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
       font-weight: 700;
+    }
+
+    .header-btns {
+      display: flex;
+      gap: 6px;
     }
 
     .btn-header {
       background: #1e293b;
       border: 1px solid #334155;
       color: #f1f5f9;
-      padding: 6px 12px;
-      border-radius: 8px;
+      padding: 5px 10px;
+      border-radius: 6px;
       font-size: 11px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       cursor: pointer;
     }
 
@@ -92,12 +102,11 @@
       position: relative;
       background: #020617;
       width: 100%;
-      height: 350px;
+      height: 310px;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border-bottom: 1px solid #1e293b;
     }
 
     .viewport-grid-bg {
@@ -105,20 +114,47 @@
       inset: 0;
       background-image: radial-gradient(#1e293b 1px, transparent 1px);
       background-size: 14px 14px;
-      opacity: 0.4;
+      opacity: 0.35;
       pointer-events: none;
     }
 
+    /* CROP STAGE FRAME */
     .crop-stage {
       position: relative;
-      height: 330px;
-      width: 330px; /* Default adjust on video load */
+      height: 290px;
+      width: 290px;
       background: #000;
       overflow: hidden;
       border-radius: 10px;
       box-shadow: 0 0 0 1px #475569, 0 10px 25px rgba(0,0,0,0.8);
       touch-action: none;
-      transition: width 0.25s ease, height 0.25s ease;
+      transition: width 0.2s ease, height 0.2s ease;
+    }
+
+    /* RUNNING NEON BORDER (ဗီဒီယို ဘောင်တွင် ပြေးနေသော လိုင်းအလင်းတန်း) */
+    .crop-stage.running-border {
+      box-shadow: none;
+    }
+
+    .crop-stage.running-border::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 12px;
+      background: conic-gradient(from 0deg, #38bdf8, #ec4899, #fbbf24, #10b981, #38bdf8);
+      z-index: 70;
+      pointer-events: none;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      padding: 3px;
+      animation: rotateBorder 3s linear infinite;
+    }
+
+    @keyframes rotateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
     .media-canvas {
@@ -132,9 +168,7 @@
       will-change: transform;
     }
 
-    .media-canvas:active {
-      cursor: grabbing;
-    }
+    .media-canvas:active { cursor: grabbing; }
 
     .media-canvas video {
       display: block;
@@ -175,10 +209,25 @@
       border-radius: 6px;
     }
 
+    /* Real Timecode Overlay */
+    #timecodeOverlay {
+      bottom: 45px;
+      right: 10px;
+      padding: 3px 6px;
+      background: rgba(0, 0, 0, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #38bdf8;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
     /* Live Subtitles */
     .live-sub-container {
       position: absolute;
-      bottom: 12px;
+      bottom: 10px;
       left: 6px;
       right: 6px;
       text-align: center;
@@ -211,21 +260,20 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* Scrubber & Player Controls */
+    /* Mini Player Controls with Zoom In / Zoom Out */
     .player-mini-bar {
       background: #090e17;
-      padding: 6px 12px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid #1e293b;
+      gap: 8px;
     }
 
     .time-readout {
       font-size: 10px;
       color: #94a3b8;
       font-family: monospace;
-      min-width: 65px;
+      min-width: 62px;
     }
 
     .scrubber {
@@ -238,20 +286,47 @@
       background: #1e293b;
       border: 1px solid #334155;
       color: #fff;
-      padding: 4px 10px;
-      border-radius: 6px;
+      padding: 4px 8px;
+      border-radius: 5px;
       font-size: 11px;
       font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Zoom Controller Bar */
+    .zoom-ctrl-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #131d2e;
+      border: 1px solid #243248;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .btn-zoom {
+      background: transparent;
+      border: none;
+      color: #38bdf8;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 0 4px;
+      cursor: pointer;
+    }
+
+    .zoom-slider {
+      width: 55px;
+      height: 3px;
+      accent-color: #38bdf8;
     }
 
     /* Aspect Ratio Bar */
     .aspect-bar {
       background: #0f172a;
-      padding: 8px 12px;
+      padding: 6px 10px;
       display: flex;
-      gap: 6px;
+      gap: 5px;
       overflow-x: auto;
-      border-bottom: 1px solid #1e293b;
       scrollbar-width: none;
     }
 
@@ -261,9 +336,9 @@
       background: #1e293b;
       border: 1px solid #334155;
       color: #94a3b8;
-      padding: 5px 11px;
+      padding: 4px 9px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       white-space: nowrap;
       cursor: pointer;
@@ -275,13 +350,13 @@
       border-color: #f8fafc;
     }
 
-    /* Feature Action Bar */
+    /* Action Bar (5 Features: Logo, Title, Blur, Timecode, Running Border) */
     .overlay-action-bar {
-      padding: 10px 12px;
+      padding: 8px 10px;
       background: #111827;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
       border-bottom: 1px solid #1f2937;
     }
 
@@ -289,20 +364,21 @@
       background: #1e293b;
       border: 1px solid #334155;
       color: #f1f5f9;
-      padding: 8px 4px;
-      border-radius: 8px;
-      font-size: 11px;
+      padding: 6px 2px;
+      border-radius: 6px;
+      font-size: 9px;
       font-weight: 700;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       cursor: pointer;
+      text-align: center;
     }
 
     .status-dot {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       background: #64748b;
     }
@@ -328,13 +404,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       border-bottom: 1px solid #1e293b;
-      padding-bottom: 6px;
+      padding-bottom: 5px;
     }
 
     .panel-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       color: #e2e8f0;
     }
@@ -349,17 +425,17 @@
     .toggle-wrap input { display: none; }
 
     .switch-track {
-      width: 36px;
-      height: 20px;
+      width: 34px;
+      height: 18px;
       background: #334155;
-      border-radius: 20px;
+      border-radius: 18px;
       position: relative;
       transition: background 0.2s;
     }
 
     .switch-thumb {
-      width: 14px;
-      height: 14px;
+      width: 12px;
+      height: 12px;
       background: #fff;
       border-radius: 50%;
       position: absolute;
@@ -396,23 +472,23 @@
       border: 1px solid #29384d;
       border-radius: 12px;
       margin: 10px 12px;
-      padding: 14px;
+      padding: 12px;
     }
 
     .category-pills {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin: 10px 0;
+      gap: 5px;
+      margin: 8px 0;
     }
 
     .cat-btn {
       background: #1b263b;
       border: 1px solid #2d3e58;
       color: #94a3b8;
-      padding: 6px 2px;
+      padding: 5px 2px;
       border-radius: 6px;
-      font-size: 11px;
+      font-size: 10px;
       font-family: var(--user-custom-font);
       font-weight: 700;
       text-align: center;
@@ -430,10 +506,10 @@
       color: #fff;
       border: none;
       width: 100%;
-      padding: 11px;
+      padding: 10px;
       border-radius: 8px;
       font-weight: 700;
-      font-size: 13px;
+      font-size: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -442,14 +518,37 @@
       box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
     }
 
-    .btn-generate:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Video Export Card */
+    .export-card {
+      background: #101a2e;
+      border: 1px solid #23354f;
+      border-radius: 12px;
+      margin: 10px 12px;
+      padding: 12px;
+    }
+
+    .btn-export-video {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #fff;
+      border: none;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
     }
 
     /* SRT Editor List */
     .editor-section {
-      margin: 12px 12px 20px;
+      margin: 10px 12px 20px;
       background: #0e1522;
       border: 1px solid #1e293b;
       border-radius: 12px;
@@ -468,7 +567,7 @@
       background: #1e293b;
       border: 1px solid #38bdf8;
       color: #38bdf8;
-      padding: 5px 8px;
+      padding: 4px 7px;
       border-radius: 6px;
       font-size: 10px;
       font-weight: 700;
@@ -476,7 +575,7 @@
     }
 
     .srt-scroll-box {
-      max-height: 380px;
+      max-height: 340px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
@@ -488,7 +587,7 @@
       background: #151f30;
       border: 1px solid #223047;
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 8px;
       transition: all 0.2s;
       cursor: pointer;
     }
@@ -550,78 +649,104 @@
 </head>
 <body>
 
-  <!-- Top App Header -->
-  <header class="top-header">
-    <div class="brand-title">
-      <span>SILVER STUDIO</span>
-      <span class="badge-silver">SRT PRO</span>
+  <!-- STICKY TOP SECTION: ဖုန်း screen အပေါ်ဆုံးတွင် အသေထားသော အပိုင်း -->
+  <div class="sticky-top-section">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="brand-title">
+        <span>SILVER STUDIO</span>
+        <span class="badge-silver">SRT PRO</span>
+      </div>
+      <div class="header-btns">
+        <button class="btn-header" onclick="openModal('workerModal')" title="Worker URL စစ်ဆေးရန်">⚙️</button>
+        <button class="btn-header" onclick="openModal('videoModal')">📹 Video ထည့်ရန်</button>
+      </div>
+    </header>
+
+    <!-- Video Viewport -->
+    <div class="video-viewport-area">
+      <div class="viewport-grid-bg"></div>
+
+      <div class="crop-stage" id="cropStage">
+        <!-- Movable Video Canvas -->
+        <div class="media-canvas" id="mediaCanvas">
+          <video id="mainVideo" playsinline preload="auto" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
+        </div>
+
+        <!-- Overlays -->
+        <div id="logoOverlay" class="drag-overlay">
+          <img id="logoImg" src="" style="width: 45px; display: block; border-radius: 4px;">
+        </div>
+
+        <div id="titleOverlay" class="drag-overlay">
+          <span id="titleTextDisplay">ခေါင်းစဉ်စာသား</span>
+        </div>
+
+        <div id="blurOverlay" class="drag-overlay"></div>
+
+        <!-- Real Timecode Overlay -->
+        <div id="timecodeOverlay" class="drag-overlay">
+          <span id="timecodeText">00:00:00</span>
+        </div>
+
+        <!-- Live Subtitles -->
+        <div class="live-sub-container">
+          <div id="liveSubMM" class="live-sub-mm">မြန်မာစာတန်းထိုး နေရာ</div>
+          <div id="liveSubENG" class="live-sub-eng">English Live Karaoke Subtitle</div>
+        </div>
+      </div>
     </div>
-    <div class="header-btns">
-      <button class="btn-header" onclick="openModal('videoModal')">📹 Video ထည့်ရန်</button>
+
+    <!-- Mini Player Controls with Zoom Slider -->
+    <div class="player-mini-bar">
+      <button class="btn-play-pause" id="btnPlayPause" onclick="togglePlay()">Play</button>
+      <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
+      <input type="range" class="scrubber" id="videoScrubber" min="0" max="100" value="0">
+      
+      <!-- Zoom In / Zoom Out Controls -->
+      <div class="zoom-ctrl-wrap">
+        <button class="btn-zoom" onclick="adjustZoom(-0.1)">-</button>
+        <input type="range" class="zoom-slider" id="zoomSlider" min="1" max="3" step="0.1" value="1" oninput="setZoom(this.value)">
+        <button class="btn-zoom" onclick="adjustZoom(0.1)">+</button>
+      </div>
+
+      <button class="btn-play-pause" onclick="resetVideoPosition()" title="Reset Pan & Zoom">↺</button>
     </div>
-  </header>
 
-  <!-- Video Viewport -->
-  <div class="video-viewport-area">
-    <div class="viewport-grid-bg"></div>
+    <!-- Aspect Ratio Bar -->
+    <div class="aspect-bar">
+      <div class="aspect-chip active" onclick="setAspect('original', null, null, this)">★ မူရင်း (Original Full)</div>
+      <div class="aspect-chip" onclick="setAspect('9:16', 170, 290, this)">9:16 (TikTok)</div>
+      <div class="aspect-chip" onclick="setAspect('4:5', 232, 290, this)">4:5 (IG Post)</div>
+      <div class="aspect-chip" onclick="setAspect('1:1', 290, 290, this)">1:1 (Square)</div>
+      <div class="aspect-chip" onclick="setAspect('16:9', 330, 186, this)">16:9 (Landscape)</div>
+    </div>
 
-    <div class="crop-stage" id="cropStage">
-      <!-- Movable Video Canvas -->
-      <div class="media-canvas" id="mediaCanvas">
-        <video id="mainVideo" playsinline preload="auto" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
-      </div>
-
-      <!-- Overlays -->
-      <div id="logoOverlay" class="drag-overlay">
-        <img id="logoImg" src="" style="width: 45px; display: block; border-radius: 4px;">
-      </div>
-
-      <div id="titleOverlay" class="drag-overlay">
-        <span id="titleTextDisplay">ခေါင်းစဉ်စာသား</span>
-      </div>
-
-      <div id="blurOverlay" class="drag-overlay"></div>
-
-      <!-- Live Subtitles -->
-      <div class="live-sub-container">
-        <div id="liveSubMM" class="live-sub-mm">မြန်မာစာတန်းထိုး နေရာ</div>
-        <div id="liveSubENG" class="live-sub-eng">English Live Karaoke Subtitle</div>
-      </div>
+    <!-- Action Bar (5 Features) -->
+    <div class="overlay-action-bar">
+      <button class="btn-action-tab" onclick="togglePanel('logoPanel')">
+        <div class="status-dot" id="dotLogo"></div>
+        <span>+ Logo</span>
+      </button>
+      <button class="btn-action-tab" onclick="togglePanel('titlePanel')">
+        <div class="status-dot" id="dotTitle"></div>
+        <span>+ Title</span>
+      </button>
+      <button class="btn-action-tab" onclick="togglePanel('blurPanel')">
+        <div class="status-dot" id="dotBlur"></div>
+        <span>+ Blur</span>
+      </button>
+      <button class="btn-action-tab" onclick="toggleTimecodeOverlay()">
+        <div class="status-dot" id="dotTimecode"></div>
+        <span>+ Real Time</span>
+      </button>
+      <button class="btn-action-tab" onclick="toggleRunningBorder()">
+        <div class="status-dot" id="dotBorder"></div>
+        <span>+ ဘောင်ပြေး</span>
+      </button>
     </div>
   </div>
-
-  <!-- Mini Player Controls -->
-  <div class="player-mini-bar">
-    <button class="btn-play-pause" id="btnPlayPause" onclick="togglePlay()">Play</button>
-    <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
-    <input type="range" class="scrubber" id="videoScrubber" min="0" max="100" value="0">
-    <button class="btn-play-pause" onclick="resetVideoPosition()" title="Reset Pan">↺</button>
-  </div>
-
-  <!-- Aspect Ratio Bar ("မူရင်း" အပါအဝင်) -->
-  <div class="aspect-bar">
-    <div class="aspect-chip active" onclick="setAspect('original', null, null, this)">★ မူရင်း (Original Full)</div>
-    <div class="aspect-chip" onclick="setAspect('9:16', 185, 330, this)">9:16 (TikTok)</div>
-    <div class="aspect-chip" onclick="setAspect('4:5', 264, 330, this)">4:5 (IG Post)</div>
-    <div class="aspect-chip" onclick="setAspect('1:1', 330, 330, this)">1:1 (Square)</div>
-    <div class="aspect-chip" onclick="setAspect('16:9', 350, 197, this)">16:9 (Landscape)</div>
-  </div>
-
-  <!-- Feature Action Bar -->
-  <div class="overlay-action-bar">
-    <button class="btn-action-tab" onclick="togglePanel('logoPanel')">
-      <div class="status-dot" id="dotLogo"></div>
-      <span>+ Add Logo</span>
-    </button>
-    <button class="btn-action-tab" onclick="togglePanel('titlePanel')">
-      <div class="status-dot" id="dotTitle"></div>
-      <span>+ Title Text</span>
-    </button>
-    <button class="btn-action-tab" onclick="togglePanel('blurPanel')">
-      <div class="status-dot" id="dotBlur"></div>
-      <span>+ Add Blur</span>
-    </button>
-  </div>
+  <!-- END OF STICKY TOP SECTION -->
 
   <!-- Logo Setting Panel -->
   <div class="panel-card" id="logoPanel">
@@ -634,7 +759,7 @@
     </div>
     <div class="control-row">
       <span>Logo ပုံတင်ရန်</span>
-      <input type="file" id="logoFileInput" accept="image/*" style="font-size:10px; width:160px;" onchange="handleLogoUpload(this)">
+      <input type="file" id="logoFileInput" accept="image/*" style="font-size:10px; width:150px;" onchange="handleLogoUpload(this)">
     </div>
     <div class="control-row">
       <span>Logo Size</span>
@@ -723,6 +848,18 @@
     <div id="genStatus" style="font-size:11px; color:#94a3b8; text-align:center; margin-top:8px;"></div>
   </div>
 
+  <!-- VIDEO EXPORT CARD (Subtitle + Overlays အားလုံးပါပြီး Download ပြုလုပ်ခြင်း) -->
+  <div class="export-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span style="font-size:12px; font-weight:700; color:#10b981;">🎬 Video Export Studio</span>
+      <span id="exportStatusText" style="font-size:10px; color:#94a3b8;">အဆင်သင့်</span>
+    </div>
+    <button class="btn-export-video" id="btnExportVideo" onclick="exportRenderedVideo()">
+      <span>ဗီဒီယို (Subtitles & Overlays အပြီးသတ်) ဒေါင်းလုဒ်ဆွဲမည်</span>
+    </button>
+    <div id="exportProgressBar" style="display:none; height:4px; background:#10b981; border-radius:2px; margin-top:8px; width:0%; transition:width 0.2s;"></div>
+  </div>
+
   <!-- SRT Auto-Scroll Editor -->
   <div class="editor-section">
     <div class="editor-toolbar">
@@ -737,6 +874,19 @@
     <div class="srt-scroll-box" id="srtScrollBox"></div>
   </div>
 
+  <!-- Worker Settings Modal -->
+  <div class="modal-overlay" id="workerModal">
+    <div class="modal-content">
+      <h3 style="font-size:13px; margin-bottom:10px;">Cloudflare Worker Settings</h3>
+      <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">လက်ရှိ သုံးနေသော Worker URL:</p>
+      <input type="text" id="workerUrlInput" class="control-input" value="https://myanmar-srt-studio.nainelinoo14tpro.workers.dev">
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+        <button class="btn-header" onclick="closeModal('workerModal')">Cancel</button>
+        <button class="btn-generate" style="width:80px; padding:6px;" onclick="saveCustomWorkerUrl()">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Video Source Modal -->
   <div class="modal-overlay" id="videoModal">
     <div class="modal-content">
@@ -745,24 +895,17 @@
         <span style="font-size:11px; color:#94a3b8;">ဖုန်းထဲမှ Video File:</span>
         <input type="file" id="localVideoFile" accept="video/*" class="control-input" style="margin-top:4px;" onchange="handleLocalVideo(this)">
       </div>
-      <div style="margin-bottom:12px;">
-        <span style="font-size:11px; color:#94a3b8;">Direct Video URL (MP4 Stream):</span>
-        <input type="text" id="ytUrlInput" class="control-input" placeholder="Video URL paste လုပ်ပါ" style="margin-top:4px;">
-      </div>
       <div style="display:flex; justify-content:flex-end; gap:8px;">
         <button class="btn-header" onclick="closeModal('videoModal')">ပိတ်မည်</button>
-        <button class="btn-generate" style="width:90px; padding:6px;" onclick="loadCustomVideoUrl()">Load Video</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // ========================================================
-    // 1. CLOUDFLARE WORKER URL (ဒီနေရာတွင် မိမိ Worker URL ကို တိုက်ရိုက် ထည့်ထားပါသည်)
-    // ========================================================
-    const WORKER_URL = "https://myanmar-srt-studio.nainelinoo14tpro.workers.dev";
+  <canvas id="exportCanvas" style="display:none;"></canvas>
 
-    // App State
+  <script>
+    let WORKER_URL = localStorage.getItem('SILVER_WORKER_URL') || "https://myanmar-srt-studio.nainelinoo14tpro.workers.dev";
+
     let selectedCategory = 'song';
     let currentActiveIndex = -1;
     let videoFileBlob = null;
@@ -779,19 +922,21 @@
     const scrubber = document.getElementById('videoScrubber');
     const timeDisplay = document.getElementById('timeDisplay');
     const btnPlayPause = document.getElementById('btnPlayPause');
+    const zoomSlider = document.getElementById('zoomSlider');
 
     let panX = 0, panY = 0, zoomScale = 1.0;
     let isDragging = false, startX = 0, startY = 0;
 
     window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('workerUrlInput').value = WORKER_URL;
       renderSRTEditor();
       setupPanDrag();
       setupOverlayDrag('logoOverlay');
       setupOverlayDrag('titleOverlay');
       setupOverlayDrag('blurOverlay');
+      setupOverlayDrag('timecodeOverlay');
     });
 
-    // မူရင်းဗီဒီယို Load ဖြစ်သည်နှင့် အချိုးကျ အပြည့်အဝ ချိန်ညှိပေးခြင်း
     video.addEventListener('loadedmetadata', () => {
       fitVideoToStage();
     });
@@ -799,22 +944,19 @@
     function fitVideoToStage() {
       const vWidth = video.videoWidth || 640;
       const vHeight = video.videoHeight || 360;
-      const stageHeight = 330;
+      const stageHeight = 290;
 
       if (currentAspectMode === 'original') {
         const stageWidth = Math.round((vWidth / vHeight) * stageHeight);
         cropStage.style.height = stageHeight + 'px';
-        cropStage.style.width = Math.min(360, Math.max(160, stageWidth)) + 'px';
+        cropStage.style.width = Math.min(350, Math.max(160, stageWidth)) + 'px';
       }
 
-      // Video Element Size ကို Stage နှင့် အချိုးကျ သတ်မှတ်ခြင်း
       video.style.height = stageHeight + 'px';
       video.style.width = 'auto';
-
       resetVideoPosition();
     }
 
-    // Aspect Ratio ရွေးချယ်မှု စနစ်
     function setAspect(ratio, w, h, el) {
       document.querySelectorAll('.aspect-chip').forEach(c => c.classList.remove('active'));
       el.classList.add('active');
@@ -831,7 +973,18 @@
       }
     }
 
-    // Touch & Mouse Pan
+    // ZOOM IN / ZOOM OUT CONTROLS
+    function setZoom(val) {
+      zoomScale = parseFloat(val);
+      applyVideoTransform();
+    }
+
+    function adjustZoom(delta) {
+      zoomScale = Math.min(3.0, Math.max(1.0, +(zoomScale + delta).toFixed(1)));
+      zoomSlider.value = zoomScale;
+      applyVideoTransform();
+    }
+
     function setupPanDrag() {
       cropStage.addEventListener('pointerdown', (e) => {
         if (e.target.closest('.drag-overlay') || e.target.closest('.live-sub-container')) return;
@@ -864,6 +1017,7 @@
 
     function resetVideoPosition() {
       panX = 0; panY = 0; zoomScale = 1.0;
+      zoomSlider.value = 1.0;
       applyVideoTransform();
     }
 
@@ -885,6 +1039,7 @@
         el.style.left = (e.clientX - oX) + 'px';
         el.style.top = (e.clientY - oY) + 'px';
         el.style.right = 'auto';
+        el.style.bottom = 'auto';
       });
 
       const endOverlayDrag = (e) => {
@@ -920,6 +1075,24 @@
         document.getElementById('blurOverlay').style.display = on ? 'block' : 'none';
         document.getElementById('dotBlur').classList.toggle('active', on);
       }
+    }
+
+    // Real-Time Timecode Toggle
+    function toggleTimecodeOverlay() {
+      const el = document.getElementById('timecodeOverlay');
+      const dot = document.getElementById('dotTimecode');
+      const isVisible = el.style.display === 'block';
+      el.style.display = isVisible ? 'none' : 'block';
+      dot.classList.toggle('active', !isVisible);
+    }
+
+    // Running Border Toggle (ပြေးနေတဲ့ ဘောင်)
+    function toggleRunningBorder() {
+      const stage = document.getElementById('cropStage');
+      const dot = document.getElementById('dotBorder');
+      const isActive = stage.classList.contains('running-border');
+      stage.classList.toggle('running-border', !isActive);
+      dot.classList.toggle('active', !isActive);
     }
 
     function handleLogoUpload(input) {
@@ -961,6 +1134,7 @@
       const dur = video.duration || 1;
       scrubber.value = (cur / dur) * 100;
       timeDisplay.innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
+      document.getElementById('timecodeText').innerText = formatTimecode(cur);
 
       const activeIdx = srtData.findIndex(item => cur >= item.start && cur <= item.end);
 
@@ -996,6 +1170,13 @@
       const m = Math.floor(sec / 60).toString().padStart(2, '0');
       const s = Math.floor(sec % 60).toString().padStart(2, '0');
       return `${m}:${s}`;
+    }
+
+    function formatTimecode(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
+      return `00:${m}:${s}.${ms}`;
     }
 
     function renderSRTEditor() {
@@ -1045,7 +1226,7 @@
       el.classList.add('active');
     }
 
-    // In-Browser Audio Extractor (16kHz Mono WAV)
+    // Audio Extractor & WAV Compressor
     async function compressAudioToWav(fileOrBlob) {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
       const arrayBuffer = await fileOrBlob.arrayBuffer();
@@ -1082,26 +1263,22 @@
       return view;
     }
 
-    // Direct Cloudflare Worker API Call
+    // Direct AI Call with Error Prevention
     async function startSubGeneration() {
+      if (!videoFileBlob) {
+        alert('ကျေးဇူးပြု၍ အပေါ်ရှိ 📹 Video ခလုတ်မှတစ်ဆင့် ဖုန်းထဲရှိ မိမိဗီဒီယိုဖိုင်ကို အရင်ရွေးချယ်ပေးပါခင်ဗျာ။ (Demo Video မှာ CORS ကန့်သတ်ချက် ရှိပါသည်)');
+        openModal('videoModal');
+        return;
+      }
+
       const statusEl = document.getElementById('genStatus');
       const btn = document.getElementById('btnGenSub');
       btn.disabled = true;
 
       try {
-        let audioBlobToSend = null;
+        statusEl.innerText = '⏳ ဗီဒီယိုထဲမှ အသံကို သီးသန့်ချုံ့ထုတ်နေပါသည်...';
+        const audioBlobToSend = await compressAudioToWav(videoFileBlob);
 
-        if (videoFileBlob) {
-          statusEl.innerText = '⏳ ဗီဒီယိုထဲမှ အသံကို ဖောက်ထုတ်ချုံ့ယူနေပါသည်...';
-          audioBlobToSend = await compressAudioToWav(videoFileBlob);
-        } else {
-          statusEl.innerText = '⏳ အသံဖိုင် စီမံနေပါသည်...';
-          const resp = await fetch(video.src);
-          const blob = await resp.blob();
-          audioBlobToSend = await compressAudioToWav(blob);
-        }
-
-        // 1. Groq Whisper
         statusEl.innerText = '⚡ Groq Whisper ဖြင့် English SRT ထုတ်ယူနေပါသည်...';
         const formData = new FormData();
         formData.append('file', audioBlobToSend, 'audio.wav');
@@ -1110,6 +1287,11 @@
           method: 'POST',
           body: formData
         });
+
+        if (!groqRes.ok) {
+          throw new Error(`Worker Transcribe Error (${groqRes.status}): Worker URL မှန်မမှန် စစ်ဆေးပေးပါခင်ဗျာ။`);
+        }
+
         const groqData = await groqRes.json();
         if (groqData.error) throw new Error(groqData.error);
 
@@ -1119,7 +1301,6 @@
           engSRTText += `${i + 1}\n${toSRTTime(seg.start)} --> ${toSRTTime(seg.end)}\n${seg.text.trim()}\n\n`;
         });
 
-        // 2. Gemini Translation
         statusEl.innerText = '✨ Gemini AI ဖြင့် မြန်မာစာတန်းထိုး ပြန်ဆိုနေပါသည်...';
         const lineCount = document.getElementById('lineCountSelect').value;
         const geminiRes = await fetch(`${WORKER_URL.replace(/\/$/, '')}/api/translate`, {
@@ -1131,6 +1312,9 @@
             lineCount: lineCount
           })
         });
+
+        if (!geminiRes.ok) throw new Error(`Worker Translation Error (${geminiRes.status})`);
+
         const geminiData = await geminiRes.json();
         if (geminiData.error) throw new Error(geminiData.error);
 
@@ -1181,6 +1365,133 @@
       renderSRTEditor();
     }
 
+    // EXPORT RENDERED VIDEO (SUBTITLES, OVERLAYS အားလုံး ပေါင်းစပ်ထုတ်ယူခြင်း)
+    async function exportRenderedVideo() {
+      const btn = document.getElementById('btnExportVideo');
+      const statusText = document.getElementById('exportStatusText');
+      const progressBar = document.getElementById('exportProgressBar');
+
+      btn.disabled = true;
+      progressBar.style.display = 'block';
+      progressBar.style.width = '0%';
+      statusText.innerText = 'Render စတင်နေပါသည်...';
+
+      const canvas = document.getElementById('exportCanvas');
+      const stageW = cropStage.clientWidth;
+      const stageH = cropStage.clientHeight;
+      canvas.width = stageW * 2; // high res
+      canvas.height = stageH * 2;
+      const ctx = canvas.getContext('2d');
+
+      const stream = canvas.captureStream(30);
+
+      // Attach audio track if available
+      try {
+        if (video.captureStream) {
+          const vStream = video.captureStream();
+          const audioTracks = vStream.getAudioTracks();
+          if (audioTracks.length > 0) stream.addTrack(audioTracks[0]);
+        }
+      } catch (e) {}
+
+      const recordedChunks = [];
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `rendered_video_${Date.now()}.webm`;
+        a.click();
+        statusText.innerText = '✅ Download ပြီးပါပြီ!';
+        btn.disabled = false;
+        progressBar.style.display = 'none';
+      };
+
+      video.currentTime = 0;
+      await video.play();
+      mediaRecorder.start();
+
+      const renderInterval = setInterval(() => {
+        if (video.paused || video.ended) {
+          clearInterval(renderInterval);
+          mediaRecorder.stop();
+          return;
+        }
+
+        const pct = Math.round((video.currentTime / video.duration) * 100);
+        progressBar.style.width = pct + '%';
+        statusText.innerText = `Render နေပါသည်... ${pct}%`;
+
+        // 1. Draw Scaled Video Frame
+        ctx.save();
+        ctx.scale(2, 2);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, stageW, stageH);
+
+        const vW = video.videoWidth;
+        const vH = video.videoHeight;
+        const vRatio = vW / vH;
+        const drawH = stageH * zoomScale;
+        const drawW = drawH * vRatio;
+        const drawX = (stageW - drawW) / 2 + panX;
+        const drawY = (stageH - drawH) / 2 + panY;
+        ctx.drawImage(video, drawX, drawY, drawW, drawH);
+
+        // 2. Draw Overlays (Logo, Title, Timecode, Blur)
+        const logo = document.getElementById('logoOverlay');
+        if (logo.style.display === 'block') {
+          const lImg = document.getElementById('logoImg');
+          if (lImg.src) ctx.drawImage(lImg, logo.offsetLeft, logo.offsetTop, lImg.width || 45, lImg.height || 45);
+        }
+
+        const title = document.getElementById('titleOverlay');
+        if (title.style.display === 'block') {
+          ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
+          ctx.fillStyle = title.style.color || '#ffffff';
+          ctx.fillText(document.getElementById('titleTextDisplay').innerText, title.offsetLeft, title.offsetTop + 14);
+        }
+
+        const tc = document.getElementById('timecodeOverlay');
+        if (tc.style.display === 'block') {
+          ctx.font = 'bold 11px monospace';
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillText(document.getElementById('timecodeText').innerText, tc.offsetLeft, tc.offsetTop + 12);
+        }
+
+        // 3. Draw Subtitles
+        const subMM = document.getElementById('liveSubMM').innerText;
+        const subEng = document.getElementById('liveSubENG').innerText;
+
+        if (subMM) {
+          ctx.font = 'bold 14px Padauk, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#ffffff';
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 3;
+          ctx.strokeText(subMM, stageW / 2, stageH - 30);
+          ctx.fillText(subMM, stageW / 2, stageH - 30);
+        }
+
+        if (subEng) {
+          ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#fbbf24';
+          ctx.strokeStyle = '#000000';
+          ctx.lineWidth = 3;
+          ctx.strokeText(subEng, stageW / 2, stageH - 12);
+          ctx.fillText(subEng, stageW / 2, stageH - 12);
+        }
+
+        ctx.restore();
+      }, 1000 / 30);
+    }
+
     function exportSRT(type) {
       let content = '';
       srtData.forEach(item => {
@@ -1200,19 +1511,20 @@
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+    function saveCustomWorkerUrl() {
+      const val = document.getElementById('workerUrlInput').value.trim();
+      if (val) {
+        WORKER_URL = val;
+        localStorage.setItem('SILVER_WORKER_URL', val);
+        alert('Worker URL အသစ် သိမ်းဆည်းပြီးပါပြီ!');
+        closeModal('workerModal');
+      }
+    }
+
     function handleLocalVideo(input) {
       if (input.files && input.files[0]) {
         videoFileBlob = input.files[0];
         video.src = URL.createObjectURL(videoFileBlob);
-        closeModal('videoModal');
-      }
-    }
-
-    function loadCustomVideoUrl() {
-      const url = document.getElementById('ytUrlInput').value.trim();
-      if (url) {
-        video.src = url;
-        videoFileBlob = null;
         closeModal('videoModal');
       }
     }
