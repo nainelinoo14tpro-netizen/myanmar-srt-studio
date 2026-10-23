@@ -4,18 +4,40 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Silver Studio - Myanmar SRT Pro</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
-
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            silver: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          },
+          boxShadow: {
+            'metallic': '0 4px 20px -2px rgba(203, 213, 225, 0.18), inset 0 1px 1px 0 rgba(255, 255, 255, 0.35)',
+            'silver-glow': '0 0 15px rgba(226, 232, 240, 0.25)'
+          }
+        }
+      }
+    }
+  </script>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Padauk:wght@400;700&display=swap');
+    
     :root {
-      --bg-dark: #080c14;
-      --bg-surface: #0f1726;
-      --bg-card: #151f32;
-      --silver-main: #e2e8f0;
-      --silver-border: #233149;
-      --accent-cyan: #38bdf8;
       --karaoke-base: #ffffff;
       --karaoke-active: #ff007f;
       --orig-sub-color: #38bdf8;
@@ -25,108 +47,93 @@
       --user-custom-font: 'Padauk', sans-serif;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+    body {
+      font-family: 'Plus Jakarta Sans', var(--user-custom-font), sans-serif;
+      touch-action: pan-y;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--silver-main);
-      font-family: 'Plus Jakarta Sans', var(--user-custom-font), sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-      padding-bottom: 70px;
+    .bg-brushed-metal {
+      background: radial-gradient(circle at 50% 0%, #334155 0%, #1e293b 45%, #0b0f19 100%);
     }
 
-    /* 1. COMPACT STICKY TOP VIEWPORT (ဖုန်း screen နှင့် အချိုးကျအောင် ညှိထားသော အပိုင်း) */
-    .sticky-top-section {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: #020617;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
-      border-bottom: 1px solid #1e293b;
+    .silver-card {
+      background: linear-gradient(135deg, rgba(241, 245, 249, 0.09) 0%, rgba(148, 163, 184, 0.04) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(226, 232, 240, 0.2);
     }
 
-    .top-header {
-      background: linear-gradient(180deg, #161e2e 0%, #0d121c 100%);
-      border-bottom: 1px solid var(--silver-border);
-      padding: 6px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand-title {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 800;
-      font-size: 12px;
-      color: #f8fafc;
-    }
-
-    .badge-silver {
-      background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+    .silver-button {
+      background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 50%, #94a3b8 100%);
       color: #0f172a;
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 9px;
-      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.8);
+    }
+    .silver-button:active {
+      background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%);
+      transform: translateY(1px);
     }
 
-    .btn-header {
+    .silver-button-dark {
+      background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.12);
+    }
+    .silver-button-dark:active {
       background: #1e293b;
-      border: 1px solid #334155;
-      color: #f1f5f9;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    }
+
+    .pan-surface {
+      touch-action: none;
+      -webkit-user-drag: none;
+    }
+
+    .overlay-element {
+      position: absolute;
+      touch-action: none;
+      cursor: grab;
+      user-select: none;
+      z-index: 35;
+    }
+    .overlay-element:active {
+      cursor: grabbing;
+    }
+
+    .corner-mark {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-color: #cbd5e1;
+      pointer-events: none;
+      z-index: 30;
+      opacity: 0.85;
+    }
+    .corner-tl { top: -2px; left: -2px; border-top: 3px solid; border-left: 3px solid; border-top-left-radius: 4px; }
+    .corner-tr { top: -2px; right: -2px; border-top: 3px solid; border-right: 3px solid; border-top-right-radius: 4px; }
+    .corner-bl { bottom: -2px; left: -2px; border-bottom: 3px solid; border-left: 3px solid; border-bottom-left-radius: 4px; }
+    .corner-br { bottom: -2px; right: -2px; border-bottom: 3px solid; border-right: 3px solid; border-bottom-right-radius: 4px; }
+
+    .toggle-switch-bg {
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+    .toggle-switch-dot {
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #f8fafc;
+      box-shadow: 0 0 6px rgba(0,0,0,0.6);
       cursor: pointer;
     }
 
-    /* Video Viewport Stage: Phone Screen Fit (အမြင့် ၂၃၀px သို့ လျှော့ချထားသည်) */
-    .video-viewport-area {
-      position: relative;
-      background: #020617;
-      width: 100%;
-      height: 235px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .viewport-grid-bg {
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(#1e293b 1px, transparent 1px);
-      background-size: 12px 12px;
-      opacity: 0.35;
-      pointer-events: none;
-    }
-
-    .crop-stage {
-      position: relative;
-      height: 225px;
-      width: 225px;
-      background: #000;
-      overflow: hidden;
-      border-radius: 8px;
-      box-shadow: 0 0 0 1px #475569, 0 8px 20px rgba(0,0,0,0.8);
-      touch-action: none;
-      transition: width 0.2s ease, height 0.2s ease;
-    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
     /* Live Progress Border SVG */
     .live-progress-border-svg {
@@ -135,7 +142,7 @@
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 65;
+      z-index: 40;
       display: none;
     }
 
@@ -147,1056 +154,954 @@
       filter: drop-shadow(0 0 6px var(--border-glow-color));
       transition: stroke-dashoffset 0.1s linear;
     }
-
-    .media-canvas {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) translate(0px, 0px) scale(1);
-      transform-origin: center center;
-      pointer-events: auto;
-      cursor: grab;
-      will-change: transform;
-    }
-
-    .media-canvas:active { cursor: grabbing; }
-
-    .media-canvas video {
-      display: block;
-      pointer-events: none;
-      object-fit: contain;
-    }
-
-    /* Overlays */
-    .drag-overlay {
-      position: absolute;
-      cursor: move;
-      touch-action: none;
-      z-index: 50;
-      user-select: none;
-      display: none;
-    }
-
-    #logoOverlay { top: 8px; left: 8px; }
-    #titleOverlay {
-      top: 8px;
-      right: 8px;
-      padding: 3px 6px;
-      border-radius: 5px;
-      font-weight: 700;
-      font-size: 12px;
-      white-space: nowrap;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px dashed rgba(255, 255, 255, 0.3);
-    }
-    #blurOverlay {
-      top: 40%;
-      left: 20%;
-      width: 80px;
-      height: 35px;
-      backdrop-filter: blur(12px);
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px dashed rgba(56, 189, 248, 0.5);
-      border-radius: 6px;
-    }
-
-    /* Live Subtitles */
-    .live-sub-container {
-      position: absolute;
-      bottom: 6px;
-      left: 4px;
-      right: 4px;
-      text-align: center;
-      z-index: 60;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .sub-track-orig {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--orig-sub-color);
-      text-shadow: 0 1px 3px #000, 0 0 3px #000;
-      line-height: 1.2;
-      display: none;
-    }
-
-    .sub-track-mm {
-      font-family: var(--user-custom-font);
-      font-weight: 700;
-      font-size: 13px;
-      color: var(--mm-sub-color);
-      text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 3px #000;
-      line-height: 1.3;
-      display: block;
-    }
-
-    .sub-track-eng {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-      line-height: 1.2;
-      display: inline-block;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-      background: linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) 0%, var(--karaoke-base) 0%, var(--karaoke-base) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: block;
-    }
-
-    /* Mini Controls */
-    .player-mini-bar {
-      background: #090e17;
-      padding: 5px 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .time-readout {
-      font-size: 10px;
-      color: #94a3b8;
-      font-family: monospace;
-      min-width: 60px;
-    }
-
-    .scrubber {
-      flex: 1;
-      height: 4px;
-      accent-color: #38bdf8;
-    }
-
-    .btn-play-pause {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 5px;
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .zoom-ctrl-wrap {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      background: #131d2e;
-      border: 1px solid #243248;
-      padding: 2px 4px;
-      border-radius: 5px;
-    }
-
-    .btn-zoom {
-      background: transparent;
-      border: none;
-      color: #38bdf8;
-      font-weight: 800;
-      font-size: 12px;
-      padding: 0 3px;
-      cursor: pointer;
-    }
-
-    .zoom-slider {
-      width: 45px;
-      height: 3px;
-      accent-color: #38bdf8;
-    }
-
-    /* Aspect Ratio Bar */
-    .aspect-bar {
-      background: #0f172a;
-      padding: 5px 8px;
-      display: flex;
-      gap: 5px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-
-    .aspect-bar::-webkit-scrollbar { display: none; }
-
-    .aspect-chip {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #94a3b8;
-      padding: 4px 8px;
-      border-radius: 5px;
-      font-size: 10px;
-      font-weight: 700;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-
-    .aspect-chip.active {
-      background: linear-gradient(135deg, #f8fafc, #cbd5e1);
-      color: #0f172a;
-      border-color: #f8fafc;
-    }
-
-    /* 2. MASTER DROPDOWN SETTINGS SELECTOR (ဖုန်း screen နေရာမစားစေသော Dropdown စနစ်) */
-    .settings-dropdown-wrapper {
-      margin: 8px 10px;
-      background: #101826;
-      border: 1px solid #223249;
-      border-radius: 8px;
-      padding: 6px 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .settings-dropdown-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #38bdf8;
-      white-space: nowrap;
-    }
-
-    .settings-select {
-      flex: 1;
-      background: #090e17;
-      border: 1px solid #334155;
-      color: #f8fafc;
-      padding: 6px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      outline: none;
-    }
-
-    /* All Setting Panels */
-    .setting-section-card {
-      background: #131c2e;
-      border: 1px solid #233148;
-      border-radius: 10px;
-      margin: 6px 10px 14px;
-      padding: 10px;
-      display: none;
-    }
-
-    .setting-section-card.show {
-      display: block;
-    }
-
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #1e293b;
-      padding-bottom: 5px;
-    }
-
-    .panel-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #e2e8f0;
-    }
-
-    .toggle-wrap {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    .toggle-wrap input { display: none; }
-
-    .switch-track {
-      width: 34px;
-      height: 18px;
-      background: #334155;
-      border-radius: 18px;
-      position: relative;
-      transition: background 0.2s;
-    }
-
-    .switch-thumb {
-      width: 12px;
-      height: 12px;
-      background: #fff;
-      border-radius: 50%;
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      transition: transform 0.2s;
-    }
-
-    .toggle-wrap input:checked + .switch-track { background: #38bdf8; }
-    .toggle-wrap input:checked + .switch-track .switch-thumb { transform: translateX(16px); }
-
-    .control-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-      font-size: 11px;
-      color: #94a3b8;
-    }
-
-    .control-input {
-      background: #090e17;
-      border: 1px solid #334155;
-      color: #fff;
-      padding: 6px 8px;
-      border-radius: 6px;
-      font-size: 12px;
-      width: 100%;
-    }
-
-    .track-choice-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
-      margin: 6px 0;
-    }
-
-    .track-choice-label {
-      background: #182338;
-      border: 1px solid #29384f;
-      padding: 5px;
-      border-radius: 5px;
-      font-size: 10px;
-      font-weight: 700;
-      text-align: center;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-    }
-
-    .track-choice-label input { accent-color: #38bdf8; }
-
-    /* Category Buttons */
-    .category-pills {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 5px;
-      margin: 8px 0;
-    }
-
-    .cat-btn {
-      background: #1b263b;
-      border: 1px solid #2d3e58;
-      color: #94a3b8;
-      padding: 5px 2px;
-      border-radius: 5px;
-      font-size: 10px;
-      font-family: var(--user-custom-font);
-      font-weight: 700;
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .cat-btn.active {
-      background: #0284c7;
-      border-color: #38bdf8;
-      color: #fff;
-    }
-
-    .btn-generate {
-      background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
-      color: #fff;
-      border: none;
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-    }
-
-    .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* Progress Box */
-    .ai-progress-box {
-      margin-top: 10px;
-      background: #0a101d;
-      border: 1px solid #1e2d42;
-      border-radius: 8px;
-      padding: 8px;
-      display: none;
-    }
-
-    .progress-top-info {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 5px;
-    }
-
-    .progress-status-label {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #38bdf8;
-    }
-
-    .progress-emoji-anim {
-      font-size: 15px;
-      display: inline-block;
-      animation: emojiPulse 1s ease-in-out infinite alternate;
-    }
-
-    @keyframes emojiPulse {
-      0% { transform: scale(1); }
-      100% { transform: scale(1.3); }
-    }
-
-    .progress-percent-val {
-      font-size: 12px;
-      font-weight: 800;
-      color: #f1f5f9;
-      font-family: monospace;
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 5px;
-      background: #1e293b;
-      border-radius: 5px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
-      border-radius: 5px;
-      transition: width 0.3s ease;
-    }
-
-    /* Subtitle Editor */
-    .editor-top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
-
-    .btn-download-srt {
-      background: #1e293b;
-      border: 1px solid #38bdf8;
-      color: #38bdf8;
-      padding: 3px 6px;
-      border-radius: 5px;
-      font-size: 10px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .srt-scroll-box {
-      max-height: 480px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      scroll-behavior: smooth;
-    }
-
-    .srt-row-item {
-      background: #151f30;
-      border: 1px solid #24344d;
-      border-radius: 8px;
-      padding: 8px;
-      transition: all 0.2s;
-    }
-
-    .srt-row-item.active {
-      border-color: #38bdf8;
-      background: #1a2a44;
-      box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
-    }
-
-    .srt-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #64748b;
-      margin-bottom: 4px;
-      font-family: monospace;
-    }
-
-    .field-tag {
-      font-size: 9px;
-      font-weight: 700;
-      padding: 1px 4px;
-      border-radius: 3px;
-      display: inline-block;
-      margin-bottom: 2px;
-    }
-
-    .tag-orig { background: #0284c7; color: #fff; }
-    .tag-eng { background: #475569; color: #fff; }
-    .tag-mm { background: #dc2626; color: #fff; }
-
-    .srt-field-input {
-      width: 100%;
-      background: #090e17;
-      border: 1px solid #223049;
-      color: #f8fafc;
-      font-size: 11px;
-      padding: 4px 6px;
-      border-radius: 4px;
-      outline: none;
-      margin-bottom: 5px;
-    }
-
-    .srt-field-input.mm { font-family: var(--user-custom-font); }
-
-    /* Video Export Studio */
-    .btn-export-video {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #fff;
-      border: none;
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-
-    .modal-content {
-      background: #131c2e;
-      border: 1px solid #2d3e58;
-      width: 100%;
-      max-width: 380px;
-      border-radius: 12px;
-      padding: 14px;
-    }
-
-    .upload-tab-nav {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #233148;
-      padding-bottom: 6px;
-    }
-
-    .tab-link {
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 6px;
-      cursor: pointer;
-    }
-
-    .tab-link.active {
-      color: #38bdf8;
-      border-bottom: 2px solid #38bdf8;
-    }
   </style>
 </head>
-<body>
+<body class="bg-brushed-metal min-h-screen text-slate-100 flex flex-col items-center antialiased pb-16">
 
-  <!-- STICKY TOP VIEWPORT -->
-  <div class="sticky-top-section">
-    <header class="top-header">
-      <div class="brand-title">
-        <span>SILVER STUDIO</span>
-        <span class="badge-silver">SRT PRO</span>
+  <!-- Main Mobile Container -->
+  <div class="w-full max-w-md mx-auto flex flex-col min-h-screen relative shadow-2xl border-x border-slate-700/60">
+
+    <!-- Top Sticky Header -->
+    <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-700/80 px-4 py-2.5 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg silver-button flex items-center justify-center font-bold text-slate-900 shadow">
+          <i data-lucide="clapperboard" class="w-4 h-4 text-slate-900"></i>
+        </div>
+        <div>
+          <h1 class="text-xs font-bold tracking-wider text-slate-100 uppercase">Silver Studio</h1>
+          <p class="text-[10px] text-slate-400">SRT Studio Pro</p>
+        </div>
       </div>
-      <button class="btn-header" onclick="openModal('videoModal')">📹 Video ထည့်ရန်</button>
+
+      <div class="flex items-center gap-2">
+        <span id="activeRatioBadge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-silver-300 border border-slate-600">
+          မူရင်း
+        </span>
+        <button onclick="openModal()" class="silver-button px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+          <i data-lucide="video" class="w-3.5 h-3.5"></i>
+          <span>Video ထည့်ရန်</span>
+        </button>
+      </div>
     </header>
 
-    <div class="video-viewport-area">
-      <div class="viewport-grid-bg"></div>
-
-      <div class="crop-stage" id="cropStage">
-        <!-- Live Clockwise Progress Border SVG -->
-        <svg class="live-progress-border-svg" id="liveBorderSvg">
-          <rect id="liveProgressRect" class="border-progress-rect" x="2" y="2" rx="6" ry="6" />
-        </svg>
-
-        <div class="media-canvas" id="mediaCanvas">
-          <video id="mainVideo" playsinline preload="auto" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
-        </div>
-
-        <!-- Overlays -->
-        <div id="logoOverlay" class="drag-overlay">
-          <img id="logoImg" src="" style="width: 40px; display: block; border-radius: 4px;">
-        </div>
-
-        <div id="titleOverlay" class="drag-overlay">
-          <span id="titleTextDisplay">ခေါင်းစဉ်စာသား</span>
-        </div>
-
-        <div id="blurOverlay" class="drag-overlay"></div>
-
-        <!-- Live Subtitles -->
-        <div class="live-sub-container">
-          <div id="liveSubOrig" class="sub-track-orig">မူရင်း အသံစာတန်း</div>
-          <div id="liveSubMM" class="sub-track-mm">မြန်မာစာတန်းထိုး နေရာ</div>
-          <div id="liveSubENG" class="sub-track-eng">English Live Karaoke Subtitle</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Mini Controls -->
-    <div class="player-mini-bar">
-      <button class="btn-play-pause" id="btnPlayPause" onclick="togglePlay()">Play</button>
-      <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
-      <input type="range" class="scrubber" id="videoScrubber" min="0" max="100" value="0">
+    <!-- FIXED TOP VIDEO VIEWPORT AREA (Clean Screen & Pro Framing) -->
+    <section class="sticky top-[53px] z-40 bg-slate-950/95 border-b border-slate-700/80 shadow-2xl backdrop-blur-md">
       
-      <div class="zoom-ctrl-wrap">
-        <button class="btn-zoom" onclick="adjustZoom(-0.1)">-</button>
-        <input type="range" class="zoom-slider" id="zoomSlider" min="1" max="3" step="0.1" value="1" oninput="setZoom(this.value)">
-        <button class="btn-zoom" onclick="adjustZoom(0.1)">+</button>
+      <div id="videoStage" class="w-full h-[235px] bg-neutral-950 relative flex items-center justify-center p-2 overflow-hidden select-none">
+        
+        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 14px 14px;"></div>
+
+        <!-- Target Frame -->
+        <div id="frameWrapper" class="relative rounded-xl shadow-[0_0_35px_rgba(0,0,0,0.95)] border-2 border-slate-300 transition-all duration-150 flex items-center justify-center shrink-0 z-10 overflow-hidden"
+             style="width: 220px; height: 220px;">
+          
+          <div class="corner-mark corner-tl"></div>
+          <div class="corner-mark corner-tr"></div>
+          <div class="corner-mark corner-bl"></div>
+          <div class="corner-mark corner-br"></div>
+
+          <!-- Live Progress Border -->
+          <svg class="live-progress-border-svg" id="liveBorderSvg">
+            <rect id="liveProgressRect" class="border-progress-rect" x="2" y="2" rx="6" ry="6" />
+          </svg>
+
+          <!-- Empty Placeholder -->
+          <div id="emptyPlaceholder" onclick="openModal()" class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-slate-800/40 transition group z-30">
+            <div class="w-10 h-10 rounded-full silver-button flex items-center justify-center mb-2 shadow-lg group-hover:scale-105 transition transform">
+              <i data-lucide="plus" class="w-5 h-5 text-slate-900"></i>
+            </div>
+            <p class="text-xs font-semibold text-slate-200">Video ထည့်ရန် နှိပ်ပါ</p>
+            <p class="text-[10px] text-slate-400 mt-1">MP4 သို့မဟုတ် Video URL</p>
+          </div>
+
+          <!-- Video Canvas -->
+          <div id="mediaWrapper" class="absolute flex items-center justify-center origin-center will-change-transform hidden">
+            <video id="htmlVideo" class="block max-w-none max-h-none pointer-events-none" playsinline loop muted></video>
+          </div>
+
+          <!-- Pan Layer -->
+          <div id="dragInteractionLayer" class="absolute inset-0 z-20 cursor-grab active:cursor-grabbing pan-surface hidden" title="ဆွဲရွှေ့၍ ဗီဒီယိုနေရာညှိပါ"></div>
+
+          <!-- Draggable Overlays Container -->
+          <div id="overlaysContainer" class="absolute inset-0 z-35 pointer-events-none">
+
+            <!-- Logo -->
+            <div id="logoOverlay" class="overlay-element pointer-events-auto hidden" style="top: 8px; left: 8px;" onpointerdown="startOverlayDrag(event, 'logo')">
+              <img id="logoImg" src="" alt="Logo" class="w-12 h-auto drop-shadow-md object-contain select-none pointer-events-none rounded transition">
+            </div>
+
+            <!-- Title Text -->
+            <div id="titleOverlay" class="overlay-element pointer-events-auto hidden" style="top: 8px; right: 8px;" onpointerdown="startOverlayDrag(event, 'title')">
+              <div id="titleBadge" class="px-2 py-0.5 rounded bg-black/60 backdrop-blur-sm border border-white/20 shadow-md text-right max-w-[180px] break-words">
+                <span id="titleDisplay" class="text-xs font-bold text-white tracking-wide leading-tight select-none pointer-events-none">
+                  ခေါင်းစဉ်စာသား
+                </span>
+              </div>
+            </div>
+
+            <!-- Blur Box -->
+            <div id="blurOverlay" class="overlay-element pointer-events-auto hidden" style="top: 40%; left: 25%; width: 80px; height: 40px;" onpointerdown="startOverlayDrag(event, 'blur')">
+              <div id="blurBox" class="w-full h-full rounded-lg border border-white/30 backdrop-blur-md bg-white/10 shadow-xl relative overflow-hidden flex items-center justify-center">
+                <span id="blurTag" class="text-[8px] text-white/60 font-mono tracking-wider uppercase select-none pointer-events-none">BLUR</span>
+              </div>
+            </div>
+
+            <!-- Live Subtitles Overlay (Original, Myanmar, English Karaoke) -->
+            <div class="absolute bottom-1.5 inset-x-2 text-center pointer-events-none flex flex-col gap-0.5 z-40">
+              <div id="liveSubOrig" class="text-[11px] font-bold drop-shadow-[0_1px_2px_#000] hidden" style="color: var(--orig-sub-color);">မူရင်းစာတန်းထိုး</div>
+              <div id="liveSubMM" class="text-[13px] font-bold drop-shadow-[0_2px_3px_#000] leading-tight" style="color: var(--mm-sub-color); font-family: var(--user-custom-font);">မြန်မာစာတန်းထိုး နေရာ</div>
+              <div id="liveSubENG" class="text-[11px] font-bold tracking-wide drop-shadow-[0_1px_2px_#000] inline-block leading-tight"
+                   style="background: linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) 0%, var(--karaoke-base) 0%, var(--karaoke-base) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                English Live Karaoke Subtitle
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
 
-      <button class="btn-play-pause" onclick="resetVideoPosition()" title="Reset Pan & Zoom">↺</button>
-    </div>
+      <!-- Playback Timeline & Quick Controls Bar -->
+      <div id="playerControlsBar" class="bg-slate-900 border-t border-slate-800 px-3 py-1.5 flex flex-col gap-1 hidden">
+        <div class="flex items-center gap-2">
+          <span id="videoCurrentTime" class="text-[10px] font-mono text-slate-400 w-8 text-right">0:00</span>
+          <input id="videoSeeker" type="range" min="0" max="100" value="0" step="0.1" oninput="handleSeek(this.value)" class="flex-1 h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+          <span id="videoDuration" class="text-[10px] font-mono text-slate-400 w-8">0:00</span>
+        </div>
 
-    <!-- Aspect Ratio Bar -->
-    <div class="aspect-bar">
-      <div class="aspect-chip active" onclick="setAspect('original', null, null, this)">★ မူရင်း (Original Full)</div>
-      <div class="aspect-chip" onclick="setAspect('9:16', 130, 225, this)">9:16 (TikTok)</div>
-      <div class="aspect-chip" onclick="setAspect('4:5', 180, 225, this)">4:5 (IG Post)</div>
-      <div class="aspect-chip" onclick="setAspect('1:1', 225, 225, this)">1:1 (Square)</div>
-      <div class="aspect-chip" onclick="setAspect('16:9', 280, 158, this)">16:9 (Landscape)</div>
-    </div>
-  </div>
+        <div class="flex items-center justify-between gap-2">
+          <button id="playPauseBtn" onclick="togglePlayPause()" class="silver-button-dark px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition active:scale-95">
+            <i id="playPauseIcon" data-lucide="play" class="w-3.5 h-3.5"></i>
+            <span id="playPauseText">Play</span>
+          </button>
 
-  <!-- 2. DROPDOWN SETTINGS SELECTOR (ဖုန်း screen အတွက် သီးသန့် Dropdown ရွေးချယ်မှုခလုတ်) -->
-  <div class="settings-dropdown-wrapper">
-    <span class="settings-dropdown-label">⚙️ Settings:</span>
-    <select class="settings-select" id="settingsDropdown" onchange="showSection(this.value)">
-      <option value="sectionGenerator">⚡ AI Subtitle Generator (အသံမှ စာတန်းထိုးထုတ်)</option>
-      <option value="sectionEditor" selected>📝 Subtitle Editor Studio (စာတန်းထိုး ပြင်ဆင်ရန်)</option>
-      <option value="sectionStyles">🎨 Subtitle Tracks & Styles (စာတန်း အရောင်/စတိုင်)</option>
-      <option value="sectionLogo">🖼️ Logo Settings</option>
-      <option value="sectionTitle">✏️ Title Text Settings</option>
-      <option value="sectionBlur">💧 Blur Box Settings</option>
-      <option value="sectionBorder">🌀 ဘောင်ပြေး Settings (Live Progress)</option>
-      <option value="sectionExport">🎬 Video Export Studio (ဗီဒီယို ဒေါင်းလုဒ်ဆွဲရန်)</option>
-    </select>
-  </div>
+          <!-- Zoom Slider -->
+          <div class="flex-1 max-w-[190px] flex items-center gap-1.5 px-2 py-0.5 bg-slate-950/90 border border-slate-700/80 rounded-lg">
+            <button onclick="adjustZoom(-0.1)" class="text-silver-300 font-bold px-1 text-xs">-</button>
+            <input id="zoomRange" type="range" min="0.8" max="2.5" step="0.05" value="1" oninput="handleZoomChange(this.value)" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+            <button onclick="adjustZoom(0.1)" class="text-silver-300 font-bold px-1 text-xs">+</button>
+            <span id="zoomValueText" class="text-[10px] font-mono text-slate-300 min-w-[24px]">1.0x</span>
+          </div>
 
-  <!-- SECTION 1: AI SUBTITLE GENERATOR -->
-  <div class="setting-section-card" id="sectionGenerator">
-    <div class="panel-header">
-      <span class="panel-title">⚡ 3-Way Multi-AI Engine</span>
-      <select id="lineCountSelect" class="control-input" style="width:110px; font-size:10px;">
-        <option value="2">၂ ကြောင်း (Double)</option>
-        <option value="1">၁ ကြောင်း (Single)</option>
+          <button onclick="resetPosition()" title="Reset Video Position" class="silver-button-dark p-1 rounded-lg text-slate-300 hover:text-white active:scale-95 transition">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Aspect Ratio Switcher Bar -->
+      <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-t border-slate-700/70 px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <button onclick="setTargetFrameRatio('original', 'မူရင်း')" id="ratio-original" class="ratio-btn silver-button px-2.5 py-1 rounded text-xs font-semibold shrink-0 transition">
+          ★ မူရင်း (Full)
+        </button>
+        <button onclick="setTargetFrameRatio(9/16, '9:16')" id="ratio-9-16" class="ratio-btn silver-button-dark px-2 py-1 rounded text-xs font-semibold shrink-0 transition">
+          9:16 (TikTok)
+        </button>
+        <button onclick="setTargetFrameRatio(4/5, '4:5')" id="ratio-4-5" class="ratio-btn silver-button-dark px-2 py-1 rounded text-xs font-semibold shrink-0 transition">
+          4:5 (IG)
+        </button>
+        <button onclick="setTargetFrameRatio(1/1, '1:1')" id="ratio-1-1" class="ratio-btn silver-button-dark px-2 py-1 rounded text-xs font-semibold shrink-0 transition">
+          1:1 (Square)
+        </button>
+        <button onclick="setTargetFrameRatio(16/9, '16:9')" id="ratio-16-9" class="ratio-btn silver-button-dark px-2 py-1 rounded text-xs font-semibold shrink-0 transition">
+          16:9 (Landscape)
+        </button>
+      </div>
+
+    </section>
+
+    <!-- MASTER DROPDOWN SETTINGS SELECTOR -->
+    <div class="px-3 py-2 bg-slate-900/90 border-b border-slate-700/80 flex items-center gap-2">
+      <span class="text-xs font-bold text-silver-300 flex items-center gap-1">
+        <i data-lucide="settings-2" class="w-3.5 h-3.5 text-silver-400"></i>
+        Settings:
+      </span>
+      <select id="settingsDropdown" onchange="switchSettingSection(this.value)" class="flex-1 bg-slate-950 border border-slate-600 rounded-lg px-2.5 py-1.5 text-xs text-white font-semibold outline-none shadow-inner">
+        <option value="sectionGenerator">⚡ AI Subtitle Generator (အသံမှ စာတန်းထိုးထုတ်)</option>
+        <option value="sectionEditor" selected>📝 Subtitle Editor Studio (စာတန်းထိုး ပြင်ဆင်ရန်)</option>
+        <option value="sectionStyles">🎨 Subtitle Tracks & Styles (စာတန်း အရောင်/စတိုင်)</option>
+        <option value="sectionLogo">🖼️ Logo Settings</option>
+        <option value="sectionTitle">✏️ Title Text Settings</option>
+        <option value="sectionBlur">💧 Blur Box Settings</option>
+        <option value="sectionBorder">🌀 ဘောင်ပြေး Settings (Live Progress)</option>
+        <option value="sectionExport">🎬 Video Export Studio (ဗီဒီယို ဒေါင်းလုဒ်ဆွဲရန်)</option>
       </select>
     </div>
 
-    <div class="category-pills">
-      <div class="cat-btn active" onclick="selectCat('song', this)">Song</div>
-      <div class="cat-btn" onclick="selectCat('movie', this)">Movie</div>
-      <div class="cat-btn" onclick="selectCat('news', this)">News</div>
-      <div class="cat-btn" onclick="selectCat('show', this)">Show</div>
-      <div class="cat-btn" onclick="selectCat('comedy', this)">ဟာသ</div>
-      <div class="cat-btn" onclick="selectCat('mystery', this)">ဆန်းကြယ်</div>
-      <div class="cat-btn" onclick="selectCat('horror', this)">သရဲတစ္ဆေ</div>
-    </div>
+    <!-- LOWER WORKSPACE & SETTINGS SECTIONS -->
+    <main class="flex-1 px-3 py-3 space-y-3">
 
-    <button class="btn-generate" id="btnGenSub" onclick="startSubGeneration()">
-      <span>အသံမှ စာတန်းထိုး (မူရင်း + ENG + မြန်မာ) ထုတ်ယူမည်</span>
-    </button>
-
-    <div class="ai-progress-box" id="aiProgressBox">
-      <div class="progress-top-info">
-        <div class="progress-status-label">
-          <span class="progress-emoji-anim" id="progressEmoji">🎧</span>
-          <span id="progressText">စတင်နေပါသည်...</span>
+      <!-- SECTION 1: AI SUBTITLE GENERATOR -->
+      <div id="sectionGenerator" class="silver-card rounded-2xl p-4 shadow-metallic space-y-3 hidden border-l-4 border-l-cyan-400">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-2">
+          <span class="text-xs font-bold text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="sparkles" class="w-4 h-4 text-cyan-400"></i>
+            Dual AI Subtitle Engine
+          </span>
+          <select id="lineCountSelect" class="bg-slate-950 border border-slate-700 rounded px-2 py-0.5 text-[11px] text-slate-300 outline-none">
+            <option value="2">၂ ကြောင်း (Double)</option>
+            <option value="1">၁ ကြောင်း (Single)</option>
+          </select>
         </div>
-        <span class="progress-percent-val" id="progressPctVal">0%</span>
-      </div>
-      <div class="progress-track">
-        <div class="progress-bar-fill" id="progressBarFill"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- SECTION 2: SUBTITLE EDITOR STUDIO -->
-  <div class="setting-section-card show" id="sectionEditor">
-    <div class="editor-top-bar">
-      <span style="font-size:11px; font-weight:700; color:#38bdf8;">📝 Subtitle Editor Studio</span>
-      <div style="display:flex; gap:4px; flex-wrap:wrap;">
-        <button class="btn-download-srt" onclick="exportSRT('orig')">မူရင်း .srt</button>
-        <button class="btn-download-srt" onclick="exportSRT('eng')">Eng .srt</button>
-        <button class="btn-download-srt" onclick="exportSRT('mm')">မြန်မာ .srt</button>
-        <button class="btn-download-srt" onclick="exportSRT('all')">3-in-1 .srt</button>
-      </div>
-    </div>
-    <div class="srt-scroll-box" id="srtScrollBox">
-      <!-- Subtitle Rows will be dynamically rendered here -->
-    </div>
-  </div>
+        <div class="grid grid-cols-4 gap-1.5">
+          <button onclick="selectCategory('song', this)" class="cat-pill silver-button py-1 rounded text-[10px] font-bold">Song</button>
+          <button onclick="selectCategory('movie', this)" class="cat-pill silver-button-dark py-1 rounded text-[10px] font-bold">Movie</button>
+          <button onclick="selectCategory('news', this)" class="cat-pill silver-button-dark py-1 rounded text-[10px] font-bold">News</button>
+          <button onclick="selectCategory('show', this)" class="cat-pill silver-button-dark py-1 rounded text-[10px] font-bold">Show</button>
+          <button onclick="selectCategory('comedy', this)" class="cat-pill silver-button-dark py-1 rounded text-[10px] font-bold">ဟာသ</button>
+          <button onclick="selectCategory('mystery', this)" class="cat-pill silver-button-dark py-1 rounded text-[10px] font-bold">ဆန်းကြယ်</button>
+          <button onclick="selectCategory('horror', this)" class="cat-pill silver-button-dark py-1 rounded text-[10px] font-bold">သရဲတစ္ဆေ</button>
+        </div>
 
-  <!-- SECTION 3: SUBTITLE TRACKS & STYLES -->
-  <div class="setting-section-card" id="sectionStyles">
-    <div class="panel-header">
-      <span class="panel-title">🎨 Subtitle Tracks & Styles</span>
-      <button class="btn-download-srt" onclick="document.getElementById('fontUploader').click()">+ Upload Font (.ttf)</button>
-      <input type="file" id="fontUploader" accept=".ttf,.otf,.woff2" style="display:none;" onchange="handleFontUpload(this)">
-    </div>
+        <button id="btnGenSub" onclick="startSubGeneration()" class="w-full silver-button py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+          <i data-lucide="zap" class="w-4 h-4 text-slate-900"></i>
+          <span>အသံမှ စာတန်းထိုး (မူရင်း + ENG + မြန်မာ) ထုတ်ယူမည်</span>
+        </button>
 
-    <span style="font-size:10px; color:#94a3b8; font-weight:700;">Video ပေါ်တွင် ပြသလိုသော ဘာသာစကား ရွေးချယ်ပါ-</span>
-    <div class="track-choice-grid">
-      <label class="track-choice-label">
-        <input type="checkbox" id="chkShowOrig" onchange="updateLiveSubVisibility()"> မူရင်း
-      </label>
-      <label class="track-choice-label">
-        <input type="checkbox" id="chkShowEng" checked onchange="updateLiveSubVisibility()"> English
-      </label>
-      <label class="track-choice-label">
-        <input type="checkbox" id="chkShowMM" checked onchange="updateLiveSubVisibility()"> Myanmar
-      </label>
-    </div>
-
-    <div class="control-row">
-      <span>မူရင်း စာတန်းအရောင်</span>
-      <input type="color" value="#38bdf8" onchange="document.documentElement.style.setProperty('--orig-sub-color', this.value)">
-      <span>မြန်မာစာတန်း အရောင်</span>
-      <input type="color" value="#ff3344" onchange="document.documentElement.style.setProperty('--mm-sub-color', this.value)">
-    </div>
-    <div class="control-row">
-      <span>ENG Karaoke Base</span>
-      <input type="color" value="#ffffff" onchange="document.documentElement.style.setProperty('--karaoke-base', this.value)">
-      <span>Karaoke Wipe Color</span>
-      <input type="color" value="#ff007f" onchange="document.documentElement.style.setProperty('--karaoke-active', this.value)">
-    </div>
-  </div>
-
-  <!-- SECTION 4: LOGO SETTINGS -->
-  <div class="setting-section-card" id="sectionLogo">
-    <div class="panel-header">
-      <span class="panel-title">🖼️ Logo Settings</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="toggleLogo" onchange="onToggleOverlay('logo')">
-        <div class="switch-track"><div class="switch-thumb"></div></div>
-      </label>
-    </div>
-    <div class="control-row">
-      <span>Logo ပုံတင်ရန်</span>
-      <input type="file" id="logoFileInput" accept="image/*" style="font-size:10px; width:150px;" onchange="handleLogoUpload(this)">
-    </div>
-    <div class="control-row">
-      <span>Logo Size</span>
-      <input type="range" min="20" max="120" value="40" oninput="document.getElementById('logoImg').style.width = this.value + 'px'">
-    </div>
-  </div>
-
-  <!-- SECTION 5: TITLE TEXT SETTINGS -->
-  <div class="setting-section-card" id="sectionTitle">
-    <div class="panel-header">
-      <span class="panel-title">✏️ Title Text Settings</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="toggleTitle" onchange="onToggleOverlay('title')">
-        <div class="switch-track"><div class="switch-thumb"></div></div>
-      </label>
-    </div>
-    <input type="text" class="control-input" id="titleTextInput" value="ခေါင်းစဉ်စာသား" oninput="document.getElementById('titleTextDisplay').innerText = this.value">
-    <div class="control-row">
-      <span>စာလုံးအရောင်</span>
-      <input type="color" value="#ffffff" onchange="document.getElementById('titleOverlay').style.color = this.value">
-      <span>Font Size</span>
-      <input type="range" min="10" max="24" value="12" oninput="document.getElementById('titleOverlay').style.fontSize = this.value + 'px'">
-    </div>
-  </div>
-
-  <!-- SECTION 6: BLUR BOX SETTINGS -->
-  <div class="setting-section-card" id="sectionBlur">
-    <div class="panel-header">
-      <span class="panel-title">💧 Blur Box Settings</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="toggleBlur" onchange="onToggleOverlay('blur')">
-        <div class="switch-track"><div class="switch-thumb"></div></div>
-      </label>
-    </div>
-    <div class="control-row">
-      <span>Blur ပြင်းအား</span>
-      <input type="range" min="4" max="30" value="12" oninput="document.getElementById('blurOverlay').style.backdropFilter = 'blur(' + this.value + 'px)'">
-    </div>
-    <div class="control-row">
-      <span>အကျယ် (Width)</span>
-      <input type="range" min="30" max="220" value="80" oninput="document.getElementById('blurOverlay').style.width = this.value + 'px'">
-    </div>
-    <div class="control-row">
-      <span>အမြင့် (Height)</span>
-      <input type="range" min="20" max="140" value="35" oninput="document.getElementById('blurOverlay').style.height = this.value + 'px'">
-    </div>
-    <div class="control-row">
-      <span>ထောင့်ကွေး (Radius)</span>
-      <input type="range" min="0" max="30" value="6" oninput="document.getElementById('blurOverlay').style.borderRadius = this.value + 'px'">
-    </div>
-  </div>
-
-  <!-- SECTION 7: RUNNING PROGRESS BORDER -->
-  <div class="setting-section-card" id="sectionBorder">
-    <div class="panel-header">
-      <span class="panel-title">🌀 ဘောင်ပြေး Settings (Live Progress)</span>
-      <label class="toggle-wrap">
-        <input type="checkbox" id="toggleBorder" onchange="onToggleBorderSwitch(this.checked)">
-        <div class="switch-track"><div class="switch-thumb"></div></div>
-      </label>
-    </div>
-    <div class="control-row">
-      <span>ဘောင်အရောင်</span>
-      <input type="color" value="#38bdf8" onchange="document.documentElement.style.setProperty('--border-glow-color', this.value)">
-      <span>ဘောင်အထူ (Stroke)</span>
-      <input type="range" min="1" max="8" value="4" oninput="document.documentElement.style.setProperty('--border-stroke-w', this.value + 'px')">
-    </div>
-  </div>
-
-  <!-- SECTION 8: VIDEO EXPORT STUDIO -->
-  <div class="setting-section-card" id="sectionExport">
-    <div class="panel-header">
-      <span class="panel-title">🎬 Video Export Studio</span>
-      <span id="exportStatusText" style="font-size:10px; color:#94a3b8;">အဆင်သင့်</span>
-    </div>
-    <button class="btn-export-video" id="btnExportVideo" onclick="exportRenderedVideo()">
-      <span>ဗီဒီယို (Subtitles & Overlays အပြီးသတ်) ဒေါင်းလုဒ်ဆွဲမည်</span>
-    </button>
-    <div id="exportProgressBar" style="display:none; height:4px; background:#10b981; border-radius:2px; margin-top:8px; width:0%; transition:width 0.2s;"></div>
-  </div>
-
-  <!-- Video Source Modal -->
-  <div class="modal-overlay" id="videoModal">
-    <div class="modal-content">
-      <div class="upload-tab-nav">
-        <button class="tab-link active" id="tabLocalBtn" onclick="switchVideoTab('local')">📱 ဖုန်းထဲမှ Video</button>
-        <button class="tab-link" id="tabYtBtn" onclick="switchVideoTab('yt')">🔗 Direct Link (MP4)</button>
+        <!-- Progress Box -->
+        <div id="aiProgressBox" class="bg-slate-950 border border-slate-700 rounded-xl p-3 space-y-2 hidden">
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2">
+              <span id="progressEmoji" class="text-base">🎧</span>
+              <span id="progressText" class="text-[11px] text-silver-300 font-semibold">စတင်နေပါသည်...</span>
+            </div>
+            <span id="progressPctVal" class="font-mono text-cyan-400 font-bold">0%</span>
+          </div>
+          <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div id="progressBarFill" class="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 w-0 transition-all duration-300"></div>
+          </div>
+        </div>
       </div>
 
-      <div id="localTabPane">
-        <span style="font-size:11px; color:#94a3b8;">ဖုန်းထဲမှ Video File ရွေးချယ်ပါ:</span>
-        <input type="file" id="localVideoFile" accept="video/*" class="control-input" style="margin-top:6px;" onchange="handleLocalVideo(this)">
+      <!-- SECTION 2: SUBTITLE EDITOR STUDIO -->
+      <div id="sectionEditor" class="silver-card rounded-2xl p-3 shadow-metallic space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-2 flex-wrap gap-2">
+          <span class="text-xs font-bold text-slate-100 flex items-center gap-1.5">
+            <i data-lucide="file-text" class="w-4 h-4 text-cyan-400"></i>
+            Subtitle Editor Studio
+          </span>
+          <div class="flex items-center gap-1">
+            <button onclick="exportSRT('orig')" class="silver-button-dark px-2 py-0.5 rounded text-[10px] font-semibold">မူရင်း.srt</button>
+            <button onclick="exportSRT('eng')" class="silver-button-dark px-2 py-0.5 rounded text-[10px] font-semibold">Eng.srt</button>
+            <button onclick="exportSRT('mm')" class="silver-button-dark px-2 py-0.5 rounded text-[10px] font-semibold">မြန်မာ.srt</button>
+            <button onclick="exportSRT('all')" class="silver-button px-2 py-0.5 rounded text-[10px] font-bold">3-in-1</button>
+          </div>
+        </div>
+
+        <div id="srtScrollBox" class="space-y-2 max-h-[460px] overflow-y-auto pr-1 no-scrollbar">
+          <!-- Subtitle Items rendered here -->
+        </div>
       </div>
 
-      <div id="ytTabPane" style="display:none;">
-        <span style="font-size:11px; color:#94a3b8;">Video MP4 Stream Link ထည့်ပါ:</span>
-        <input type="text" id="ytUrlInput" class="control-input" placeholder="https://domain.com/video.mp4" style="margin-top:6px;">
-        <button class="btn-generate" style="margin-top:8px; padding:7px;" onclick="loadYoutubeOrDirectUrl()">Load Video</button>
+      <!-- SECTION 3: SUBTITLE TRACKS & STYLES -->
+      <div id="sectionStyles" class="silver-card rounded-2xl p-4 shadow-metallic space-y-3 hidden border-l-4 border-l-pink-400">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-2">
+          <span class="text-xs font-bold text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="palette" class="w-4 h-4 text-pink-400"></i>
+            Subtitle Tracks & Styles
+          </span>
+          <label class="silver-button px-2 py-1 rounded text-[10px] font-bold cursor-pointer flex items-center gap-1">
+            <i data-lucide="upload" class="w-3 h-3"></i>
+            <span>Upload Font (.ttf)</span>
+            <input type="file" id="fontUploader" accept=".ttf,.otf,.woff2" class="hidden" onchange="handleFontUpload(this)">
+          </label>
+        </div>
+
+        <div class="space-y-2">
+          <span class="text-[11px] text-slate-400 block font-semibold">Video ပေါ်တွင် ပြသလိုသော ဘာသာစကားများ:</span>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <label class="bg-slate-900/80 p-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer">
+              <input type="checkbox" id="chkShowOrig" onchange="updateLiveSubVisibility()" class="accent-cyan-400"> မူရင်း
+            </label>
+            <label class="bg-slate-900/80 p-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer">
+              <input type="checkbox" id="chkShowEng" checked onchange="updateLiveSubVisibility()" class="accent-pink-400"> English
+            </label>
+            <label class="bg-slate-900/80 p-2 rounded-lg border border-slate-700 flex items-center justify-center gap-1.5 cursor-pointer">
+              <input type="checkbox" id="chkShowMM" checked onchange="updateLiveSubVisibility()" class="accent-red-400"> Myanmar
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">မူရင်း စာတန်းအရောင်</span>
+            <input type="color" value="#38bdf8" onchange="document.documentElement.style.setProperty('--orig-sub-color', this.value)" class="w-full h-8 bg-transparent rounded cursor-pointer border border-slate-600">
+          </div>
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">မြန်မာစာတန်း အရောင်</span>
+            <input type="color" value="#ff3344" onchange="document.documentElement.style.setProperty('--mm-sub-color', this.value)" class="w-full h-8 bg-transparent rounded cursor-pointer border border-slate-600">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">Karaoke Base Color</span>
+            <input type="color" value="#ffffff" onchange="document.documentElement.style.setProperty('--karaoke-base', this.value)" class="w-full h-8 bg-transparent rounded cursor-pointer border border-slate-600">
+          </div>
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">Karaoke Wipe Color</span>
+            <input type="color" value="#ff007f" onchange="document.documentElement.style.setProperty('--karaoke-active', this.value)" class="w-full h-8 bg-transparent rounded cursor-pointer border border-slate-600">
+          </div>
+        </div>
       </div>
 
-      <div style="display:flex; justify-content:flex-end; margin-top:10px;">
-        <button class="btn-header" onclick="closeModal('videoModal')">ပိတ်မည်</button>
+      <!-- SECTION 4: LOGO SETTINGS -->
+      <div id="sectionLogo" class="silver-card rounded-2xl p-4 shadow-metallic space-y-3 hidden border-l-4 border-l-cyan-400">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-800 text-cyan-400 flex items-center justify-center">
+              <i data-lucide="image" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-100 uppercase tracking-wider block">Logo Settings</span>
+              <span id="logoStatusText" class="text-[10px] text-slate-400">ပိတ်ထားသည် (OFF)</span>
+            </div>
+          </div>
+          <button id="toggleSwitchLogo" onclick="toggleOverlaySwitch('logo')" class="toggle-switch-bg relative w-12 h-6 rounded-full bg-slate-700 border border-slate-500 p-0.5 transition cursor-pointer">
+            <div id="toggleDotLogo" class="toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-0"></div>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label class="silver-button px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5">
+            <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+            <span>Logo ပုံတင်ရန်</span>
+            <input type="file" id="logoFileInput" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+          </label>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+            <span>Logo Size</span>
+            <span id="logoSizeLabel" class="font-mono text-slate-200">48px</span>
+          </div>
+          <input type="range" min="20" max="120" value="48" oninput="updateLogoSize(this.value)" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <div>
+          <span class="text-[11px] text-slate-400 block mb-1">အမြန်နေရာချခြင်း:</span>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button onclick="setOverlayCorner('logo', 'tl')" class="silver-button-dark py-1 rounded text-[10px] text-cyan-300 font-semibold">အပေါ်-ဘယ်</button>
+            <button onclick="setOverlayCorner('logo', 'tr')" class="silver-button-dark py-1 rounded text-[10px]">အပေါ်-ညာ</button>
+            <button onclick="setOverlayCorner('logo', 'bl')" class="silver-button-dark py-1 rounded text-[10px]">အောက်-ဘယ်</button>
+            <button onclick="setOverlayCorner('logo', 'br')" class="silver-button-dark py-1 rounded text-[10px]">အောက်-ညာ</button>
+          </div>
+        </div>
       </div>
+
+      <!-- SECTION 5: TITLE TEXT SETTINGS -->
+      <div id="sectionTitle" class="silver-card rounded-2xl p-4 shadow-metallic space-y-3 hidden border-l-4 border-l-emerald-400">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-emerald-950/80 border border-emerald-800 text-emerald-400 flex items-center justify-center">
+              <i data-lucide="type" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-100 uppercase tracking-wider block">Title Text Settings</span>
+              <span id="titleStatusText" class="text-[10px] text-slate-400">ပိတ်ထားသည် (OFF)</span>
+            </div>
+          </div>
+          <button id="toggleSwitchTitle" onclick="toggleOverlaySwitch('title')" class="toggle-switch-bg relative w-12 h-6 rounded-full bg-slate-700 border border-slate-500 p-0.5 transition cursor-pointer">
+            <div id="toggleDotTitle" class="toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-0"></div>
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-[11px] text-slate-300 mb-1">ခေါင်းစဉ်စာသား ရိုက်ထည့်ပါ</label>
+          <input type="text" id="titleTextInput" value="ခေါင်းစဉ်စာသား" oninput="updateTitleText(this.value)" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+              <span>စာလုံးအရွယ်</span>
+              <span id="titleSizeLabel" class="font-mono text-slate-200">12px</span>
+            </div>
+            <input type="range" min="10" max="24" value="12" oninput="updateTitleSize(this.value)" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+          </div>
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">စာလုံးအရောင်</span>
+            <input type="color" value="#ffffff" onchange="updateTitleColor(this.value)" class="w-full h-7 bg-transparent rounded cursor-pointer border border-slate-600">
+          </div>
+        </div>
+
+        <div>
+          <span class="text-[11px] text-slate-400 block mb-1">အမြန်နေရာချခြင်း:</span>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button onclick="setOverlayCorner('title', 'tr')" class="silver-button-dark py-1 rounded text-[10px] text-emerald-300 font-semibold">အပေါ်-ညာ</button>
+            <button onclick="setOverlayCorner('title', 'tl')" class="silver-button-dark py-1 rounded text-[10px]">အပေါ်-ဘယ်</button>
+            <button onclick="setOverlayCorner('title', 'bl')" class="silver-button-dark py-1 rounded text-[10px]">အောက်-ဘယ်</button>
+            <button onclick="setOverlayCorner('title', 'br')" class="silver-button-dark py-1 rounded text-[10px]">အောက်-ညာ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 6: BLUR BOX SETTINGS -->
+      <div id="sectionBlur" class="silver-card rounded-2xl p-4 shadow-metallic space-y-3 hidden border-l-4 border-l-purple-400">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-purple-950/80 border border-purple-800 text-purple-400 flex items-center justify-center">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-100 uppercase tracking-wider block">Blur Box Settings</span>
+              <span id="blurStatusText" class="text-[10px] text-slate-400">ပိတ်ထားသည် (OFF)</span>
+            </div>
+          </div>
+          <button id="toggleSwitchBlur" onclick="toggleOverlaySwitch('blur')" class="toggle-switch-bg relative w-12 h-6 rounded-full bg-slate-700 border border-slate-500 p-0.5 transition cursor-pointer">
+            <div id="toggleDotBlur" class="toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-0"></div>
+          </button>
+        </div>
+
+        <div>
+          <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+            <span>Blur ပြင်းအား</span>
+            <span id="blurStrengthLabel" class="font-mono text-slate-200">12px</span>
+          </div>
+          <input type="range" min="3" max="30" value="12" oninput="updateBlurStrength(this.value)" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+              <span>အကျယ် (Width)</span>
+              <span id="blurWidthLabel" class="font-mono text-slate-200">80px</span>
+            </div>
+            <input type="range" min="30" max="220" value="80" oninput="updateBlurDimensions(this.value, null)" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+          </div>
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-1">
+              <span>အမြင့် (Height)</span>
+              <span id="blurHeightLabel" class="font-mono text-slate-200">40px</span>
+            </div>
+            <input type="range" min="20" max="120" value="40" oninput="updateBlurDimensions(null, this.value)" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <button onclick="setOverlayCorner('blur', 'center')" class="silver-button-dark py-1.5 px-3 rounded-lg text-[11px] text-purple-300 font-semibold flex items-center gap-1">
+            <i data-lucide="target" class="w-3.5 h-3.5"></i> အလယ်ဗဟိုသို့ထားမည်
+          </button>
+        </div>
+      </div>
+
+      <!-- SECTION 7: RUNNING PROGRESS BORDER -->
+      <div id="sectionBorder" class="silver-card rounded-2xl p-4 shadow-metallic space-y-3 hidden border-l-4 border-l-cyan-400">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-3">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-cyan-950/80 border border-cyan-800 text-cyan-400 flex items-center justify-center">
+              <i data-lucide="circle-dashed" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-slate-100 uppercase tracking-wider block">ဘောင်ပြေး Settings (Live Progress)</span>
+              <span id="borderStatusText" class="text-[10px] text-slate-400">ပိတ်ထားသည် (OFF)</span>
+            </div>
+          </div>
+          <button id="toggleSwitchBorder" onclick="toggleProgressBorder()" class="toggle-switch-bg relative w-12 h-6 rounded-full bg-slate-700 border border-slate-500 p-0.5 transition cursor-pointer">
+            <div id="toggleDotBorder" class="toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-0"></div>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">ဘောင်အရောင်</span>
+            <input type="color" value="#38bdf8" onchange="document.documentElement.style.setProperty('--border-glow-color', this.value)" class="w-full h-7 bg-transparent rounded cursor-pointer border border-slate-600">
+          </div>
+          <div>
+            <span class="text-[11px] text-slate-400 block mb-1">ဘောင်အထူ (Stroke)</span>
+            <input type="range" min="1" max="8" value="4" oninput="document.documentElement.style.setProperty('--border-stroke-w', this.value + 'px')" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer mt-3">
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 8: VIDEO EXPORT STUDIO -->
+      <div id="sectionExport" class="silver-card rounded-2xl p-4 shadow-metallic space-y-3 hidden border-l-4 border-l-emerald-400">
+        <div class="flex items-center justify-between border-b border-slate-700/70 pb-2">
+          <span class="text-xs font-bold text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+            <i data-lucide="film" class="w-4 h-4 text-emerald-400"></i>
+            Video Export Studio
+          </span>
+          <span id="exportStatusText" class="text-[10px] text-slate-400">အဆင်သင့်</span>
+        </div>
+
+        <button id="btnExportVideo" onclick="exportRenderedVideo()" class="w-full silver-button py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+          <i data-lucide="download" class="w-4 h-4 text-slate-900"></i>
+          <span>ဗီဒီယို (Subtitles & Overlays အပြီးသတ်) ဒေါင်းလုဒ်ဆွဲမည်</span>
+        </button>
+
+        <div id="exportProgressBar" class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden hidden">
+          <div id="exportProgressBarFill" class="h-full bg-emerald-400 w-0 transition-all duration-200"></div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- VIDEO SOURCE MODAL -->
+  <div id="videoSourceModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-opacity duration-200">
+    <div class="w-full max-w-sm bg-gradient-to-b from-slate-850 to-slate-900 border border-slate-600 rounded-2xl shadow-2xl overflow-hidden transform transition-all scale-95 duration-200" id="modalCard">
+      
+      <div class="px-4 py-3.5 border-b border-slate-700 flex items-center justify-between bg-slate-800/80">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-lg silver-button flex items-center justify-center">
+            <i data-lucide="video" class="w-4 h-4 text-slate-900"></i>
+          </div>
+          <h2 class="text-sm font-bold text-slate-100">Video ထည့်သွင်းရန်</h2>
+        </div>
+        <button onclick="closeModal()" class="w-7 h-7 rounded-full bg-slate-700/80 hover:bg-slate-600 text-slate-300 flex items-center justify-center transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-4 space-y-4">
+        <div class="flex p-1 bg-slate-950 rounded-xl border border-slate-800">
+          <button id="tabBtnFile" onclick="switchModalTab('file')" class="flex-1 py-1.5 rounded-lg text-xs font-semibold transition silver-button">
+            <i data-lucide="hard-drive" class="w-3.5 h-3.5 inline mr-1"></i> Video File
+          </button>
+          <button id="tabBtnYoutube" onclick="switchModalTab('youtube')" class="flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 transition">
+            <i data-lucide="link" class="w-3.5 h-3.5 inline mr-1"></i> Direct Link
+          </button>
+        </div>
+
+        <div id="fileTabContent" class="space-y-3">
+          <label class="border-2 border-dashed border-slate-600 hover:border-slate-400 rounded-xl p-5 flex flex-col items-center justify-center cursor-pointer bg-slate-900/50 hover:bg-slate-900 transition group text-center">
+            <div class="w-10 h-10 rounded-full silver-button-dark flex items-center justify-center mb-2 group-hover:scale-105 transition">
+              <i data-lucide="upload-cloud" class="w-5 h-5 text-silver-300"></i>
+            </div>
+            <span class="text-xs font-semibold text-slate-200">မိမိဖုန်းထဲမှ Video ရွေးပါ</span>
+            <input type="file" id="localVideoInput" accept="video/*" class="hidden" onchange="handleFileUpload(event)">
+          </label>
+        </div>
+
+        <div id="youtubeTabContent" class="space-y-3 hidden">
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5">Direct Video Link (MP4)</label>
+            <input type="text" id="directUrlInput" placeholder="https://domain.com/video.mp4" class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-100 placeholder-slate-500 focus:outline-none">
+          </div>
+          <button onclick="handleDirectUrlSubmit()" class="w-full silver-button py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg transition">
+            <i data-lucide="play" class="w-3.5 h-3.5"></i>
+            <span>Video စတင်ဖွင့်မည်</span>
+          </button>
+        </div>
+
+      </div>
+
     </div>
   </div>
 
   <canvas id="exportCanvas" style="display:none;"></canvas>
 
   <script>
-    // CLOUDFLARE WORKER URL
+    // CLOUDFLARE WORKER ENDPOINT
     const WORKER_URL = "https://myanmar-srt-studio.nainelinoo-14tpro.workers.dev";
 
+    // Application State
+    let targetFrameRatio = 'original';
+    let targetRatioName = 'မူရင်း';
     let selectedCategory = 'song';
     let currentActiveIndex = -1;
     let videoFileBlob = null;
-    let currentAspectMode = 'original';
     let isProgressBorderActive = false;
 
-    // Subtitle Data Storage
+    let nativeVideoWidth = 1920;
+    let nativeVideoHeight = 1080;
+    let nativeVideoAspect = 16/9;
+
+    let panX = 0, panY = 0, scale = 1.0;
+    let isVideoDragging = false, activePointerId = null;
+    let startX = 0, startY = 0, initialPanX = 0, initialPanY = 0;
+
     let srtData = [];
 
-    const video = document.getElementById('mainVideo');
-    const mediaCanvas = document.getElementById('mediaCanvas');
-    const cropStage = document.getElementById('cropStage');
-    const scrubber = document.getElementById('videoScrubber');
-    const timeDisplay = document.getElementById('timeDisplay');
-    const btnPlayPause = document.getElementById('btnPlayPause');
-    const zoomSlider = document.getElementById('zoomSlider');
+    // Overlays State
+    const overlays = {
+      logo: { active: false, size: 48 },
+      title: { active: false, size: 12, color: '#ffffff' },
+      blur: { active: false, width: 80, height: 40, strength: 12 }
+    };
 
-    let panX = 0, panY = 0, zoomScale = 1.0;
-    let isDragging = false, startX = 0, startY = 0;
+    let activeDraggedOverlay = null;
+    let overlayDragStartX = 0, overlayDragStartY = 0;
+    let overlayInitX = 0, overlayInitY = 0;
 
-    window.addEventListener('DOMContentLoaded', () => {
+    // Elements
+    const videoStage = document.getElementById('videoStage');
+    const frameWrapper = document.getElementById('frameWrapper');
+    const mediaWrapper = document.getElementById('mediaWrapper');
+    const emptyPlaceholder = document.getElementById('emptyPlaceholder');
+    const htmlVideo = document.getElementById('htmlVideo');
+    const dragInteractionLayer = document.getElementById('dragInteractionLayer');
+    const playerControlsBar = document.getElementById('playerControlsBar');
+    const zoomRange = document.getElementById('zoomRange');
+    const zoomValueText = document.getElementById('zoomValueText');
+    const activeRatioBadge = document.getElementById('activeRatioBadge');
+
+    const logoOverlay = document.getElementById('logoOverlay');
+    const logoImg = document.getElementById('logoImg');
+    const titleOverlay = document.getElementById('titleOverlay');
+    const titleDisplay = document.getElementById('titleDisplay');
+    const blurOverlay = document.getElementById('blurOverlay');
+    const blurBox = document.getElementById('blurBox');
+
+    const videoSeeker = document.getElementById('videoSeeker');
+    const videoCurrentTime = document.getElementById('videoCurrentTime');
+    const videoDuration = document.getElementById('videoDuration');
+
+    window.addEventListener('load', () => {
+      lucide.createIcons();
+      setupVideoPointerGestures();
+      setupVideoTimelineListeners();
       updateLiveSubVisibility();
-      setupPanDrag();
-      setupOverlayDrag('logoOverlay');
-      setupOverlayDrag('titleOverlay');
-      setupOverlayDrag('blurOverlay');
+      renderSRTEditor();
     });
 
     // Dropdown Settings Switcher
-    function showSection(sectionId) {
-      document.querySelectorAll('.setting-section-card').forEach(card => card.classList.remove('show'));
-      const activeCard = document.getElementById(sectionId);
-      if (activeCard) {
-        activeCard.classList.add('show');
-        if (sectionId === 'sectionEditor') renderSRTEditor();
-      }
+    function switchSettingSection(sectionId) {
+      const sections = ['sectionGenerator', 'sectionEditor', 'sectionStyles', 'sectionLogo', 'sectionTitle', 'sectionBlur', 'sectionBorder', 'sectionExport'];
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', id !== sectionId);
+      });
+      if (sectionId === 'sectionEditor') renderSRTEditor();
     }
 
-    video.addEventListener('loadedmetadata', () => {
-      fitVideoToStage();
-    });
+    // Modal
+    function openModal() {
+      const modal = document.getElementById('videoSourceModal');
+      const card = document.getElementById('modalCard');
+      modal.classList.remove('hidden');
+      setTimeout(() => card.classList.replace('scale-95', 'scale-100'), 10);
+    }
 
-    function fitVideoToStage() {
-      const vWidth = video.videoWidth || 640;
-      const vHeight = video.videoHeight || 360;
-      const stageHeight = 225;
+    function closeModal() {
+      const modal = document.getElementById('videoSourceModal');
+      const card = document.getElementById('modalCard');
+      card.classList.replace('scale-100', 'scale-95');
+      setTimeout(() => modal.classList.add('hidden'), 150);
+    }
 
-      if (currentAspectMode === 'original') {
-        const stageWidth = Math.round((vWidth / vHeight) * stageHeight);
-        cropStage.style.height = stageHeight + 'px';
-        cropStage.style.width = Math.min(320, Math.max(140, stageWidth)) + 'px';
+    function switchModalTab(tab) {
+      document.getElementById('tabBtnFile').className = tab === 'file' ? 'flex-1 py-1.5 rounded-lg text-xs font-semibold transition silver-button' : 'flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-400 transition';
+      document.getElementById('tabBtnYoutube').className = tab === 'youtube' ? 'flex-1 py-1.5 rounded-lg text-xs font-semibold transition silver-button' : 'flex-1 py-1.5 rounded-lg text-xs font-semibold text-slate-400 transition';
+      document.getElementById('fileTabContent').classList.toggle('hidden', tab !== 'file');
+      document.getElementById('youtubeTabContent').classList.toggle('hidden', tab !== 'youtube');
+    }
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      videoFileBlob = file;
+      htmlVideo.src = URL.createObjectURL(file);
+      activateVideo();
+      closeModal();
+    }
+
+    function handleDirectUrlSubmit() {
+      const url = document.getElementById('directUrlInput').value.trim();
+      if (!url) return;
+      videoFileBlob = null;
+      htmlVideo.src = url;
+      activateVideo();
+      closeModal();
+    }
+
+    function activateVideo() {
+      emptyPlaceholder.classList.add('hidden');
+      mediaWrapper.classList.remove('hidden');
+      dragInteractionLayer.classList.remove('hidden');
+      playerControlsBar.classList.remove('hidden');
+
+      htmlVideo.onloadedmetadata = () => {
+        nativeVideoWidth = htmlVideo.videoWidth || 1920;
+        nativeVideoHeight = htmlVideo.videoHeight || 1080;
+        nativeVideoAspect = nativeVideoWidth / nativeVideoHeight;
+        recalculateFraming();
+      };
+      htmlVideo.play().catch(() => {});
+      updatePlayPauseButton(true);
+    }
+
+    // Framing Engine
+    function setTargetFrameRatio(ratioNumeric, ratioName) {
+      targetFrameRatio = ratioNumeric;
+      targetRatioName = ratioName;
+      activeRatioBadge.textContent = ratioName;
+
+      document.querySelectorAll('.ratio-btn').forEach(btn => {
+        btn.className = 'ratio-btn silver-button-dark px-2 py-1 rounded text-xs font-semibold shrink-0 transition';
+      });
+      const id = ratioNumeric === 'original' ? 'ratio-original' : `ratio-${ratioName.replace(':', '-')}`;
+      const activeBtn = document.getElementById(id);
+      if (activeBtn) activeBtn.className = 'ratio-btn silver-button px-2.5 py-1 rounded text-xs font-semibold shrink-0 transition';
+
+      recalculateFraming();
+    }
+
+    function recalculateFraming() {
+      const stageH = 220;
+      let frameW, frameH = stageH;
+
+      if (targetFrameRatio === 'original') {
+        frameW = Math.round(stageH * nativeVideoAspect);
+        frameW = Math.min(320, Math.max(130, frameW));
+      } else {
+        frameW = Math.round(stageH * targetFrameRatio);
+        frameW = Math.min(340, Math.max(130, frameW));
       }
 
-      video.style.height = stageHeight + 'px';
-      video.style.width = 'auto';
-      resetVideoPosition();
+      frameWrapper.style.width = `${frameW}px`;
+      frameWrapper.style.height = `${frameH}px`;
+
+      htmlVideo.style.height = `${stageH}px`;
+      htmlVideo.style.width = 'auto';
+
+      resetPosition();
       updateLiveProgressBorderDimensions();
     }
 
-    function setAspect(ratio, w, h, el) {
-      document.querySelectorAll('.aspect-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      currentAspectMode = ratio;
-
-      if (ratio === 'original') {
-        fitVideoToStage();
-      } else {
-        cropStage.style.width = w + 'px';
-        cropStage.style.height = h + 'px';
-        video.style.height = h + 'px';
-        video.style.width = 'auto';
-        resetVideoPosition();
-        updateLiveProgressBorderDimensions();
-      }
-    }
-
-    function setZoom(val) {
-      zoomScale = parseFloat(val);
-      applyVideoTransform();
-    }
-
-    function adjustZoom(delta) {
-      zoomScale = Math.min(3.0, Math.max(1.0, +(zoomScale + delta).toFixed(1)));
-      zoomSlider.value = zoomScale;
-      applyVideoTransform();
-    }
-
-    function setupPanDrag() {
-      cropStage.addEventListener('pointerdown', (e) => {
-        if (e.target.closest('.drag-overlay') || e.target.closest('.live-sub-container')) return;
-        isDragging = true;
-        startX = e.clientX - panX;
-        startY = e.clientY - panY;
-        cropStage.setPointerCapture(e.pointerId);
+    // Touch Pan & Zoom
+    function setupVideoPointerGestures() {
+      dragInteractionLayer.addEventListener('pointerdown', (e) => {
+        isVideoDragging = true;
+        activePointerId = e.pointerId;
+        dragInteractionLayer.setPointerCapture(e.pointerId);
+        startX = e.clientX;
+        startY = e.clientY;
+        initialPanX = panX;
+        initialPanY = panY;
       });
 
-      cropStage.addEventListener('pointermove', (e) => {
-        if (!isDragging) return;
-        panX = e.clientX - startX;
-        panY = e.clientY - startY;
-        applyVideoTransform();
+      dragInteractionLayer.addEventListener('pointermove', (e) => {
+        if (!isVideoDragging || e.pointerId !== activePointerId) return;
+        panX = initialPanX + (e.clientX - startX);
+        panY = initialPanY + (e.clientY - startY);
+        applyTransform();
       });
 
       const stopDrag = (e) => {
-        if (isDragging) {
-          isDragging = false;
-          try { cropStage.releasePointerCapture(e.pointerId); } catch(err){}
+        if (isVideoDragging && e.pointerId === activePointerId) {
+          isVideoDragging = false;
+          try { dragInteractionLayer.releasePointerCapture(e.pointerId); } catch(err){}
         }
       };
-      cropStage.addEventListener('pointerup', stopDrag);
-      cropStage.addEventListener('pointercancel', stopDrag);
+      dragInteractionLayer.addEventListener('pointerup', stopDrag);
+      dragInteractionLayer.addEventListener('pointercancel', stopDrag);
     }
 
-    function applyVideoTransform() {
-      mediaCanvas.style.transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${zoomScale})`;
+    function applyTransform() {
+      mediaWrapper.style.transform = `translate(${panX}px, ${panY}px) scale(${scale})`;
     }
 
-    function resetVideoPosition() {
-      panX = 0; panY = 0; zoomScale = 1.0;
-      zoomSlider.value = 1.0;
-      applyVideoTransform();
+    function handleZoomChange(val) {
+      scale = parseFloat(val);
+      zoomValueText.textContent = `${scale.toFixed(1)}x`;
+      applyTransform();
     }
 
-    function setupOverlayDrag(elementId) {
-      const el = document.getElementById(elementId);
-      let isOverlayDrag = false, oX = 0, oY = 0;
+    function adjustZoom(delta) {
+      scale = Math.min(2.5, Math.max(0.8, +(scale + delta).toFixed(1)));
+      zoomRange.value = scale;
+      zoomValueText.textContent = `${scale.toFixed(1)}x`;
+      applyTransform();
+    }
 
-      el.addEventListener('pointerdown', (e) => {
-        isOverlayDrag = true;
-        oX = e.clientX - el.offsetLeft;
-        oY = e.clientY - el.offsetTop;
-        el.setPointerCapture(e.pointerId);
-        e.stopPropagation();
-      });
+    function resetPosition() {
+      panX = 0; panY = 0; scale = 1.0;
+      zoomRange.value = 1.0;
+      zoomValueText.textContent = '1.0x';
+      applyTransform();
+    }
 
-      el.addEventListener('pointermove', (e) => {
-        if (!isOverlayDrag) return;
-        el.style.left = (e.clientX - oX) + 'px';
-        el.style.top = (e.clientY - oY) + 'px';
-        el.style.right = 'auto';
-        el.style.bottom = 'auto';
-      });
+    // Playback
+    function setupVideoTimelineListeners() {
+      htmlVideo.addEventListener('timeupdate', () => {
+        if (!htmlVideo.duration) return;
+        const cur = htmlVideo.currentTime;
+        const dur = htmlVideo.duration;
+        videoSeeker.value = (cur / dur) * 100;
+        videoCurrentTime.textContent = formatTime(cur);
 
-      const endOverlayDrag = (e) => {
-        if (isOverlayDrag) {
-          isOverlayDrag = false;
-          try { el.releasePointerCapture(e.pointerId); } catch(err){}
+        updateBorderProgress();
+
+        if (!srtData || srtData.length === 0) return;
+
+        const activeIdx = srtData.findIndex(item => cur >= item.start && cur <= item.end);
+
+        if (activeIdx !== -1) {
+          const item = srtData[activeIdx];
+          document.getElementById('liveSubOrig').innerText = item.orig || '';
+          document.getElementById('liveSubMM').innerText = item.mm || '';
+          document.getElementById('liveSubENG').innerText = item.eng || '';
+
+          const progress = Math.min(100, Math.max(0, ((cur - item.start) / (item.end - item.start)) * 100));
+          document.getElementById('liveSubENG').style.background = 
+            `linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) ${progress}%, var(--karaoke-base) ${progress}%, var(--karaoke-base) 100%)`;
+          document.getElementById('liveSubENG').style.webkitBackgroundClip = 'text';
+
+          if (currentActiveIndex !== activeIdx) {
+            currentActiveIndex = activeIdx;
+            highlightAndScrollEditor(activeIdx);
+          }
+        } else {
+          document.getElementById('liveSubOrig').innerText = '';
+          document.getElementById('liveSubMM').innerText = '';
+          document.getElementById('liveSubENG').innerText = '';
+          if (currentActiveIndex !== -1) {
+            clearEditorHighlights();
+            currentActiveIndex = -1;
+          }
         }
-      };
-      el.addEventListener('pointerup', endOverlayDrag);
-      el.addEventListener('pointercancel', endOverlayDrag);
+      });
+
+      htmlVideo.addEventListener('loadedmetadata', () => {
+        videoDuration.textContent = formatTime(htmlVideo.duration);
+      });
     }
 
-    function onToggleOverlay(type) {
-      if (type === 'logo') {
-        const on = document.getElementById('toggleLogo').checked;
-        document.getElementById('logoOverlay').style.display = on ? 'block' : 'none';
-      } else if (type === 'title') {
-        const on = document.getElementById('toggleTitle').checked;
-        document.getElementById('titleOverlay').style.display = on ? 'block' : 'none';
-      } else if (type === 'blur') {
-        const on = document.getElementById('toggleBlur').checked;
-        document.getElementById('blurOverlay').style.display = on ? 'block' : 'none';
+    function handleSeek(val) {
+      if (htmlVideo.duration) {
+        htmlVideo.currentTime = (val / 100) * htmlVideo.duration;
       }
     }
 
-    function onToggleBorderSwitch(checked) {
-      isProgressBorderActive = checked;
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60);
+      const s = Math.floor(sec % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function togglePlayPause() {
+      if (htmlVideo.paused) {
+        htmlVideo.play();
+        updatePlayPauseButton(true);
+      } else {
+        htmlVideo.pause();
+        updatePlayPauseButton(false);
+      }
+    }
+
+    function updatePlayPauseButton(isPlaying) {
+      const playPauseIcon = document.getElementById('playPauseIcon');
+      const playPauseText = document.getElementById('playPauseText');
+      playPauseIcon.setAttribute('data-lucide', isPlaying ? 'pause' : 'play');
+      playPauseText.textContent = isPlaying ? 'Pause' : 'Play';
+      lucide.createIcons();
+    }
+
+    // Overlays Gestures
+    function startOverlayDrag(event, type) {
+      event.stopPropagation();
+      activeDraggedOverlay = type;
+      const el = getOverlayElement(type);
+
+      overlayDragStartX = event.clientX;
+      overlayDragStartY = event.clientY;
+      overlayInitX = el.offsetLeft;
+      overlayInitY = el.offsetTop;
+      el.setPointerCapture(event.pointerId);
+
+      const onPointerMove = (e) => {
+        if (!activeDraggedOverlay) return;
+        const newX = Math.max(0, Math.min(overlayInitX + (e.clientX - overlayDragStartX), frameWrapper.clientWidth - el.offsetWidth));
+        const newY = Math.max(0, Math.min(overlayInitY + (e.clientY - overlayDragStartY), frameWrapper.clientHeight - el.offsetHeight));
+        el.style.left = `${newX}px`;
+        el.style.top = `${newY}px`;
+        el.style.right = 'auto';
+      };
+
+      const onPointerUp = (e) => {
+        if (activeDraggedOverlay) {
+          try { el.releasePointerCapture(e.pointerId); } catch(err){}
+          activeDraggedOverlay = null;
+          el.removeEventListener('pointermove', onPointerMove);
+          el.removeEventListener('pointerup', onPointerUp);
+        }
+      };
+
+      el.addEventListener('pointermove', onPointerMove);
+      el.addEventListener('pointerup', onPointerUp);
+    }
+
+    function getOverlayElement(type) {
+      if (type === 'logo') return logoOverlay;
+      if (type === 'title') return titleOverlay;
+      if (type === 'blur') return blurOverlay;
+    }
+
+    function toggleOverlaySwitch(type) {
+      overlays[type].active = !overlays[type].active;
+      const isActive = overlays[type].active;
+      const el = getOverlayElement(type);
+
+      const bg = document.getElementById(`toggleSwitch${capitalize(type)}`);
+      const dot = document.getElementById(`toggleDot${capitalize(type)}`);
+      const txt = document.getElementById(`${type}StatusText`);
+
+      if (isActive) {
+        bg.className = 'toggle-switch-bg relative w-12 h-6 rounded-full bg-cyan-500 border border-cyan-400 p-0.5 transition cursor-pointer shadow-[0_0_10px_rgba(6,182,212,0.4)]';
+        dot.className = 'toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-6';
+        txt.textContent = 'ဖွင့်ထားသည် (ON)';
+        txt.className = 'text-[10px] text-cyan-400 font-bold';
+        el.classList.remove('hidden');
+      } else {
+        bg.className = 'toggle-switch-bg relative w-12 h-6 rounded-full bg-slate-700 border border-slate-500 p-0.5 transition cursor-pointer';
+        dot.className = 'toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-0';
+        txt.textContent = 'ပိတ်ထားသည် (OFF)';
+        txt.className = 'text-[10px] text-slate-400';
+        el.classList.add('hidden');
+      }
+    }
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    function setOverlayCorner(type, pos) {
+      const el = getOverlayElement(type);
+      const fw = frameWrapper.clientWidth;
+      const fh = frameWrapper.clientHeight;
+      el.style.right = 'auto';
+
+      if (pos === 'tl') { el.style.left = '8px'; el.style.top = '8px'; }
+      if (pos === 'tr') { el.style.left = `${fw - el.offsetWidth - 8}px`; el.style.top = '8px'; }
+      if (pos === 'bl') { el.style.left = '8px'; el.style.top = `${fh - el.offsetHeight - 8}px`; }
+      if (pos === 'br') { el.style.left = `${fw - el.offsetWidth - 8}px`; el.style.top = `${fh - el.offsetHeight - 8}px`; }
+      if (pos === 'center') {
+        el.style.left = `${Math.round((fw - el.offsetWidth) / 2)}px`;
+        el.style.top = `${Math.round((fh - el.offsetHeight) / 2)}px`;
+      }
+    }
+
+    // Live Progress Border
+    function toggleProgressBorder() {
+      isProgressBorderActive = !isProgressBorderActive;
       const svg = document.getElementById('liveBorderSvg');
+      const bg = document.getElementById('toggleSwitchBorder');
+      const dot = document.getElementById('toggleDotBorder');
+      const txt = document.getElementById('borderStatusText');
+
       svg.style.display = isProgressBorderActive ? 'block' : 'none';
+
       if (isProgressBorderActive) {
+        bg.className = 'toggle-switch-bg relative w-12 h-6 rounded-full bg-cyan-500 border border-cyan-400 p-0.5 transition cursor-pointer shadow-[0_0_10px_rgba(6,182,212,0.4)]';
+        dot.className = 'toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-6';
+        txt.textContent = 'ဖွင့်ထားသည် (ON)';
+        txt.className = 'text-[10px] text-cyan-400 font-bold';
         updateLiveProgressBorderDimensions();
         updateBorderProgress();
+      } else {
+        bg.className = 'toggle-switch-bg relative w-12 h-6 rounded-full bg-slate-700 border border-slate-500 p-0.5 transition cursor-pointer';
+        dot.className = 'toggle-switch-dot w-4 h-4 rounded-full bg-white shadow-md transform translate-x-0';
+        txt.textContent = 'ပိတ်ထားသည် (OFF)';
+        txt.className = 'text-[10px] text-slate-400';
       }
     }
 
     function updateLiveProgressBorderDimensions() {
       const rect = document.getElementById('liveProgressRect');
-      const w = cropStage.clientWidth - 4;
-      const h = cropStage.clientHeight - 4;
+      const w = frameWrapper.clientWidth - 4;
+      const h = frameWrapper.clientHeight - 4;
       rect.setAttribute('width', Math.max(10, w));
       rect.setAttribute('height', Math.max(10, h));
       const perimeter = 2 * (w + h);
@@ -1205,164 +1110,72 @@
 
     function updateBorderProgress() {
       if (!isProgressBorderActive) return;
-      const dur = video.duration || 1;
-      const cur = video.currentTime || 0;
+      const dur = htmlVideo.duration || 1;
+      const cur = htmlVideo.currentTime || 0;
       const progress = Math.min(1, Math.max(0, cur / dur));
       const rect = document.getElementById('liveProgressRect');
-      const w = cropStage.clientWidth - 4;
-      const h = cropStage.clientHeight - 4;
+      const w = frameWrapper.clientWidth - 4;
+      const h = frameWrapper.clientHeight - 4;
       const perimeter = 2 * (w + h);
       rect.style.strokeDashoffset = perimeter * (1 - progress);
     }
 
-    function updateLiveSubVisibility() {
-      const showOrig = document.getElementById('chkShowOrig').checked;
-      const showEng = document.getElementById('chkShowEng').checked;
-      const showMM = document.getElementById('chkShowMM').checked;
-
-      document.getElementById('liveSubOrig').style.display = showOrig ? 'block' : 'none';
-      document.getElementById('liveSubENG').style.display = showEng ? 'inline-block' : 'none';
-      document.getElementById('liveSubMM').style.display = showMM ? 'block' : 'none';
+    // Logo / Title / Blur controls
+    function handleLogoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        logoImg.src = event.target.result;
+        if (!overlays.logo.active) toggleOverlaySwitch('logo');
+      };
+      reader.readAsDataURL(file);
     }
 
-    function handleLogoUpload(input) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          document.getElementById('logoImg').src = e.target.result;
-          document.getElementById('toggleLogo').checked = true;
-          onToggleOverlay('logo');
-        };
-        reader.readAsDataURL(input.files[0]);
-      }
+    function updateLogoSize(val) {
+      overlays.logo.size = val;
+      logoImg.style.width = `${val}px`;
+      document.getElementById('logoSizeLabel').textContent = `${val}px`;
+    }
+
+    function updateTitleText(t) { titleDisplay.textContent = t || 'ခေါင်းစဉ်စာသား'; }
+    function updateTitleSize(val) { titleDisplay.style.fontSize = `${val}px`; document.getElementById('titleSizeLabel').textContent = `${val}px`; }
+    function updateTitleColor(c) { titleDisplay.style.color = c; }
+
+    function updateBlurStrength(val) { blurBox.style.backdropFilter = `blur(${val}px)`; document.getElementById('blurStrengthLabel').textContent = `${val}px`; }
+    function updateBlurDimensions(w, h) {
+      if (w !== null) { blurOverlay.style.width = `${w}px`; document.getElementById('blurWidthLabel').textContent = `${w}px`; }
+      if (h !== null) { blurOverlay.style.height = `${h}px`; document.getElementById('blurHeightLabel').textContent = `${h}px`; }
+    }
+
+    function updateLiveSubVisibility() {
+      const o = document.getElementById('chkShowOrig').checked;
+      const e = document.getElementById('chkShowEng').checked;
+      const m = document.getElementById('chkShowMM').checked;
+
+      document.getElementById('liveSubOrig').style.display = o ? 'block' : 'none';
+      document.getElementById('liveSubENG').style.display = e ? 'inline-block' : 'none';
+      document.getElementById('liveSubMM').style.display = m ? 'block' : 'none';
     }
 
     async function handleFontUpload(input) {
       if (!input.files || !input.files[0]) return;
-      const file = input.files[0];
       const fontName = 'CustomFont_' + Date.now();
-      const buffer = await file.arrayBuffer();
+      const buffer = await input.files[0].arrayBuffer();
       const fontFace = new FontFace(fontName, buffer);
       await fontFace.load();
       document.fonts.add(fontFace);
       document.documentElement.style.setProperty('--user-custom-font', fontName);
-      alert('Custom Font အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ!');
+      alert('Custom Font ထည့်သွင်းပြီးပါပြီ!');
     }
 
-    function togglePlay() {
-      if (video.paused) {
-        video.play();
-        btnPlayPause.innerText = 'Pause';
-      } else {
-        video.pause();
-        btnPlayPause.innerText = 'Play';
-      }
-    }
-
-    // Video Realtime Sync & Live Subtitles
-    video.addEventListener('timeupdate', () => {
-      const cur = video.currentTime;
-      const dur = video.duration || 1;
-      scrubber.value = (cur / dur) * 100;
-      timeDisplay.innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
-
-      updateBorderProgress();
-
-      if (!srtData || srtData.length === 0) return;
-
-      const activeIdx = srtData.findIndex(item => cur >= item.start && cur <= item.end);
-
-      if (activeIdx !== -1) {
-        const item = srtData[activeIdx];
-        document.getElementById('liveSubOrig').innerText = item.orig || '';
-        document.getElementById('liveSubENG').innerText = item.eng || '';
-        document.getElementById('liveSubMM').innerText = item.mm || '';
-
-        const progress = Math.min(100, Math.max(0, ((cur - item.start) / (item.end - item.start)) * 100));
-        document.getElementById('liveSubENG').style.background = 
-          `linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) ${progress}%, var(--karaoke-base) ${progress}%, var(--karaoke-base) 100%)`;
-        document.getElementById('liveSubENG').style.webkitBackgroundClip = 'text';
-
-        if (currentActiveIndex !== activeIdx) {
-          currentActiveIndex = activeIdx;
-          highlightAndScrollEditor(activeIdx);
-        }
-      } else {
-        document.getElementById('liveSubOrig').innerText = '';
-        document.getElementById('liveSubENG').innerText = '';
-        document.getElementById('liveSubMM').innerText = '';
-        if (currentActiveIndex !== -1) {
-          clearEditorHighlights();
-          currentActiveIndex = -1;
-        }
-      }
-    });
-
-    scrubber.addEventListener('input', () => {
-      video.currentTime = (scrubber.value / 100) * (video.duration || 1);
-    });
-
-    function formatTime(sec) {
-      const m = Math.floor(sec / 60).toString().padStart(2, '0');
-      const s = Math.floor(sec % 60).toString().padStart(2, '0');
-      return `${m}:${s}`;
-    }
-
-    // Interactive 3-Language Subtitle Editor Rendering
-    function renderSRTEditor() {
-      const container = document.getElementById('srtScrollBox');
-      container.innerHTML = '';
-
-      if (!srtData || srtData.length === 0) {
-        container.innerHTML = '<div style="font-size:11px; color:#64748b; text-align:center; padding:15px;">စာတန်းထိုး မရှိသေးပါ။ AI Generator မှ ထုတ်ယူပါခင်ဗျာ။</div>';
-        return;
-      }
-
-      srtData.forEach((item, idx) => {
-        const row = document.createElement('div');
-        row.className = 'srt-row-item';
-        row.id = `srt-row-${idx}`;
-        row.innerHTML = `
-          <div class="srt-meta">
-            <span>#${item.id} (${item.startStr} → ${item.endStr})</span>
-            <span style="color:#38bdf8; cursor:pointer;" onclick="seekTo(${item.start})">▶ Play</span>
-          </div>
-          <div><span class="field-tag tag-orig">မူရင်း</span></div>
-          <input class="srt-field-input" value="${item.orig || ''}" oninput="srtData[${idx}].orig = this.value">
-          <div><span class="field-tag tag-eng">English</span></div>
-          <input class="srt-field-input" value="${item.eng || ''}" oninput="srtData[${idx}].eng = this.value">
-          <div><span class="field-tag tag-mm">မြန်မာ</span></div>
-          <input class="srt-field-input mm" value="${item.mm || ''}" oninput="srtData[${idx}].mm = this.value">
-        `;
-        container.appendChild(row);
-      });
-    }
-
-    function seekTo(seconds) {
-      video.currentTime = seconds;
-      video.play();
-      btnPlayPause.innerText = 'Pause';
-    }
-
-    function highlightAndScrollEditor(idx) {
-      clearEditorHighlights();
-      const el = document.getElementById(`srt-row-${idx}`);
-      if (el) {
-        el.classList.add('active');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-
-    function clearEditorHighlights() {
-      document.querySelectorAll('.srt-row-item').forEach(r => r.classList.remove('active'));
-    }
-
-    function selectCat(cat, el) {
+    function selectCategory(cat, btn) {
       selectedCategory = cat;
-      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-      el.classList.add('active');
+      document.querySelectorAll('.cat-pill').forEach(b => b.className = 'cat-pill silver-button-dark py-1 rounded text-[10px] font-bold');
+      btn.className = 'cat-pill silver-button py-1 rounded text-[10px] font-bold';
     }
 
+    // Audio Compressor
     async function compressAudioToWav(fileOrBlob) {
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
       const arrayBuffer = await fileOrBlob.arrayBuffer();
@@ -1400,38 +1213,28 @@
     }
 
     function updateProgress(emoji, text, percent) {
-      const box = document.getElementById('aiProgressBox');
-      const emojiEl = document.getElementById('progressEmoji');
-      const textEl = document.getElementById('progressText');
-      const pctEl = document.getElementById('progressPctVal');
-      const bar = document.getElementById('progressBarFill');
-
-      box.style.display = 'block';
-      emojiEl.innerText = emoji;
-      textEl.innerText = text;
-      pctEl.innerText = percent + '%';
-      bar.style.width = percent + '%';
+      document.getElementById('aiProgressBox').classList.remove('hidden');
+      document.getElementById('progressEmoji').innerText = emoji;
+      document.getElementById('progressText').innerText = text;
+      document.getElementById('progressPctVal').innerText = percent + '%';
+      document.getElementById('progressBarFill').style.width = percent + '%';
     }
 
-    // 3-WAY SUBTITLE GENERATION (Bulletproof Parser)
+    // AI SUBTITLE GENERATION (FULL 3-WAY MULTI-LANGUAGE TRANSLATION)
     async function startSubGeneration() {
       const btn = document.getElementById('btnGenSub');
       btn.disabled = true;
 
       try {
         let audioBlobToSend = null;
-        updateProgress('🎧', 'ဗီဒီယိုမှ အသံဖိုင်ကို သီးသန့်ချုံ့ထုတ်နေပါသည်...', 15);
+        updateProgress('🎧', 'အသံဖိုင်ကို သီးသန့် ချုံ့ထုတ်နေပါသည်...', 15);
 
         if (videoFileBlob) {
           audioBlobToSend = await compressAudioToWav(videoFileBlob);
         } else {
-          try {
-            const resp = await fetch(video.src);
-            const blob = await resp.blob();
-            audioBlobToSend = await compressAudioToWav(blob);
-          } catch(e) {
-            throw new Error('ကျေးဇူးပြု၍ "Video ထည့်ရန်" ခလုတ်မှတစ်ဆင့် ဖုန်းထဲမှ ဗီဒီယိုဖိုင်ကို အရင်ရွေးချယ်ပေးပါခင်ဗျာ။');
-          }
+          const resp = await fetch(htmlVideo.src);
+          const blob = await resp.blob();
+          audioBlobToSend = await compressAudioToWav(blob);
         }
 
         updateProgress('⚡', 'Groq Whisper သို့ မူရင်းစကားသံ ပေးပို့နေပါသည်...', 35);
@@ -1441,8 +1244,6 @@
         const groqRes = await fetch(`${WORKER_URL.replace(/\/$/, '')}/api/transcribe`, {
           method: 'POST',
           body: formData
-        }).catch(err => {
-          throw new Error('Worker ချိတ်ဆက်မရပါ: Worker URL မှန်မမှန် စစ်ဆေးပါခင်ဗျာ။');
         });
 
         if (!groqRes.ok) throw new Error(`Groq Worker Error (${groqRes.status})`);
@@ -1450,11 +1251,9 @@
         if (groqData.error) throw new Error(groqData.error);
 
         const rawSegments = groqData.segments || [];
-        if (rawSegments.length === 0) {
-          throw new Error('အသံထဲမှ စကားသံ/သီချင်းစာသား မတွေ့ရှိပါ။ အသံကြည်လင်သော ဗီဒီယိုဖြင့် စမ်းသပ်ပါခင်ဗျာ။');
-        }
+        if (rawSegments.length === 0) throw new Error('အသံထဲမှ စကားသံ ရှာမတွေ့ပါ။');
 
-        updateProgress('✨', 'Gemini AI ဖြင့် မူရင်းမှ English နှင့် မြန်မာသို့ တပြိုင်နက် ဘာသာပြန်နေပါသည်...', 65);
+        updateProgress('✨', 'Gemini AI ဖြင့် English နှင့် မြန်မာသို့ တပြိုင်နက် ဘာသာပြန်နေပါသည်...', 65);
 
         const segmentsToTranslate = rawSegments.map((seg, i) => ({
           id: i + 1,
@@ -1475,10 +1274,11 @@
         });
 
         const geminiData = await geminiRes.json();
-        updateProgress('📝', 'စာတန်းထိုး (၃) မျိုးစလုံးကို စနစ်တကျ ထည့်သွင်းနေပါသည်...', 90);
+        if (geminiData.error) throw new Error(geminiData.error);
 
-        // BULLETPROOF PARSING (အကယ်၍ Gemini JSON မရခဲ့လျှင်ပင် မူရင်း transcription မပျောက်စေရန် fallback လုပ်ခြင်း)
-        if (geminiData.result && Array.isArray(geminiData.result) && geminiData.result.length > 0) {
+        updateProgress('📝', 'စာတန်းထိုး (၃) မျိုးစလုံး ထည့်သွင်းနေပါသည်...', 90);
+
+        if (geminiData.result && Array.isArray(geminiData.result)) {
           srtData = geminiData.result.map(item => ({
             id: item.id,
             start: item.start,
@@ -1486,29 +1286,17 @@
             startStr: toSRTTime(item.start),
             endStr: toSRTTime(item.end),
             orig: item.original || '',
-            eng: item.english || item.original || '',
-            mm: item.myanmar || item.original || ''
-          }));
-        } else {
-          // Fallback directly to Whisper segments
-          srtData = rawSegments.map((seg, i) => ({
-            id: i + 1,
-            start: seg.start,
-            end: seg.end,
-            startStr: toSRTTime(seg.start),
-            endStr: toSRTTime(seg.end),
-            orig: seg.text.trim(),
-            eng: seg.text.trim(),
-            mm: seg.text.trim()
+            eng: item.english || '',
+            mm: item.myanmar || ''
           }));
         }
 
         renderSRTEditor();
         updateProgress('✅', 'စာတန်းထိုး (မူရင်း/အင်္ဂလိပ်/မြန်မာ) အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ!', 100);
 
-        // အလိုအလျောက် Editor နေရာသို့ ရွှေ့ပေးခြင်း
+        // Switch to Subtitle Editor Studio automatically
         document.getElementById('settingsDropdown').value = 'sectionEditor';
-        showSection('sectionEditor');
+        switchSettingSection('sectionEditor');
 
       } catch (err) {
         alert('Error: ' + err.message);
@@ -1528,20 +1316,76 @@
       return `${hh}:${mm}:${ss},${ms}`;
     }
 
+    // Subtitle Editor Rendering
+    function renderSRTEditor() {
+      const container = document.getElementById('srtScrollBox');
+      container.innerHTML = '';
+
+      if (!srtData || srtData.length === 0) {
+        container.innerHTML = '<div class="text-xs text-slate-400 text-center py-6">စာတန်းထိုး မရှိသေးပါ။ AI Subtitle Generator မှ ထုတ်ယူပါခင်ဗျာ။</div>';
+        return;
+      }
+
+      srtData.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'silver-card rounded-xl p-2.5 border border-slate-700/80 space-y-1.5 transition';
+        row.id = `srt-row-${idx}`;
+        row.innerHTML = `
+          <div class="flex justify-between items-center text-[10px] text-slate-400 font-mono">
+            <span>#${item.id} (${item.startStr} → ${item.endStr})</span>
+            <button onclick="seekTo(${item.start})" class="text-cyan-400 font-bold hover:underline flex items-center gap-1">▶ Play</button>
+          </div>
+          <div>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">မူရင်း</span>
+            <input class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200 mt-0.5 outline-none" value="${item.orig || ''}" oninput="srtData[${idx}].orig = this.value">
+          </div>
+          <div>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">English</span>
+            <input class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200 mt-0.5 outline-none" value="${item.eng || ''}" oninput="srtData[${idx}].eng = this.value">
+          </div>
+          <div>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-red-950 text-red-400 border border-red-800">မြန်မာ</span>
+            <input class="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white mt-0.5 outline-none font-bold" style="font-family: var(--user-custom-font);" value="${item.mm || ''}" oninput="srtData[${idx}].mm = this.value">
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function seekTo(sec) {
+      htmlVideo.currentTime = sec;
+      htmlVideo.play();
+      updatePlayPauseButton(true);
+    }
+
+    function highlightAndScrollEditor(idx) {
+      clearEditorHighlights();
+      const el = document.getElementById(`srt-row-${idx}`);
+      if (el) {
+        el.classList.add('border-cyan-400', 'bg-slate-850');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function clearEditorHighlights() {
+      document.querySelectorAll('#srtScrollBox > div').forEach(r => r.classList.remove('border-cyan-400', 'bg-slate-850'));
+    }
+
     // Video Export Studio
     async function exportRenderedVideo() {
       const btn = document.getElementById('btnExportVideo');
       const statusText = document.getElementById('exportStatusText');
       const progressBar = document.getElementById('exportProgressBar');
+      const progressBarFill = document.getElementById('exportProgressBarFill');
 
       btn.disabled = true;
-      progressBar.style.display = 'block';
-      progressBar.style.width = '0%';
+      progressBar.classList.remove('hidden');
+      progressBarFill.style.width = '0%';
       statusText.innerText = 'Render စတင်နေပါသည်...';
 
       const canvas = document.getElementById('exportCanvas');
-      const stageW = cropStage.clientWidth;
-      const stageH = cropStage.clientHeight;
+      const stageW = frameWrapper.clientWidth;
+      const stageH = frameWrapper.clientHeight;
       canvas.width = stageW * 2;
       canvas.height = stageH * 2;
       const ctx = canvas.getContext('2d');
@@ -1549,8 +1393,8 @@
       const stream = canvas.captureStream(30);
 
       try {
-        if (video.captureStream) {
-          const vStream = video.captureStream();
+        if (htmlVideo.captureStream) {
+          const vStream = htmlVideo.captureStream();
           const audioTracks = vStream.getAudioTracks();
           if (audioTracks.length > 0) stream.addTrack(audioTracks[0]);
         }
@@ -1565,29 +1409,28 @@
 
       mediaRecorder.onstop = () => {
         const blob = new Blob(recordedChunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `rendered_video_${Date.now()}.webm`;
+        a.href = URL.createObjectURL(blob);
+        a.download = `silver_studio_video_${Date.now()}.webm`;
         a.click();
         statusText.innerText = '✅ Download ပြီးပါပြီ!';
         btn.disabled = false;
-        progressBar.style.display = 'none';
+        progressBar.classList.add('hidden');
       };
 
-      video.currentTime = 0;
-      await video.play();
+      htmlVideo.currentTime = 0;
+      await htmlVideo.play();
       mediaRecorder.start();
 
       const renderInterval = setInterval(() => {
-        if (video.paused || video.ended) {
+        if (htmlVideo.paused || htmlVideo.ended) {
           clearInterval(renderInterval);
           mediaRecorder.stop();
           return;
         }
 
-        const pct = Math.round((video.currentTime / video.duration) * 100);
-        progressBar.style.width = pct + '%';
+        const pct = Math.round((htmlVideo.currentTime / htmlVideo.duration) * 100);
+        progressBarFill.style.width = pct + '%';
         statusText.innerText = `Render နေပါသည်... ${pct}%`;
 
         ctx.save();
@@ -1595,38 +1438,32 @@
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, stageW, stageH);
 
-        const vW = video.videoWidth;
-        const vH = video.videoHeight;
-        const vRatio = vW / vH;
-        const drawH = stageH * zoomScale;
-        const drawW = drawH * vRatio;
+        const drawH = stageH * scale;
+        const drawW = drawH * nativeVideoAspect;
         const drawX = (stageW - drawW) / 2 + panX;
         const drawY = (stageH - drawH) / 2 + panY;
-        ctx.drawImage(video, drawX, drawY, drawW, drawH);
+        ctx.drawImage(htmlVideo, drawX, drawY, drawW, drawH);
 
         // Logo
-        const logo = document.getElementById('logoOverlay');
-        if (logo.style.display === 'block') {
-          const lImg = document.getElementById('logoImg');
-          if (lImg.src) ctx.drawImage(lImg, logo.offsetLeft, logo.offsetTop, lImg.width || 40, lImg.height || 40);
+        if (overlays.logo.active && logoImg.src) {
+          ctx.drawImage(logoImg, logoOverlay.offsetLeft, logoOverlay.offsetTop, logoImg.width || 48, logoImg.height || 48);
         }
 
         // Title
-        const title = document.getElementById('titleOverlay');
-        if (title.style.display === 'block') {
+        if (overlays.title.active) {
           ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
-          ctx.fillStyle = title.style.color || '#ffffff';
-          ctx.fillText(document.getElementById('titleTextDisplay').innerText, title.offsetLeft, title.offsetTop + 12);
+          ctx.fillStyle = titleDisplay.style.color || '#ffffff';
+          ctx.fillText(titleDisplay.innerText, titleOverlay.offsetLeft, titleOverlay.offsetTop + 12);
         }
 
-        // Subtitles drawing
-        const showOrig = document.getElementById('chkShowOrig').checked;
-        const showEng = document.getElementById('chkShowEng').checked;
-        const showMM = document.getElementById('chkShowMM').checked;
+        // Subtitles
+        const o = document.getElementById('chkShowOrig').checked;
+        const e = document.getElementById('chkShowEng').checked;
+        const m = document.getElementById('chkShowMM').checked;
 
-        let curBottomOffset = stageH - 10;
+        let curBottomOffset = stageH - 8;
 
-        if (showEng) {
+        if (e) {
           const subEng = document.getElementById('liveSubENG').innerText;
           if (subEng) {
             ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
@@ -1636,11 +1473,11 @@
             ctx.lineWidth = 3;
             ctx.strokeText(subEng, stageW / 2, curBottomOffset);
             ctx.fillText(subEng, stageW / 2, curBottomOffset);
-            curBottomOffset -= 16;
+            curBottomOffset -= 15;
           }
         }
 
-        if (showMM) {
+        if (m) {
           const subMM = document.getElementById('liveSubMM').innerText;
           if (subMM) {
             ctx.font = 'bold 13px Padauk, sans-serif';
@@ -1650,14 +1487,14 @@
             ctx.lineWidth = 3;
             ctx.strokeText(subMM, stageW / 2, curBottomOffset);
             ctx.fillText(subMM, stageW / 2, curBottomOffset);
-            curBottomOffset -= 18;
+            curBottomOffset -= 17;
           }
         }
 
-        if (showOrig) {
+        if (o) {
           const subOrig = document.getElementById('liveSubOrig').innerText;
           if (subOrig) {
-            ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
+            ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
             ctx.textAlign = 'center';
             ctx.fillStyle = '#38bdf8';
             ctx.strokeStyle = '#000000';
@@ -1671,7 +1508,7 @@
       }, 1000 / 30);
     }
 
-    // Export .srt (Original, English, Myanmar, 3-in-1)
+    // Export .srt
     function exportSRT(type) {
       if (!srtData || srtData.length === 0) {
         alert('ဒေါင်းလုဒ်လုပ်ရန် စာတန်းထိုး မရှိသေးပါခင်ဗျာ။');
@@ -1691,33 +1528,6 @@
       a.href = URL.createObjectURL(blob);
       a.download = `subtitle_${type}.srt`;
       a.click();
-    }
-
-    // Modal Handlers
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-    function switchVideoTab(tab) {
-      document.getElementById('tabLocalBtn').classList.toggle('active', tab === 'local');
-      document.getElementById('tabYtBtn').classList.toggle('active', tab === 'yt');
-      document.getElementById('localTabPane').style.display = tab === 'local' ? 'block' : 'none';
-      document.getElementById('ytTabPane').style.display = tab === 'yt' ? 'block' : 'none';
-    }
-
-    function handleLocalVideo(input) {
-      if (input.files && input.files[0]) {
-        videoFileBlob = input.files[0];
-        video.src = URL.createObjectURL(videoFileBlob);
-        closeModal('videoModal');
-      }
-    }
-
-    function loadYoutubeOrDirectUrl() {
-      const url = document.getElementById('ytUrlInput').value.trim();
-      if (!url) return;
-      video.src = url;
-      videoFileBlob = null;
-      closeModal('videoModal');
     }
   </script>
 </body>
