@@ -1,19 +1,19 @@
+
 /**
  * Silver Studio - Myanmar SRT Pro
- * Cloudflare Worker Full Code
+ * Cloudflare Worker
  *
- * Required Secrets:
- * GROQ_API_KEY
- * GEMINI_API_KEY
+ * Required Worker Secrets:
+ *   GROQ_API_KEY
+ *   GEMINI_API_KEY
  *
- * Optional Variable:
- * GEMINI_MODEL
+ * Optional Worker Variable:
+ *   GEMINI_MODEL
  *
- * Routes:
- * GET  /
- * GET  /api/health
- * POST /api/transcribe
- * POST /api/translate
+ * Endpoints:
+ *   GET  /api/health
+ *   POST /api/transcribe
+ *   POST /api/translate
  */
 
 const CORS_HEADERS = {
@@ -22,212 +22,135 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers":
     "Content-Type, Authorization, x-goog-api-key",
   "Access-Control-Max-Age": "86400",
-  "Vary": "Origin"
+  "Vary": "Origin",
 };
 
-function json(data, status = 200, extra = {}) {
+const JSON_HEADERS = {
+  ...CORS_HEADERS,
+  "Content-Type": "application/json; charset=utf-8",
+  "Cache-Control": "no-store",
+};
+
+function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: {
-      ...CORS_HEADERS,
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
-      ...extra
-    }
+    headers: { ...JSON_HEADERS, ...extraHeaders },
   });
 }
 
-async function readBody(response) {
+async function readJsonResponse(response) {
   const text = await response.text();
 
-  if (!text) return {};
-
   try {
-    return JSON.parse(text);
+    return {
+      data: text ? JSON.parse(text) : {},
+      text,
+    };
   } catch {
-    return { raw: text.slice(0, 2000) };
+    return {
+      data: { raw: text.slice(0, 2000) },
+      text,
+    };
   }
 }
 
-function upstreamError(data, fallback) {
-  if (typeof data?.error === "string") {
-    return data.error;
-  }
+function errorMessage(data, fallback) {
+  const message =
+    data?.error?.message ??
+    data?.error?.status ??
+    data?.message;
 
-  return (
-    data?.error?.message ||
-    data?.message ||
-    data?.raw ||
-    fallback
-  );
+  return typeof message === "string" ? message : fallback;
 }
 
 const TONE_MAP = {
-  song: "သီချင်းစာသားဟန်၊ ကဗျာဆန်ပြီး အဓိပ္ပာယ်ပြည့်ဝသော မြန်မာစကား",
-  movie: "သဘာဝကျသော ရုပ်ရှင်ဒိုင်ယာလော့ဂ် မြန်မာစကား",
-  news: "စံပြု သတင်းမီဒီယာသုံး မြန်မာစာ",
-  show: "ပေါ့ပေါ့ပါးပါး နေ့စဉ်သုံး စကားပြောဟန်",
-  comedy: "သဘာဝကျပြီး ပေါ့ပါးသွက်လက်သော ဟာသဟန်",
-  mystery: "ဆန်းကြယ်နက်နဲသော စကားပြောဟန်",
-  horror: "သည်းထိတ်ရင်ဖိုဇာတ်လမ်းနှင့် လိုက်ဖက်သောဟန်"
+  song: "သီချင်းစာသားဟန်၊ ကာရန်စည်းဝါးညီပြီး ကဗျာဆန်ဆန်",
+  movie: "ရုပ်ရှင်ဇာတ်လမ်းနှင့် သဘာဝကျသော စကားပြောဟန်",
+  news: "သတင်းမီဒီယာသုံး စံပြုမြန်မာစာဟန်",
+  show: "ပေါ့ပေါ့ပါးပါး သဘာဝကျသော နေ့စဉ်စကားပြောဟန်",
+  comedy: "ဟာသဆန်ပြီး ပေါ့ပါးသွက်လက်သောဟန်",
+  mystery: "ဆန်းကြယ်နက်နဲပြီး စိတ်ဝင်စားဖွယ်ဟန်",
+  horror: "သည်းထိတ်ရင်ဖို ဇာတ်လမ်းနှင့်လိုက်ဖက်သောဟန်",
 };
 
-function extractText(data) {
-  const parts =
-    data?.candidates?.[0]?.content?.parts || [];
+function normalizeTranslationArray(rawText, segments) {
+  if (typeof rawText !== "string" || !rawText.trim()) {
+    return null;
+  }
 
-  return parts
-    .filter(
-      part =>
-        typeof part.text === "string" &&
-        !part.thought
-    )
-    .map(part => part.text)
-    .join("\n")
-    .trim();
-}
-
-function extractJsonArray(raw) {
-  if (!raw) return null;
-
-  let text = raw
-    .trim()
+  let cleaned = rawText.trim()
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```$/i, "")
     .trim();
 
-  const start = text.indexOf("[");
-  const end = text.lastIndexOf("]");
+  const first = cleaned.indexOf("[");
+  const last = cleaned.lastIndexOf("]");
 
-  if (start < 0 || end <= start) {
-    return null;
+  if (first >= 0 && last > first) {
+    cleaned = cleaned.slice(first, last + 1);
   }
 
-  try {
-    const value = JSON.parse(
-      text.slice(start, end + 1)
-    );
+  let parsed;
 
-    return Array.isArray(value)
-      ? value
-      : null;
+  try {
+    parsed = JSON.parse(cleaned);
   } catch {
     return null;
   }
-}
-
-async function translateBatch(
-  batch,
-  env,
-  tone,
-  lineCount
-) {
-  const model = String(
-    env.GEMINI_MODEL || "gemini-2.5-flash"
-  ).trim();
-
-  const lineInstruction =
-    String(lineCount) === "1"
-      ? "Keep each Burmese subtitle concise and on one line."
-      : "Keep each Burmese subtitle readable, at most two short lines.";
-
-  const prompt = [
-    "You are a professional subtitle translator.",
-    "Translate each input segment into natural English and natural Burmese.",
-    "Return ONLY a valid JSON array. No markdown and no explanation.",
-    'Each item must contain these keys: id, start, end, original, english, myanmar.',
-    "Preserve id, start and end exactly and keep the same order.",
-    "The original field must preserve the provided transcription text.",
-    "Burmese style: " + tone + ".",
-    lineInstruction,
-    "Return exactly " + batch.length + " objects.",
-    "Input JSON:",
-    JSON.stringify(batch)
-  ].join("\n");
-
-  const response = await fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/" +
-      encodeURIComponent(model) +
-      ":generateContent",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-goog-api-key": env.GEMINI_API_KEY
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.2,
-          responseMimeType: "application/json"
-        }
-      })
-    }
-  );
-
-  const data = await readBody(response);
-
-  if (!response.ok) {
-    const error = new Error(
-      upstreamError(data, "Gemini API request failed")
-    );
-
-    error.status = response.status;
-    error.model = model;
-
-    throw error;
-  }
-
-  const raw = extractText(data);
-  const parsed = extractJsonArray(raw);
 
   if (
-    !parsed ||
-    parsed.length !== batch.length
+    !Array.isArray(parsed) ||
+    parsed.length !== segments.length
   ) {
-    const error = new Error(
-      "Gemini က မှန်ကန်သော JSON subtitle list ကို မပြန်ပို့နိုင်ပါ။"
-    );
-
-    error.status = 502;
-    error.model = model;
-
-    throw error;
+    return null;
   }
 
-  return batch.map((segment, index) => {
+  return segments.map((segment, index) => {
     const item =
-      parsed[index] &&
-      typeof parsed[index] === "object"
+      parsed[index] && typeof parsed[index] === "object"
         ? parsed[index]
         : {};
 
-    const original = segment.text;
+    const original = String(segment.text ?? "");
+
+    const english =
+      typeof item.english === "string" &&
+      item.english.trim()
+        ? item.english.trim()
+        : "";
+
+    const myanmar =
+      typeof item.myanmar === "string" &&
+      item.myanmar.trim()
+        ? item.myanmar.trim()
+        : "";
+
+    if (!english || !myanmar) {
+      return null;
+    }
 
     return {
       id: segment.id,
       start: segment.start,
       end: segment.end,
       original,
-
-      english:
-        typeof item.english === "string" &&
-        item.english.trim()
-          ? item.english.trim()
-          : original,
-
-      myanmar:
-        typeof item.myanmar === "string" &&
-        item.myanmar.trim()
-          ? item.myanmar.trim()
-          : original
+      english,
+      myanmar,
     };
-  });
+  }).every(Boolean)
+    ? segments.map((segment, index) => {
+        const item = parsed[index];
+
+        return {
+          id: segment.id,
+          start: segment.start,
+          end: segment.end,
+          original: String(segment.text ?? ""),
+          english: item.english.trim(),
+          myanmar: item.myanmar.trim(),
+        };
+      })
+    : null;
 }
 
 export default {
@@ -235,17 +158,22 @@ export default {
     if (request.method === "OPTIONS") {
       return new Response(null, {
         status: 204,
-        headers: CORS_HEADERS
+        headers: CORS_HEADERS,
       });
     }
 
     const url = new URL(request.url);
-
-    const path =
-      url.pathname.replace(/\/+$/, "") || "/";
+    const path = url.pathname.replace(/\/+$/, "") || "/";
+    const model =
+      typeof env.GEMINI_MODEL === "string" &&
+      env.GEMINI_MODEL.trim()
+        ? env.GEMINI_MODEL.trim()
+        : "gemini-3.8-flash";
 
     try {
+      // ----------------------------------------
       // HEALTH CHECK
+      // ----------------------------------------
       if (
         request.method === "GET" &&
         (path === "/" || path === "/api/health")
@@ -253,40 +181,26 @@ export default {
         return json({
           status: "ok",
           service: "Silver Studio - Myanmar SRT Pro",
-
-          groq_configured:
-            Boolean(env.GROQ_API_KEY),
-
-          gemini_configured:
-            Boolean(env.GEMINI_API_KEY),
-
-          gemini_model:
-            String(
-              env.GEMINI_MODEL ||
-              "gemini-2.5-flash"
-            ),
-
+          groq_configured: Boolean(env.GROQ_API_KEY),
+          gemini_configured: Boolean(env.GEMINI_API_KEY),
+          gemini_model: model,
           routes: [
             "POST /api/transcribe",
-            "POST /api/translate"
-          ]
+            "POST /api/translate",
+          ],
         });
       }
 
-      // GROQ TRANSCRIPTION
-      if (path === "/api/transcribe") {
-        if (request.method !== "POST") {
-          return json(
-            { error: "POST method လိုအပ်ပါသည်။" },
-            405,
-            { Allow: "POST, OPTIONS" }
-          );
-        }
-
+      // ----------------------------------------
+      // GROQ WHISPER TRANSCRIPTION
+      // ----------------------------------------
+      if (
+        path === "/api/transcribe" &&
+        request.method === "POST"
+      ) {
         if (!env.GROQ_API_KEY) {
           return json({
-            error:
-              "GROQ_API_KEY ကို Cloudflare Worker Secrets တွင် ထည့်ပါ။"
+            error: "Worker တွင် GROQ_API_KEY မသတ်မှတ်ရသေးပါ။",
           }, 503);
         }
 
@@ -296,8 +210,7 @@ export default {
           formData = await request.formData();
         } catch {
           return json({
-            error:
-              "multipart/form-data request လိုအပ်ပါသည်။"
+            error: "multipart/form-data ပုံစံဖြင့် ပို့ပေးပါ။",
           }, 400);
         }
 
@@ -309,21 +222,21 @@ export default {
           typeof audioFile.size !== "number"
         ) {
           return json({
-            error:
-              'အသံဖိုင်ကို "file" field ဖြင့် ပို့ပေးပါ။'
+            error: 'အသံဖိုင်ကို "file" field ဖြင့် ပို့ပေးပါ။',
           }, 400);
         }
 
         if (audioFile.size === 0) {
           return json({
-            error: "အသံဖိုင်သည် ဗလာဖြစ်နေပါသည်။"
+            error: "အသံဖိုင်သည် ဗလာဖြစ်နေပါသည်။",
           }, 400);
         }
 
         if (audioFile.size > 25 * 1024 * 1024) {
           return json({
             error:
-              "အသံဖိုင်သည် 25 MB ကျော်နေပါသည်။"
+              "အသံဖိုင်သည် 25 MB ကျော်နေပါသည်။ " +
+              "အသံဖိုင်ကို အပိုင်းခွဲ၍ ပြန်ပို့ပါ။",
           }, 413);
         }
 
@@ -332,76 +245,58 @@ export default {
         groqForm.append(
           "file",
           audioFile,
-          audioFile.name || "audio.wav"
+          audioFile.name || "audio.webm"
         );
-
-        groqForm.append(
-          "model",
-          "whisper-large-v3-turbo"
-        );
-
-        groqForm.append(
-          "response_format",
-          "verbose_json"
-        );
-
+        groqForm.append("model", "whisper-large-v3-turbo");
+        groqForm.append("response_format", "verbose_json");
         groqForm.append("temperature", "0");
 
-        const response = await fetch(
-          "https://api.groq.com/openai/v1/audio/transcriptions",
-          {
-            method: "POST",
-            headers: {
-              Authorization:
-                "Bearer " + env.GROQ_API_KEY
-            },
-            body: groqForm
-          }
-        );
+        let groqRes;
 
-        const data = await readBody(response);
-
-        if (!response.ok) {
+        try {
+          groqRes = await fetch(
+            "https://api.groq.com/openai/v1/audio/transcriptions",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${env.GROQ_API_KEY}`,
+              },
+              body: groqForm,
+            }
+          );
+        } catch (error) {
           return json({
-            error:
-              "Groq transcription မအောင်မြင်ပါ။",
-
-            status: response.status,
-
-            detail: upstreamError(
-              data,
-              "Groq API error"
-            )
-          }, response.status);
+            error: "Groq API သို့ ချိတ်ဆက်၍မရပါ။",
+            detail: String(error?.message || error),
+          }, 502);
         }
 
-        if (
-          typeof data.text !== "string" ||
-          !Array.isArray(data.segments)
-        ) {
+        const { data } = await readJsonResponse(groqRes);
+
+        if (!groqRes.ok) {
           return json({
-            error:
-              "Groq transcription response မမှန်ကန်ပါ။"
+            error: "Groq transcription မအောင်မြင်ပါ။",
+            status: groqRes.status,
+            detail: errorMessage(
+              data,
+              "Groq API က အမှားပြန်ပို့ခဲ့သည်။"
+            ),
           }, 502);
         }
 
         return json(data);
       }
 
+      // ----------------------------------------
       // GEMINI TRANSLATION
-      if (path === "/api/translate") {
-        if (request.method !== "POST") {
-          return json(
-            { error: "POST method လိုအပ်ပါသည်။" },
-            405,
-            { Allow: "POST, OPTIONS" }
-          );
-        }
-
+      // ----------------------------------------
+      if (
+        path === "/api/translate" &&
+        request.method === "POST"
+      ) {
         if (!env.GEMINI_API_KEY) {
           return json({
-            error:
-              "GEMINI_API_KEY ကို Cloudflare Worker Secrets တွင် ထည့်ပါ။"
+            error: "Worker တွင် GEMINI_API_KEY မသတ်မှတ်ရသေးပါ။",
           }, 503);
         }
 
@@ -411,36 +306,36 @@ export default {
           body = await request.json();
         } catch {
           return json({
-            error:
-              "Request body သည် မှန်ကန်သော JSON ဖြစ်ရပါမည်။"
+            error: "Request body သည် မှန်ကန်သော JSON မဟုတ်ပါ။",
           }, 400);
         }
 
-        if (
-          !Array.isArray(body?.segments) ||
-          body.segments.length === 0
-        ) {
+        const segments = body?.segments;
+        const category =
+          typeof body?.category === "string"
+            ? body.category
+            : "";
+
+        const lineCount = String(body?.lineCount ?? "2");
+
+        if (!Array.isArray(segments) || segments.length === 0) {
           return json({
-            error:
-              "ဘာသာပြန်ရန် segments array လိုအပ်ပါသည်။"
+            error: "ဘာသာပြန်ရန် segments array လိုအပ်ပါသည်။",
           }, 400);
         }
 
-        if (body.segments.length > 500) {
+        if (segments.length > 100) {
           return json({
             error:
-              "တစ်ကြိမ်လျှင် segments 500 ခုအထိသာ လက်ခံပါသည်။"
+              "တစ်ကြိမ်လျှင် စာကြောင်း 100 ခုထက် မပိုစေရပါ။ " +
+              "အပိုင်းခွဲပြီး ပြန်ပို့ပါ။",
           }, 413);
         }
 
-        const segments = [];
+        const safeSegments = [];
 
-        for (
-          let i = 0;
-          i < body.segments.length;
-          i++
-        ) {
-          const segment = body.segments[i];
+        for (let i = 0; i < segments.length; i++) {
+          const segment = segments[i];
 
           if (
             !segment ||
@@ -448,127 +343,155 @@ export default {
             Array.isArray(segment)
           ) {
             return json({
-              error:
-                "segments[" + i + "] သည် object ဖြစ်ရပါမည်။"
+              error: `segments[${i}] သည် object ဖြစ်ရပါမည်။`,
             }, 400);
           }
 
           const text = String(
-            segment.text ??
-            segment.original ??
-            ""
+            segment.text ?? segment.original ?? ""
           ).trim();
 
           if (!text) {
             return json({
-              error:
-                "segments[" + i + "] တွင် text မရှိပါ။"
+              error: `segments[${i}] တွင် ဘာသာပြန်ရန် စာသားမရှိပါ။`,
             }, 400);
           }
 
-          const start = Number(segment.start);
-          const end = Number(segment.end);
-
-          segments.push({
+          safeSegments.push({
             id: segment.id ?? i + 1,
-
-            start: Number.isFinite(start)
-              ? start
+            start: Number.isFinite(Number(segment.start))
+              ? Number(segment.start)
               : 0,
-
-            end: Number.isFinite(end)
-              ? end
+            end: Number.isFinite(Number(segment.end))
+              ? Number(segment.end)
               : 0,
-
-            text
+            text,
           });
         }
-
-        const category =
-          typeof body.category === "string"
-            ? body.category
-            : "";
 
         const tone =
           TONE_MAP[category] ||
           "သဘာဝကျသော မြန်မာစကားပြောဟန်";
 
-        const lineCount =
-          body.lineCount ?? "2";
+        const lineInstruction = lineCount === "1"
+          ? "မြန်မာစာတန်းတစ်ခုစီကို တစ်ကြောင်းတည်း အတိုချုပ်ပါ။"
+          : "မြန်မာစာတန်းတစ်ခုစီကို ဖတ်ရလွယ်သော နှစ်ကြောင်းအတွင်း ရေးပါ။";
 
-        const result = [];
+        const prompt = [
+          "You are a professional subtitle translator.",
+          "Translate every input segment.",
+          "Return ONLY a valid JSON array.",
+          "Return exactly one object for every input segment.",
+          'Each object must contain: "id", "start", "end", "original", "english", "myanmar".',
+          "Preserve each input id, start and end exactly.",
+          "Keep original equal to the supplied source text.",
+          "Translate english naturally into English.",
+          `Translate myanmar into natural Burmese (Myanmar). Style: ${tone}.`,
+          lineInstruction,
+          "Do not omit any segment.",
+          "Do not include markdown fences or explanatory text.",
+          "Input segments:",
+          JSON.stringify(safeSegments),
+        ].join("\n");
 
-        for (
-          let i = 0;
-          i < segments.length;
-          i += 20
-        ) {
-          const batch = segments.slice(
-            i,
-            i + 20
+        let geminiRes;
+
+        try {
+          geminiRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": env.GEMINI_API_KEY,
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    role: "user",
+                    parts: [{ text: prompt }],
+                  },
+                ],
+                generationConfig: {
+                  temperature: 0.2,
+                  responseMimeType: "application/json",
+                },
+              }),
+            }
           );
+        } catch (error) {
+          return json({
+            error: "Gemini API သို့ ချိတ်ဆက်၍မရပါ။",
+            detail: String(error?.message || error),
+            model,
+          }, 502);
+        }
 
-          try {
-            const translated =
-              await translateBatch(
-                batch,
-                env,
-                tone,
-                lineCount
-              );
+        const { data } = await readJsonResponse(geminiRes);
 
-            result.push(...translated);
-          } catch (error) {
-            return json({
-              error:
-                "Gemini translation မအောင်မြင်ပါ။",
+        if (!geminiRes.ok) {
+          return json({
+            error: "Gemini translation မအောင်မြင်ပါ။",
+            status: geminiRes.status,
+            detail: errorMessage(
+              data,
+              "Gemini API က အမှားပြန်ပို့ခဲ့သည်။"
+            ),
+            model,
+          }, 502);
+        }
 
-              status:
-                Number(error?.status) || 502,
+        const rawText = (data?.candidates || [])
+          .flatMap(candidate => candidate?.content?.parts || [])
+          .filter(part =>
+            typeof part?.text === "string" &&
+            !part.thought
+          )
+          .map(part => part.text)
+          .join("\n");
 
-              detail:
-                error instanceof Error
-                  ? error.message
-                  : String(error),
+        const result = normalizeTranslationArray(
+          rawText,
+          safeSegments
+        );
 
-              model:
-                error?.model ||
-                String(
-                  env.GEMINI_MODEL ||
-                  "gemini-2.5-flash"
-                ),
-
-              batch:
-                Math.floor(i / 20) + 1
-            }, Number(error?.status) || 502);
-          }
+        if (!result) {
+          return json({
+            error:
+              "Gemini က မှန်ကန်သော ဘာသာပြန် JSON ကို မပြန်ပို့နိုင်ပါ။",
+            detail:
+              "စာကြောင်းအရေအတွက် သို့မဟုတ် JSON ပုံစံ မကိုက်ညီပါ။ ပြန်စမ်းပါ။",
+            model,
+          }, 502);
         }
 
         return json({
           result,
+          model,
+        });
+      }
 
-          model: String(
-            env.GEMINI_MODEL ||
-            "gemini-2.5-flash"
-          )
+      if (
+        path === "/api/transcribe" ||
+        path === "/api/translate"
+      ) {
+        return json({
+          error: "ဤ endpoint သည် POST request ကိုသာ လက်ခံပါသည်။",
+        }, 405, {
+          Allow: "POST, OPTIONS",
         });
       }
 
       return json({
         error: "Not found",
-        path
+        path,
       }, 404);
 
     } catch (error) {
       return json({
-        error:
-          "Worker အတွင်းပိုင်းအမှား ဖြစ်ပေါ်ခဲ့သည်။",
-
-        detail:
-          error instanceof Error
-            ? error.message
-            : String(error)
+        error: "Worker အတွင်းပိုင်းအမှား ဖြစ်ပေါ်ခဲ့သည်။",
+        detail: String(error?.message || error),
       }, 500);
     }
-  }
+  },
 };
