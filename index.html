@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Silver Studio - Myanmar SRT Pro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Padauk:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #090d14;
+      --bg-surface: #101622;
+      --bg-card: #161e2e;
+      --silver-glow: rgba(226, 232, 240, 0.15);
+      --silver-main: #e2e8f0;
+      --silver-muted: #94a3b8;
+      --silver-border: #2d3748;
+      --accent-cyan: #38bdf8;
+      --accent-emerald: #34d399;
+      --karaoke-base: #94a3b8;
+      --karaoke-active: #fbbf24;
+      --mm-sub-color: #ffffff;
+      --user-custom-font: 'Padauk', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--silver-main);
+      font-family: 'Plus Jakarta Sans', var(--user-custom-font), sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding-bottom: 90px;
+    }
+
+    /* Top App Header */
+    .top-header {
+      background: linear-gradient(180deg, #161e2e 0%, #0d121c 100%);
+      border-bottom: 1px solid var(--silver-border);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      color: #f8fafc;
+    }
+
+    .badge-silver {
+      background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+      color: #0f172a;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .header-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .btn-header {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    /* Fixed Video Viewport Area */
+    .video-viewport-area {
+      position: relative;
+      background: #020617;
+      width: 100%;
+      height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .viewport-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(#1e293b 1px, transparent 1px);
+      background-size: 14px 14px;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* Aspect Framing Stage */
+    .crop-stage {
+      position: relative;
+      height: 330px;
+      width: 185px; /* Default 9:16 */
+      background: #000;
+      overflow: hidden;
+      border-radius: 10px;
+      box-shadow: 0 0 0 1px #475569, 0 10px 25px rgba(0,0,0,0.8);
+      touch-action: none;
+    }
+
+    .media-canvas {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) translate(0px, 0px) scale(1);
+      transform-origin: center center;
+      pointer-events: auto;
+      cursor: grab;
+      will-change: transform;
+    }
+
+    .media-canvas:active {
+      cursor: grabbing;
+    }
+
+    .media-canvas video {
+      display: block;
+      max-width: none;
+      pointer-events: none;
+      object-fit: contain;
+    }
+
+    /* Draggable Overlays */
+    .drag-overlay {
+      position: absolute;
+      cursor: move;
+      touch-action: none;
+      z-index: 50;
+      user-select: none;
+      display: none;
+    }
+
+    #logoOverlay {
+      top: 10px;
+      left: 10px;
+    }
+
+    #titleOverlay {
+      top: 10px;
+      right: 10px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      white-space: nowrap;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+    }
+
+    #blurOverlay {
+      top: 40%;
+      left: 20%;
+      width: 90px;
+      height: 40px;
+      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed rgba(56, 189, 248, 0.5);
+      border-radius: 6px;
+    }
+
+    /* Live Subtitle Container at bottom */
+    .live-sub-container {
+      position: absolute;
+      bottom: 12px;
+      left: 6px;
+      right: 6px;
+      text-align: center;
+      z-index: 60;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .live-sub-mm {
+      font-family: var(--user-custom-font);
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--mm-sub-color);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 3px #000;
+      line-height: 1.3;
+      padding: 2px 6px;
+    }
+
+    .live-sub-eng {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      line-height: 1.2;
+      display: inline-block;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+      /* Karaoke Fill Effect */
+      background: linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) 0%, var(--karaoke-base) 0%, var(--karaoke-base) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Timeline Scrubber & Quick Pan Controls */
+    .player-mini-bar {
+      background: #090e17;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .time-readout {
+      font-size: 10px;
+      color: #94a3b8;
+      font-family: monospace;
+      min-width: 65px;
+    }
+
+    .scrubber {
+      flex: 1;
+      height: 4px;
+      accent-color: #38bdf8;
+    }
+
+    .btn-play-pause {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* Aspect Ratio Bar */
+    .aspect-bar {
+      background: #0f172a;
+      padding: 8px 12px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      border-bottom: 1px solid #1e293b;
+      scrollbar-width: none;
+    }
+
+    .aspect-bar::-webkit-scrollbar { display: none; }
+
+    .aspect-chip {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .aspect-chip.active {
+      background: linear-gradient(135deg, #f8fafc, #cbd5e1);
+      color: #0f172a;
+      border-color: #f8fafc;
+    }
+
+    /* Feature Action Bar (Logo, Title, Blur) */
+    .overlay-action-bar {
+      padding: 10px 12px;
+      background: #111827;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      border-bottom: 1px solid #1f2937;
+    }
+
+    .btn-action-tab {
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #f1f5f9;
+      padding: 8px 4px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .btn-action-tab.active {
+      border-color: #38bdf8;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #64748b;
+    }
+
+    .status-dot.active {
+      background: #34d399;
+      box-shadow: 0 0 5px #34d399;
+    }
+
+    /* Common Card / Panel Styling */
+    .panel-card {
+      background: #131c2e;
+      border: 1px solid #233148;
+      border-radius: 12px;
+      margin: 10px 12px;
+      padding: 12px;
+      display: none;
+    }
+
+    .panel-card.show {
+      display: block;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 6px;
+    }
+
+    .panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Modern Toggle Switch */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .toggle-wrap input { display: none; }
+
+    .switch-track {
+      width: 36px;
+      height: 20px;
+      background: #334155;
+      border-radius: 20px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .switch-thumb {
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+    }
+
+    .toggle-wrap input:checked + .switch-track {
+      background: #38bdf8;
+    }
+
+    .toggle-wrap input:checked + .switch-track .switch-thumb {
+      transform: translateX(16px);
+    }
+
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .control-input {
+      background: #090e17;
+      border: 1px solid #334155;
+      color: #fff;
+      padding: 6px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      width: 100%;
+    }
+
+    /* Subtitle Generator Card */
+    .ai-card {
+      background: linear-gradient(145deg, #162032 0%, #0d1522 100%);
+      border: 1px solid #29384d;
+      border-radius: 12px;
+      margin: 10px 12px;
+      padding: 14px;
+    }
+
+    .category-pills {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin: 10px 0;
+    }
+
+    .cat-btn {
+      background: #1b263b;
+      border: 1px solid #2d3e58;
+      color: #94a3b8;
+      padding: 6px 2px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-family: var(--user-custom-font);
+      font-weight: 700;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .cat-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #fff;
+    }
+
+    .btn-generate {
+      background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+      color: #fff;
+      border: none;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-generate:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* SRT Editor List & Auto Scroll Area */
+    .editor-section {
+      margin: 12px 12px 20px;
+      background: #0e1522;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .editor-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download-srt {
+      background: #1e293b;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 5px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .srt-scroll-box {
+      max-height: 380px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 4px;
+      scroll-behavior: smooth;
+    }
+
+    .srt-row-item {
+      background: #151f30;
+      border: 1px solid #223047;
+      border-radius: 8px;
+      padding: 8px 10px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .srt-row-item.active {
+      border-color: #38bdf8;
+      background: #1a2a44;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+    }
+
+    .srt-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #64748b;
+      margin-bottom: 4px;
+      font-family: monospace;
+    }
+
+    .srt-edit-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #f8fafc;
+      font-size: 12px;
+      outline: none;
+      font-family: var(--user-custom-font);
+      margin-bottom: 2px;
+    }
+
+    .srt-edit-input.eng {
+      font-size: 11px;
+      color: #94a3b8;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: #131c2e;
+      border: 1px solid #2d3e58;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 14px;
+      padding: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="top-header">
+    <div class="brand-title">
+      <span>SILVER STUDIO</span>
+      <span class="badge-silver">SRT PRO</span>
+    </div>
+    <div class="header-btns">
+      <button class="btn-header" onclick="openModal('workerModal')">⚙️ Worker</button>
+      <button class="btn-header" onclick="openModal('videoModal')">📹 Video</button>
+    </div>
+  </header>
+
+  <!-- Fixed Top Video Viewport -->
+  <div class="video-viewport-area">
+    <div class="viewport-grid-bg"></div>
+
+    <div class="crop-stage" id="cropStage">
+      <!-- Movable Video Canvas -->
+      <div class="media-canvas" id="mediaCanvas">
+        <video id="mainVideo" playsinline preload="auto" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
+      </div>
+
+      <!-- Draggable Overlays -->
+      <div id="logoOverlay" class="drag-overlay">
+        <img id="logoImg" src="" style="width: 45px; display: block; border-radius: 4px;">
+      </div>
+
+      <div id="titleOverlay" class="drag-overlay">
+        <span id="titleTextDisplay">ခေါင်းစဉ်စာသား</span>
+      </div>
+
+      <div id="blurOverlay" class="drag-overlay"></div>
+
+      <!-- Bottom Live Subtitles -->
+      <div class="live-sub-container">
+        <div id="liveSubMM" class="live-sub-mm">မြန်မာစာတန်းထိုး နေရာ</div>
+        <div id="liveSubENG" class="live-sub-eng">English Live Karaoke Subtitle</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Player Scrubber & Zoom Bar -->
+  <div class="player-mini-bar">
+    <button class="btn-play-pause" id="btnPlayPause" onclick="togglePlay()">Play</button>
+    <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
+    <input type="range" class="scrubber" id="videoScrubber" min="0" max="100" value="0">
+    <button class="btn-play-pause" onclick="resetVideoPosition()" title="Reset Pan">↺</button>
+  </div>
+
+  <!-- Aspect Ratio Selector Bar -->
+  <div class="aspect-bar">
+    <div class="aspect-chip active" onclick="setAspect('9:16', 185, 330, this)">9:16 (TikTok)</div>
+    <div class="aspect-chip" onclick="setAspect('4:5', 264, 330, this)">4:5 (IG Post)</div>
+    <div class="aspect-chip" onclick="setAspect('1:1', 330, 330, this)">1:1 (Square)</div>
+    <div class="aspect-chip" onclick="setAspect('16:9', 340, 191, this)">16:9 (Landscape)</div>
+    <div class="aspect-chip" onclick="setAspect('21:9', 350, 150, this)">21:9 (Cinema)</div>
+  </div>
+
+  <!-- Feature Action Bar (Logo, Title, Blur) -->
+  <div class="overlay-action-bar">
+    <button class="btn-action-tab" id="tabBtnLogo" onclick="togglePanel('logoPanel')">
+      <div class="status-dot" id="dotLogo"></div>
+      <span>+ Add Logo</span>
+    </button>
+    <button class="btn-action-tab" id="tabBtnTitle" onclick="togglePanel('titlePanel')">
+      <div class="status-dot" id="dotTitle"></div>
+      <span>+ Title Text</span>
+    </button>
+    <button class="btn-action-tab" id="tabBtnBlur" onclick="togglePanel('blurPanel')">
+      <div class="status-dot" id="dotBlur"></div>
+      <span>+ Add Blur</span>
+    </button>
+  </div>
+
+  <!-- Logo Setting Panel -->
+  <div class="panel-card" id="logoPanel">
+    <div class="panel-header">
+      <span class="panel-title">🖼️ Logo Settings</span>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="toggleLogo" onchange="onToggleOverlay('logo')">
+        <div class="switch-track"><div class="switch-thumb"></div></div>
+      </label>
+    </div>
+    <div class="control-row">
+      <span>Logo ပုံတင်ရန်</span>
+      <input type="file" id="logoFileInput" accept="image/*" style="font-size:10px; width:160px;" onchange="handleLogoUpload(this)">
+    </div>
+    <div class="control-row">
+      <span>Logo Size</span>
+      <input type="range" min="20" max="120" value="45" oninput="document.getElementById('logoImg').style.width = this.value + 'px'">
+    </div>
+  </div>
+
+  <!-- Title Text Setting Panel -->
+  <div class="panel-card" id="titlePanel">
+    <div class="panel-header">
+      <span class="panel-title">✏️ Title Text Settings</span>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="toggleTitle" onchange="onToggleOverlay('title')">
+        <div class="switch-track"><div class="switch-thumb"></div></div>
+      </label>
+    </div>
+    <input type="text" class="control-input" id="titleTextInput" value="ခေါင်းစဉ်စာသား" oninput="document.getElementById('titleTextDisplay').innerText = this.value" placeholder="စာသားရိုက်ထည့်ပါ">
+    <div class="control-row">
+      <span>စာလုံးအရောင်</span>
+      <input type="color" value="#ffffff" onchange="document.getElementById('titleOverlay').style.color = this.value">
+      <span>Font Size</span>
+      <input type="range" min="10" max="24" value="13" oninput="document.getElementById('titleOverlay').style.fontSize = this.value + 'px'">
+    </div>
+  </div>
+
+  <!-- Blur Box Setting Panel -->
+  <div class="panel-card" id="blurPanel">
+    <div class="panel-header">
+      <span class="panel-title">💧 Blur Box Settings</span>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="toggleBlur" onchange="onToggleOverlay('blur')">
+        <div class="switch-track"><div class="switch-thumb"></div></div>
+      </label>
+    </div>
+    <div class="control-row">
+      <span>Blur ပြင်းအား</span>
+      <input type="range" min="4" max="30" value="12" oninput="document.getElementById('blurOverlay').style.backdropFilter = 'blur(' + this.value + 'px)'">
+    </div>
+  </div>
+
+  <!-- Subtitle Styles & Custom Font Card -->
+  <div class="panel-card show" style="display:block; margin-top:10px;">
+    <div class="panel-header">
+      <span class="panel-title">🎨 Subtitle & Karaoke Styles</span>
+      <button class="btn-download-srt" onclick="document.getElementById('fontUploader').click()">+ Upload Font (.ttf)</button>
+      <input type="file" id="fontUploader" accept=".ttf,.otf,.woff2" style="display:none;" onchange="handleFontUpload(this)">
+    </div>
+    <div class="control-row">
+      <span>မြန်မာစာတန်း အရောင်</span>
+      <input type="color" value="#ffffff" onchange="document.documentElement.style.setProperty('--mm-sub-color', this.value)">
+      <span>Font Size</span>
+      <input type="range" min="10" max="22" value="14" oninput="document.getElementById('liveSubMM').style.fontSize = this.value + 'px'">
+    </div>
+    <div class="control-row">
+      <span>ENG Karaoke Base Color</span>
+      <input type="color" value="#94a3b8" onchange="document.documentElement.style.setProperty('--karaoke-base', this.value)">
+      <span>Karaoke Wipe Color</span>
+      <input type="color" value="#fbbf24" onchange="document.documentElement.style.setProperty('--karaoke-active', this.value)">
+    </div>
+  </div>
+
+  <!-- AI Subtitle Generator Section -->
+  <div class="ai-card">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:12px; font-weight:700; color:#38bdf8;">⚡ Dual AI Subtitle Engine</span>
+      <select id="lineCountSelect" class="control-input" style="width:110px; font-size:10px;">
+        <option value="2">၂ ကြောင်း (Double)</option>
+        <option value="1">၁ ကြောင်း (Single)</option>
+      </select>
+    </div>
+
+    <!-- Category (7 Types) -->
+    <div class="category-pills" id="catGroup">
+      <div class="cat-btn active" onclick="selectCat('song', this)">Song</div>
+      <div class="cat-btn" onclick="selectCat('movie', this)">Movie</div>
+      <div class="cat-btn" onclick="selectCat('news', this)">News</div>
+      <div class="cat-btn" onclick="selectCat('show', this)">Show</div>
+      <div class="cat-btn" onclick="selectCat('comedy', this)">ဟာသ</div>
+      <div class="cat-btn" onclick="selectCat('mystery', this)">ဆန်းကြယ်</div>
+      <div class="cat-btn" onclick="selectCat('horror', this)">သရဲတစ္ဆေ</div>
+    </div>
+
+    <button class="btn-generate" id="btnGenSub" onclick="startSubGeneration()">
+      <span>အသံမှ စာတန်းထိုး အလိုအလျောက် ထုတ်ယူမည်</span>
+    </button>
+    <div id="genStatus" style="font-size:11px; color:#94a3b8; text-align:center; margin-top:8px;"></div>
+  </div>
+
+  <!-- Real-time SRT Auto-Scroll Editor -->
+  <div class="editor-section">
+    <div class="editor-toolbar">
+      <span style="font-size:12px; font-weight:700;">📝 Interactive SRT Editor</span>
+      <div style="display:flex; gap:4px;">
+        <button class="btn-download-srt" onclick="exportSRT('mm')">Burmese .srt</button>
+        <button class="btn-download-srt" onclick="exportSRT('eng')">Eng .srt</button>
+        <button class="btn-download-srt" onclick="exportSRT('dual')">Dual .srt</button>
+      </div>
+    </div>
+
+    <!-- Subtitle Item Rows -->
+    <div class="srt-scroll-box" id="srtScrollBox">
+      <!-- Auto generated subtitle rows appear here -->
+    </div>
+  </div>
+
+  <!-- Worker Settings Modal -->
+  <div class="modal-overlay" id="workerModal">
+    <div class="modal-content">
+      <h3 style="font-size:13px; margin-bottom:10px;">Cloudflare Worker Settings</h3>
+      <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Deploy ထားသော Worker URL ကို ထည့်ပါ:</p>
+      <input type="text" id="workerUrlInput" class="control-input" placeholder="https://myanmar-srt-studio.workers.dev">
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+        <button class="btn-header" onclick="closeModal('workerModal')">Cancel</button>
+        <button class="btn-generate" style="width:80px; padding:6px;" onclick="saveWorkerUrl()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Source Modal -->
+  <div class="modal-overlay" id="videoModal">
+    <div class="modal-content">
+      <h3 style="font-size:13px; margin-bottom:10px;">Video ရွေးချယ်တင်သွင်းပါ</h3>
+      <div style="margin-bottom:12px;">
+        <span style="font-size:11px; color:#94a3b8;">ဖုန်းထဲမှ Video File:</span>
+        <input type="file" id="localVideoFile" accept="video/*" class="control-input" style="margin-top:4px;" onchange="handleLocalVideo(this)">
+      </div>
+      <div style="margin-bottom:12px;">
+        <span style="font-size:11px; color:#94a3b8;">YouTube URL (Direct MP4 Stream):</span>
+        <input type="text" id="ytUrlInput" class="control-input" placeholder="Video URL paste လုပ်ပါ" style="margin-top:4px;">
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn-header" onclick="closeModal('videoModal')">ပိတ်မည်</button>
+        <button class="btn-generate" style="width:90px; padding:6px;" onclick="loadCustomVideoUrl()">Load Video</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // App State
+    let selectedCategory = 'song';
+    let currentActiveIndex = -1;
+    let videoFileBlob = null;
+    let srtData = [
+      { id: 1, start: 0.5, end: 3.5, startStr: '00:00:00,500', endStr: '00:00:03,500', mm: 'Silver Studio မှ ကြိုဆိုပါသည်', eng: 'Welcome to Silver Studio' },
+      { id: 2, start: 3.8, end: 7.2, startStr: '00:00:03,800', endStr: '00:00:07,200', mm: 'အချိန်ကိုက် စာတန်းထိုးများကို စိတ်ကြိုက် ပြင်ဆင်နိုင်ပါသည်', eng: 'You can customize synced subtitles easily' }
+    ];
+
+    const video = document.getElementById('mainVideo');
+    const mediaCanvas = document.getElementById('mediaCanvas');
+    const cropStage = document.getElementById('cropStage');
+    const scrubber = document.getElementById('videoScrubber');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+
+    // Pan & Drag Tracking
+    let panX = 0, panY = 0, zoomScale = 1.0;
+    let isDragging = false, startX = 0, startY = 0;
+
+    // Load saved Worker URL
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUrl = localStorage.getItem('SILVER_WORKER_URL');
+      if (savedUrl) document.getElementById('workerUrlInput').value = savedUrl;
+      renderSRTEditor();
+      setupPanDrag();
+      setupOverlayDrag('logoOverlay');
+      setupOverlayDrag('titleOverlay');
+      setupOverlayDrag('blurOverlay');
+    });
+
+    // Touch & Mouse Pan Engine for Video Canvas
+    function setupPanDrag() {
+      cropStage.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.drag-overlay') || e.target.closest('.live-sub-container')) return;
+        isDragging = true;
+        startX = e.clientX - panX;
+        startY = e.clientY - panY;
+        cropStage.setPointerCapture(e.pointerId);
+      });
+
+      cropStage.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        panX = e.clientX - startX;
+        panY = e.clientY - startY;
+        applyVideoTransform();
+      });
+
+      const stopDrag = (e) => {
+        if (isDragging) {
+          isDragging = false;
+          try { cropStage.releasePointerCapture(e.pointerId); } catch(err){}
+        }
+      };
+      cropStage.addEventListener('pointerup', stopDrag);
+      cropStage.addEventListener('pointercancel', stopDrag);
+    }
+
+    function applyVideoTransform() {
+      mediaCanvas.style.transform = `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${zoomScale})`;
+    }
+
+    function resetVideoPosition() {
+      panX = 0; panY = 0; zoomScale = 1.0;
+      applyVideoTransform();
+    }
+
+    // Draggable Overlays (Logo, Title, Blur)
+    function setupOverlayDrag(elementId) {
+      const el = document.getElementById(elementId);
+      let isOverlayDrag = false, oX = 0, oY = 0;
+
+      el.addEventListener('pointerdown', (e) => {
+        isOverlayDrag = true;
+        oX = e.clientX - el.offsetLeft;
+        oY = e.clientY - el.offsetTop;
+        el.setPointerCapture(e.pointerId);
+        e.stopPropagation();
+      });
+
+      el.addEventListener('pointermove', (e) => {
+        if (!isOverlayDrag) return;
+        el.style.left = (e.clientX - oX) + 'px';
+        el.style.top = (e.clientY - oY) + 'px';
+        el.style.right = 'auto'; // release auto alignment
+      });
+
+      const endOverlayDrag = (e) => {
+        if (isOverlayDrag) {
+          isOverlayDrag = false;
+          try { el.releasePointerCapture(e.pointerId); } catch(err){}
+        }
+      };
+      el.addEventListener('pointerup', endOverlayDrag);
+      el.addEventListener('pointercancel', endOverlayDrag);
+    }
+
+    // Aspect Ratio Sizing
+    function setAspect(ratio, w, h, el) {
+      document.querySelectorAll('.aspect-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      cropStage.style.width = w + 'px';
+      cropStage.style.height = h + 'px';
+    }
+
+    // Toggle Settings Panels
+    function togglePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      const isOpen = panel.classList.contains('show');
+      document.querySelectorAll('.panel-card').forEach(p => {
+        if (p.id !== 'subtitleStylePanel') p.classList.remove('show');
+      });
+      if (!isOpen) panel.classList.add('show');
+    }
+
+    // On/Off Overlays
+    function onToggleOverlay(type) {
+      if (type === 'logo') {
+        const on = document.getElementById('toggleLogo').checked;
+        document.getElementById('logoOverlay').style.display = on ? 'block' : 'none';
+        document.getElementById('dotLogo').classList.toggle('active', on);
+      } else if (type === 'title') {
+        const on = document.getElementById('toggleTitle').checked;
+        document.getElementById('titleOverlay').style.display = on ? 'block' : 'none';
+        document.getElementById('dotTitle').classList.toggle('active', on);
+      } else if (type === 'blur') {
+        const on = document.getElementById('toggleBlur').checked;
+        document.getElementById('blurOverlay').style.display = on ? 'block' : 'none';
+        document.getElementById('dotBlur').classList.toggle('active', on);
+      }
+    }
+
+    // Logo File Upload
+    function handleLogoUpload(input) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.getElementById('logoImg').src = e.target.result;
+          document.getElementById('toggleLogo').checked = true;
+          onToggleOverlay('logo');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Custom Font (.ttf) Uploader
+    async function handleFontUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const fontName = 'CustomFont_' + Date.now();
+      const buffer = await file.arrayBuffer();
+      const fontFace = new FontFace(fontName, buffer);
+      await fontFace.load();
+      document.fonts.add(fontFace);
+      document.documentElement.style.setProperty('--user-custom-font', fontName);
+      alert('Custom Font အောင်မြင်စွာ ထည့်သွင်းပြီးပါပြီ!');
+    }
+
+    // Video Player & Realtime Karaoke Progress Engine
+    function togglePlay() {
+      if (video.paused) {
+        video.play();
+        btnPlayPause.innerText = 'Pause';
+      } else {
+        video.pause();
+        btnPlayPause.innerText = 'Play';
+      }
+    }
+
+    video.addEventListener('timeupdate', () => {
+      const cur = video.currentTime;
+      const dur = video.duration || 1;
+      scrubber.value = (cur / dur) * 100;
+      timeDisplay.innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
+
+      // Find Active Subtitle
+      const activeIdx = srtData.findIndex(item => cur >= item.start && cur <= item.end);
+
+      if (activeIdx !== -1) {
+        const item = srtData[activeIdx];
+        document.getElementById('liveSubMM').innerText = item.mm;
+        document.getElementById('liveSubENG').innerText = item.eng;
+
+        // Karaoke Color Wipe Progress
+        const progress = Math.min(100, Math.max(0, ((cur - item.start) / (item.end - item.start)) * 100));
+        document.getElementById('liveSubENG').style.background = 
+          `linear-gradient(to right, var(--karaoke-active) 0%, var(--karaoke-active) ${progress}%, var(--karaoke-base) ${progress}%, var(--karaoke-base) 100%)`;
+        document.getElementById('liveSubENG').style.webkitBackgroundClip = 'text';
+
+        // Auto-scroll Editor Row
+        if (currentActiveIndex !== activeIdx) {
+          currentActiveIndex = activeIdx;
+          highlightAndScrollEditor(activeIdx);
+        }
+      } else {
+        document.getElementById('liveSubMM').innerText = '';
+        document.getElementById('liveSubENG').innerText = '';
+        if (currentActiveIndex !== -1) {
+          clearEditorHighlights();
+          currentActiveIndex = -1;
+        }
+      }
+    });
+
+    scrubber.addEventListener('input', () => {
+      video.currentTime = (scrubber.value / 100) * (video.duration || 1);
+    });
+
+    function formatTime(sec) {
+      const m = Math.floor(sec / 60).toString().padStart(2, '0');
+      const s = Math.floor(sec % 60).toString().padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    // Interactive SRT Editor
+    function renderSRTEditor() {
+      const container = document.getElementById('srtScrollBox');
+      container.innerHTML = '';
+      srtData.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'srt-row-item';
+        row.id = `srt-row-${idx}`;
+        row.innerHTML = `
+          <div class="srt-meta">
+            <span>#${item.id} (${item.startStr} → ${item.endStr})</span>
+            <span onclick="seekTo(${item.start})">▶ Play</span>
+          </div>
+          <input class="srt-edit-input" value="${item.mm}" oninput="srtData[${idx}].mm = this.value">
+          <input class="srt-edit-input eng" value="${item.eng}" oninput="srtData[${idx}].eng = this.value">
+        `;
+        row.onclick = (e) => {
+          if (!e.target.classList.contains('srt-edit-input')) seekTo(item.start);
+        };
+        container.appendChild(row);
+      });
+    }
+
+    function seekTo(seconds) {
+      video.currentTime = seconds;
+      video.play();
+      btnPlayPause.innerText = 'Pause';
+    }
+
+    function highlightAndScrollEditor(idx) {
+      clearEditorHighlights();
+      const el = document.getElementById(`srt-row-${idx}`);
+      if (el) {
+        el.classList.add('active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function clearEditorHighlights() {
+      document.querySelectorAll('.srt-row-item').forEach(r => r.classList.remove('active'));
+    }
+
+    // Category Tone Selector
+    function selectCat(cat, el) {
+      selectedCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    // Client-side In-Browser Audio Extractor & WAV Compressor (16kHz Mono)
+    async function compressAudioToWav(fileOrBlob) {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+      const arrayBuffer = await fileOrBlob.arrayBuffer();
+      const decoded = await audioCtx.decodeAudioData(arrayBuffer);
+      
+      // Convert to 16kHz Mono PCM WAV
+      const channelData = decoded.getChannelData(0); // Mono channel
+      const wavBuffer = encodeWAV(channelData, 16000);
+      return new Blob([wavBuffer], { type: 'audio/wav' });
+    }
+
+    function encodeWAV(samples, sampleRate) {
+      const buffer = new ArrayBuffer(44 + samples.length * 2);
+      const view = new DataView(buffer);
+      const writeString = (view, offset, string) => {
+        for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+      };
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, 36 + samples.length * 2, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); // PCM
+      view.setUint16(22, 1, true); // Mono
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, samples.length * 2, true);
+      
+      let offset = 44;
+      for (let i = 0; i < samples.length; i++, offset += 2) {
+        let s = Math.max(-1, Math.min(1, samples[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return view;
+    }
+
+    // Call Cloudflare Worker APIs
+    async function startSubGeneration() {
+      const workerUrl = localStorage.getItem('SILVER_WORKER_URL');
+      if (!workerUrl) {
+        alert('Worker URL ထည့်သွင်းထားခြင်း မရှိသေးပါ။ အပေါ်ရှိ ⚙️ Worker ခလုတ်ကို နှိပ်၍ URL အရင် ထည့်ပေးပါခင်ဗျာ။');
+        openModal('workerModal');
+        return;
+      }
+
+      const statusEl = document.getElementById('genStatus');
+      const btn = document.getElementById('btnGenSub');
+      btn.disabled = true;
+
+      try {
+        let audioBlobToSend = null;
+
+        if (videoFileBlob) {
+          statusEl.innerText = '⏳ ဗီဒီယိုထဲမှ အသံကို သီးသန့်ချုံ့ထုတ်နေပါသည် (In-Browser Compress)...';
+          audioBlobToSend = await compressAudioToWav(videoFileBlob);
+        } else {
+          // Fetch current sample video audio
+          statusEl.innerText = '⏳ အသံဖိုင် စီမံနေပါသည်...';
+          const resp = await fetch(video.src);
+          const blob = await resp.blob();
+          audioBlobToSend = await compressAudioToWav(blob);
+        }
+
+        // 1. Groq Whisper API Call
+        statusEl.innerText = '⚡ Groq Whisper ဖြင့် English SRT ထုတ်ယူနေပါသည်...';
+        const formData = new FormData();
+        formData.append('file', audioBlobToSend, 'audio.wav');
+
+        const groqRes = await fetch(`${workerUrl.replace(/\/$/, '')}/api/transcribe`, {
+          method: 'POST',
+          body: formData
+        });
+        const groqData = await groqRes.json();
+        if (groqData.error) throw new Error(groqData.error);
+
+        // Convert Groq verbose_json segments to raw SRT
+        let engSRTText = '';
+        const rawSegments = groqData.segments || [];
+        rawSegments.forEach((seg, i) => {
+          engSRTText += `${i + 1}\n${toSRTTime(seg.start)} --> ${toSRTTime(seg.end)}\n${seg.text.trim()}\n\n`;
+        });
+
+        // 2. Gemini Translation Call
+        statusEl.innerText = '✨ Gemini AI ဖြင့် မြန်မာစာတန်းထိုး ပြန်ဆိုနေပါသည်...';
+        const lineCount = document.getElementById('lineCountSelect').value;
+        const geminiRes = await fetch(`${workerUrl.replace(/\/$/, '')}/api/translate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            srtText: engSRTText,
+            category: selectedCategory,
+            lineCount: lineCount
+          })
+        });
+        const geminiData = await geminiRes.json();
+        if (geminiData.error) throw new Error(geminiData.error);
+
+        // Parse translated SRT and update UI
+        parseAndUpdateSubtitles(rawSegments, geminiData.translatedSRT);
+        statusEl.innerText = '✅ စာတန်းထိုး အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ!';
+      } catch (err) {
+        alert('Error: ' + err.message);
+        statusEl.innerText = '❌ ပြဿနာဖြစ်ပွားခဲ့သည်: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function toSRTTime(sec) {
+      const date = new Date(0);
+      date.setUTCMilliseconds(sec * 1000);
+      const hh = date.getUTCHours().toString().padStart(2, '0');
+      const mm = date.getUTCMinutes().toString().padStart(2, '0');
+      const ss = date.getUTCSeconds().toString().padStart(2, '0');
+      const ms = date.getUTCMilliseconds().toString().padStart(3, '0');
+      return `${hh}:${mm}:${ss},${ms}`;
+    }
+
+    function parseAndUpdateSubtitles(engSegments, mmSRT) {
+      const mmLines = mmSRT.split(/\r?\n\r?\n/);
+      srtData = [];
+
+      engSegments.forEach((seg, i) => {
+        let mmText = '';
+        if (mmLines[i]) {
+          const parts = mmLines[i].split(/\r?\n/);
+          mmText = parts.slice(2).join(' ') || seg.text;
+        } else {
+          mmText = seg.text;
+        }
+
+        srtData.push({
+          id: i + 1,
+          start: seg.start,
+          end: seg.end,
+          startStr: toSRTTime(seg.start),
+          endStr: toSRTTime(seg.end),
+          mm: mmText.trim(),
+          eng: seg.text.trim()
+        });
+      });
+
+      renderSRTEditor();
+    }
+
+    // Export & Download SRT
+    function exportSRT(type) {
+      let content = '';
+      srtData.forEach(item => {
+        content += `${item.id}\n${item.startStr} --> ${item.endStr}\n`;
+        if (type === 'mm') content += `${item.mm}\n\n`;
+        else if (type === 'eng') content += `${item.eng}\n\n`;
+        else content += `${item.mm}\n${item.eng}\n\n`;
+      });
+
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `subtitle_${type}.srt`;
+      a.click();
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function saveWorkerUrl() {
+      const url = document.getElementById('workerUrlInput').value.trim();
+      localStorage.setItem('SILVER_WORKER_URL', url);
+      closeModal('workerModal');
+      alert('Worker URL ကို သိမ်းဆည်းပြီးပါပြီ!');
+    }
+
+    // Video Handling
+    function handleLocalVideo(input) {
+      if (input.files && input.files[0]) {
+        videoFileBlob = input.files[0];
+        video.src = URL.createObjectURL(videoFileBlob);
+        closeModal('videoModal');
+      }
+    }
+
+    function loadCustomVideoUrl() {
+      const url = document.getElementById('ytUrlInput').value.trim();
+      if (url) {
+        video.src = url;
+        videoFileBlob = null;
+        closeModal('videoModal');
+      }
+    }
+  </script>
+</body>
+</html>
