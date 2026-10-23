@@ -43,7 +43,7 @@ export default {
         });
       }
 
-      // 2. Gemini 3.8 Flash Translation Engine (Original -> English & Myanmar)
+      // 2. Gemini 3.8 Flash Translation Engine
       if (url.pathname === "/api/translate" && request.method === "POST") {
         const { segments, category, lineCount } = await request.json();
 
@@ -66,17 +66,17 @@ export default {
 Translate the input segments array into a 3-language localized JSON format.
 Rules:
 1. "original": Keep the spoken transcription exactly as provided.
-2. "english": Provide natural, fluent English translation (if already English, keep it clean).
+2. "english": Provide natural, fluent English translation.
 3. "myanmar": Provide natural Burmese (Myanmar) translation matching tone "${chosenTone}" and constraint "${linesInstruction}".
 
 Input segments:
 ${JSON.stringify(segments)}
 
 Return ONLY a valid JSON array of objects with keys: "id", "start", "end", "original", "english", "myanmar".
-Do NOT output markdown fences. Return pure JSON.`;
+Do NOT output markdown fences. Return pure JSON array only.`;
 
-        // Gemini 3.8 Flash ကို အဓိကထား၍ ခေါ်ယူခြင်း
-        const targetModels = ["gemini-3.8-flash", "gemini-flash-latest"];
+        // Gemini 3.8 Flash ကို အဓိကထားပြီး gemini-2.5-flash ကို Fallback ထားခြင်း
+        const targetModels = ["gemini-3.8-flash", "gemini-2.5-flash"];
         let rawResponseText = null;
         let lastError = null;
 
@@ -97,9 +97,15 @@ Do NOT output markdown fences. Return pure JSON.`;
             );
 
             const geminiData = await geminiRes.json();
-            if (geminiData.candidates?.[0]?.content?.parts?.[0]?.text) {
-              rawResponseText = geminiData.candidates[0].content.parts[0].text;
-              break;
+            const candidate = geminiData.candidates?.[0];
+
+            if (candidate?.content?.parts) {
+              // Gemini 3.8 ၏ Thought token များကို ဖယ်ရှားပြီး Actual Text part ကိုသာ ဆွဲထုတ်ခြင်း
+              const textPart = candidate.content.parts.find(p => !p.thought && p.text) || candidate.content.parts[candidate.content.parts.length - 1];
+              if (textPart && textPart.text) {
+                rawResponseText = textPart.text;
+                break;
+              }
             } else if (geminiData.error) {
               lastError = geminiData.error.message;
             }
@@ -120,7 +126,7 @@ Do NOT output markdown fences. Return pure JSON.`;
         });
       }
 
-      return new Response(JSON.stringify({ status: "Silver Studio Worker Active" }), {
+      return new Response(JSON.stringify({ status: "Silver Studio Worker v5 Online" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
 
