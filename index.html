@@ -14,16 +14,9 @@
         extend: {
           colors: {
             silver: {
-              50: '#f8fafc',
-              100: '#f1f5f9',
-              200: '#e2e8f0',
-              300: '#cbd5e1',
-              400: '#94a3b8',
-              500: '#64748b',
-              600: '#475569',
-              700: '#334155',
-              800: '#1e293b',
-              900: '#0f172a',
+              50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
+              400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
+              800: '#1e293b', 900: '#0f172a',
             }
           },
           boxShadow: {
@@ -142,7 +135,6 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Live Progress Border SVG */
     .live-progress-border-svg {
       position: absolute;
       inset: 0;
@@ -165,13 +157,12 @@
 </head>
 <body class="bg-brushed-metal min-h-screen text-slate-100 flex flex-col items-center antialiased pb-20">
 
-  <!-- Main Mobile Container -->
   <div class="w-full max-w-md mx-auto flex flex-col min-h-screen relative shadow-2xl border-x border-slate-700/60 overflow-hidden">
 
-    <!-- STICKY TOP VIEWPORT AREA (အပေါ်ဆုံးတွင် အသေကပ်နေမည့် အပိုင်း) -->
+    <!-- STICKY TOP VIEWPORT AREA -->
     <section class="sticky top-0 z-50 bg-slate-950 border-b border-slate-700/80 shadow-2xl backdrop-blur-md">
       
-      <!-- Top Sticky Header -->
+      <!-- Header -->
       <header class="bg-slate-900/95 border-b border-slate-700/80 px-3 py-2 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <div class="w-7 h-7 rounded-lg silver-button flex items-center justify-center font-bold text-slate-900 shadow">
@@ -194,7 +185,7 @@
         </div>
       </header>
       
-      <!-- Video Stage (ဖုန်း Screen အချိုးကျ 310px ဖြင့် ကြီးမားပြတ်သားစေသည်) -->
+      <!-- Video Stage -->
       <div id="videoStage" class="w-full h-[310px] bg-neutral-950 relative flex items-center justify-center p-2 overflow-hidden select-none">
         
         <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 14px 14px;"></div>
@@ -222,7 +213,7 @@
             <p class="text-[10px] text-slate-400 mt-1">ဖုန်းထဲမှ Video သို့မဟုတ် Direct Link</p>
           </div>
 
-          <!-- Video Canvas (muted ဖြုတ်ထားပြီး အသံထွက်ပေါ်သည်) -->
+          <!-- Video Canvas -->
           <div id="mediaWrapper" class="absolute flex items-center justify-center origin-center will-change-transform hidden">
             <video id="htmlVideo" class="block max-w-none max-h-none pointer-events-none" playsinline loop></video>
           </div>
@@ -254,7 +245,7 @@
               </div>
             </div>
 
-            <!-- Live Subtitles Overlay (Original, Myanmar, English Karaoke) -->
+            <!-- Live Subtitles Overlay -->
             <div class="absolute bottom-1.5 inset-x-2 text-center pointer-events-none flex flex-col gap-0.5 z-40">
               <div id="liveSubOrig" class="text-[11px] font-bold drop-shadow-[0_1px_2px_#000] hidden" style="color: var(--orig-sub-color);">မူရင်းစာတန်းထိုး</div>
               <div id="liveSubMM" class="text-[13px] font-bold drop-shadow-[0_2px_3px_#000] leading-tight" style="color: var(--mm-sub-color); font-family: var(--user-custom-font);">မြန်မာစာတန်းထိုး နေရာ</div>
@@ -270,7 +261,7 @@
 
       </div>
 
-      <!-- Playback Timeline & Quick Controls Bar (With Unmute/Mute Button) -->
+      <!-- Playback Timeline & Quick Controls Bar -->
       <div id="playerControlsBar" class="bg-slate-900 border-t border-slate-800 px-3 py-1.5 flex flex-col gap-1 hidden">
         <div class="flex items-center gap-2">
           <span id="videoCurrentTime" class="text-[10px] font-mono text-slate-400 w-8 text-right">0:00</span>
@@ -284,7 +275,6 @@
               <i id="playPauseIcon" data-lucide="play" class="w-3.5 h-3.5"></i>
               <span id="playPauseText">Play</span>
             </button>
-            <!-- Sound Toggle Button -->
             <button id="volumeToggleBtn" onclick="toggleMute()" class="silver-button-dark p-1 rounded-lg text-silver-300 hover:text-white transition active:scale-95" title="အသံ ဖွင့်/ပိတ်">
               <i id="volumeIcon" data-lucide="volume-2" class="w-3.5 h-3.5 text-cyan-400"></i>
             </button>
@@ -323,10 +313,9 @@
         </button>
       </div>
 
-      <!-- STICKY ACTION AREA: AI SUBTITLE GENERATOR BUTTON (ဗီဒီယို အောက်ခြေကပ်ရက် အသေထားသော ခလုတ်) -->
+      <!-- STICKY ACTION AREA: AI SUBTITLE GENERATOR -->
       <div class="bg-slate-900/95 border-t border-slate-700 px-3 py-2 space-y-2">
         
-        <!-- Category & Lines Selection -->
         <div class="flex items-center justify-between gap-1">
           <div class="flex items-center gap-1 overflow-x-auto no-scrollbar flex-1">
             <button onclick="selectCategory('song', this)" class="cat-pill silver-button px-2 py-0.5 rounded text-[10px] font-bold shrink-0">Song</button>
@@ -343,13 +332,12 @@
           </select>
         </div>
 
-        <!-- Full Width Sticky AI Generator Button (Screen မကျော်အောင် box-border ဖြင့် တိကျစွာ ချုံ့ထားသည်) -->
         <button id="btnGenSub" onclick="startSubGeneration()" class="w-full silver-button py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg transition active:scale-95">
           <i data-lucide="zap" class="w-4 h-4 text-slate-900"></i>
           <span>အသံမှ စာတန်းထိုး (မူရင်း + ENG + မြန်မာ) ထုတ်ယူမည်</span>
         </button>
 
-        <!-- Progress Box (Animated Real %) -->
+        <!-- Progress Box -->
         <div id="aiProgressBox" class="bg-slate-950 border border-slate-700 rounded-lg p-2 space-y-1.5 hidden">
           <div class="flex items-center justify-between text-[11px]">
             <div class="flex items-center gap-1.5 truncate">
@@ -366,9 +354,8 @@
       </div>
 
     </section>
-    <!-- END OF STICKY TOP VIEWPORT -->
 
-    <!-- RESPONSIVE SETTINGS SELECTOR (စွန်းထွက်မှုမရှိသော Clean Dropdown) -->
+    <!-- RESPONSIVE SETTINGS SELECTOR -->
     <div class="w-full px-3 py-2 bg-slate-900/90 border-b border-slate-800 flex items-center gap-2">
       <span class="text-xs font-bold text-silver-300 shrink-0 flex items-center gap-1">
         <i data-lucide="sliders" class="w-3.5 h-3.5 text-silver-400"></i>
@@ -403,9 +390,7 @@
           </div>
         </div>
 
-        <div id="srtScrollBox" class="space-y-2 max-h-[460px] overflow-y-auto pr-1 no-scrollbar">
-          <!-- Subtitle Rows dynamically rendered here -->
-        </div>
+        <div id="srtScrollBox" class="space-y-2 max-h-[460px] overflow-y-auto pr-1 no-scrollbar"></div>
       </div>
 
       <!-- SECTION: SUBTITLE TRACKS & STYLES -->
@@ -799,7 +784,6 @@
       dragInteractionLayer.classList.remove('hidden');
       playerControlsBar.classList.remove('hidden');
 
-      // Unmute and set full volume
       htmlVideo.muted = false;
       htmlVideo.volume = 1.0;
       updateVolumeIcon(true);
@@ -812,7 +796,6 @@
       };
 
       htmlVideo.play().catch(() => {
-        // If browser blocks unmuted autoplay, unmute on first tap
         htmlVideo.muted = true;
         htmlVideo.play().then(() => {
           htmlVideo.muted = false;
@@ -1003,7 +986,6 @@
       lucide.createIcons();
     }
 
-    // Draggable Overlays
     function startOverlayDrag(event, type) {
       event.stopPropagation();
       activeDraggedOverlay = type;
@@ -1152,10 +1134,22 @@
     function updateTitleSize(val) { titleDisplay.style.fontSize = `${val}px`; document.getElementById('titleSizeLabel').textContent = `${val}px`; }
     function updateTitleColor(c) { titleDisplay.style.color = c; }
 
-    function updateBlurStrength(val) { blurBox.style.backdropFilter = `blur(${val}px)`; document.getElementById('blurStrengthLabel').textContent = `${val}px`; }
+    function updateBlurStrength(val) { 
+      overlays.blur.strength = parseInt(val);
+      blurBox.style.backdropFilter = `blur(${val}px)`; 
+      document.getElementById('blurStrengthLabel').textContent = `${val}px`; 
+    }
     function updateBlurDimensions(w, h) {
-      if (w !== null) { blurOverlay.style.width = `${w}px`; document.getElementById('blurWidthLabel').textContent = `${w}px`; }
-      if (h !== null) { blurOverlay.style.height = `${h}px`; document.getElementById('blurHeightLabel').textContent = `${h}px`; }
+      if (w !== null) { 
+        overlays.blur.width = parseInt(w);
+        blurOverlay.style.width = `${w}px`; 
+        document.getElementById('blurWidthLabel').textContent = `${w}px`; 
+      }
+      if (h !== null) { 
+        overlays.blur.height = parseInt(h);
+        blurOverlay.style.height = `${h}px`; 
+        document.getElementById('blurHeightLabel').textContent = `${h}px`; 
+      }
     }
 
     function updateLiveSubVisibility() {
@@ -1229,7 +1223,7 @@
       document.getElementById('progressBarFill').style.width = percent + '%';
     }
 
-    // AI SUBTITLE GENERATION (Non-freezing / Bulletproof Execution)
+    // AI SUBTITLE GENERATION (၄၅ စက္ကန့် ကန့်သတ်ချက် ဖယ်ရှားထားပြီး အဆုံးထိ Run ပေးသည်)
     async function startSubGeneration() {
       const btn = document.getElementById('btnGenSub');
       btn.disabled = true;
@@ -1262,7 +1256,7 @@
         const rawSegments = groqData.segments || [];
         if (rawSegments.length === 0) throw new Error('အသံထဲမှ စကားသံ ရှာမတွေ့ပါ။');
 
-        updateProgress('✨', 'Gemini 3.8 Flash ဖြင့် English နှင့် မြန်မာသို့ ဘာသာပြန်နေပါသည်...', 65);
+        updateProgress('✨', 'Gemini AI ဖြင့် English နှင့် မြန်မာသို့ ဘာသာပြန်နေပါသည်...', 65);
 
         const segmentsToTranslate = rawSegments.map((seg, i) => ({
           id: i + 1,
@@ -1273,10 +1267,7 @@
 
         const lineCount = document.getElementById('lineCountSelect').value;
 
-        // Auto-abort timeout after 45s to avoid freezing forever
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
-
+        // Strict Timeout မထားဘဲ အဆုံးထိ စောင့်ခိုင်းခြင်း
         const geminiRes = await fetch(`${WORKER_URL.replace(/\/$/, '')}/api/translate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1284,14 +1275,8 @@
             segments: segmentsToTranslate,
             category: selectedCategory,
             lineCount: lineCount
-          }),
-          signal: controller.signal
-        }).catch(err => {
-          clearTimeout(timeoutId);
-          throw new Error(`Gemini ချိတ်ဆက်မှု အဆင်မပြေပါ: ${err.message}`);
+          })
         });
-
-        clearTimeout(timeoutId);
 
         const geminiData = await geminiRes.json();
         if (geminiData.error) throw new Error(geminiData.error);
@@ -1310,7 +1295,6 @@
             mm: item.myanmar || ''
           }));
         } else {
-          // Fallback directly
           srtData = rawSegments.map((seg, i) => ({
             id: i + 1,
             start: seg.start,
@@ -1326,7 +1310,6 @@
         renderSRTEditor();
         updateProgress('✅', 'စာတန်းထိုး (မူရင်း/အင်္ဂလိပ်/မြန်မာ) အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ!', 100);
 
-        // Switch to Subtitle Editor Studio automatically
         document.getElementById('settingsDropdown').value = 'sectionEditor';
         switchSettingSection('sectionEditor');
 
@@ -1348,7 +1331,6 @@
       return `${hh}:${mm}:${ss},${ms}`;
     }
 
-    // Subtitle Editor Rendering
     function renderSRTEditor() {
       const container = document.getElementById('srtScrollBox');
       container.innerHTML = '';
@@ -1404,7 +1386,7 @@
       document.querySelectorAll('#srtScrollBox > div').forEach(r => r.classList.remove('border-cyan-400', 'bg-slate-850'));
     }
 
-    // Video Export Studio
+    // VIDEO EXPORT STUDIO: Blur Box, Title, Subtitle အတိအကျ Render ပြုလုပ်ပြီး Loop မဖြစ်အောင် သေချာ ရပ်တန့်ခြင်း
     async function exportRenderedVideo() {
       const btn = document.getElementById('btnExportVideo');
       const statusText = document.getElementById('exportStatusText');
@@ -1433,33 +1415,56 @@
         }
       } catch (e) {}
 
+      // Format ထောက်ပံ့မှု စစ်ဆေးခြင်း (.mp4 သို့မဟုတ် .webm)
+      let selectedMime = 'video/webm;codecs=vp9,opus';
+      let fileExt = 'webm';
+      if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1')) {
+        selectedMime = 'video/mp4;codecs=avc1';
+        fileExt = 'mp4';
+      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+        selectedMime = 'video/mp4';
+        fileExt = 'mp4';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+        selectedMime = 'video/webm;codecs=vp8,opus';
+      }
+
       const recordedChunks = [];
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: selectedMime });
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) recordedChunks.push(e.data);
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: 'video/webm' });
+        const blob = new Blob(recordedChunks, { type: selectedMime });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `silver_studio_video_${Date.now()}.webm`;
+        a.download = `silver_studio_video_${Date.now()}.${fileExt}`;
         a.click();
-        statusText.innerText = '✅ Download ပြီးပါပြီ!';
+        statusText.innerText = `✅ Download ပြီးပါပြီ (.${fileExt})!`;
         btn.disabled = false;
         progressBar.classList.add('hidden');
       };
 
+      // Loop ပိတ်ပြီး စတင်ခြင်း
+      htmlVideo.loop = false;
       htmlVideo.currentTime = 0;
       await htmlVideo.play();
       mediaRecorder.start();
 
+      let isExportActive = true;
+
       const renderInterval = setInterval(() => {
-        if (htmlVideo.paused || htmlVideo.ended) {
+        if (!isExportActive) return;
+
+        // တိကျစွာ ရပ်တန့်မှု စစ်ဆေးခြင်း
+        if (htmlVideo.ended || htmlVideo.currentTime >= (htmlVideo.duration - 0.1)) {
+          isExportActive = false;
           clearInterval(renderInterval);
-          mediaRecorder.stop();
+          htmlVideo.pause();
+          htmlVideo.loop = true; // loop ပြန်ဖွင့်ပေးခြင်း
+          if (mediaRecorder.state !== 'inactive') mediaRecorder.stop();
           return;
         }
 
@@ -1476,18 +1481,68 @@
         const drawW = drawH * nativeVideoAspect;
         const drawX = (stageW - drawW) / 2 + panX;
         const drawY = (stageH - drawH) / 2 + panY;
+        
+        // 1. Draw Base Video
         ctx.drawImage(htmlVideo, drawX, drawY, drawW, drawH);
 
+        // 2. Draw Blur Box (Export Canvas တွင် အမှန်တကယ် Blur ဖြစ်စေခြင်း)
+        if (overlays.blur.active) {
+          const bX = blurOverlay.offsetLeft;
+          const bY = blurOverlay.offsetTop;
+          const bW = blurOverlay.offsetWidth;
+          const bH = blurOverlay.offsetHeight;
+          const bStrength = overlays.blur.strength || 12;
+
+          ctx.save();
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(bX, bY, bW, bH, 6);
+          else ctx.rect(bX, bY, bW, bH);
+          ctx.clip();
+          
+          ctx.filter = `blur(${bStrength}px)`;
+          ctx.drawImage(htmlVideo, drawX, drawY, drawW, drawH);
+          ctx.filter = 'none';
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // 3. Draw Logo
         if (overlays.logo.active && logoImg.src) {
           ctx.drawImage(logoImg, logoOverlay.offsetLeft, logoOverlay.offsetTop, logoImg.width || 48, logoImg.height || 48);
         }
 
+        // 4. Draw Title Text with Badge Background
         if (overlays.title.active) {
+          const tX = titleOverlay.offsetLeft;
+          const tY = titleOverlay.offsetTop;
+          const tW = titleOverlay.offsetWidth;
+          const tH = titleOverlay.offsetHeight;
+          const titleText = titleDisplay.innerText;
+
+          ctx.save();
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(tX, tY, tW, tH, 4);
+          else ctx.rect(tX, tY, tW, tH);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
           ctx.font = 'bold 12px "Plus Jakarta Sans", sans-serif';
           ctx.fillStyle = titleDisplay.style.color || '#ffffff';
-          ctx.fillText(titleDisplay.innerText, titleOverlay.offsetLeft, titleOverlay.offsetTop + 12);
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(titleText, tX + tW - 8, tY + tH / 2);
+          ctx.restore();
         }
 
+        // 5. Draw Subtitles
         const o = document.getElementById('chkShowOrig').checked;
         const e = document.getElementById('chkShowEng').checked;
         const m = document.getElementById('chkShowMM').checked;
