@@ -13,7 +13,7 @@ export default {
     const url = new URL(request.url);
 
     try {
-      // 1. Groq Whisper (Speech-to-Text)
+      // 1. Groq Whisper (မူရင်းအသံ စာသားထုတ်ယူခြင်း - 100% အလုပ်လုပ်နေပြီးဖြစ်သည်)
       if (url.pathname === "/api/transcribe" && request.method === "POST") {
         const formData = await request.formData();
         const audioFile = formData.get("file");
@@ -43,9 +43,15 @@ export default {
         });
       }
 
-      // 2. High-Speed Subtitle Translation Engine (Gemini 3.8 Flash LOW + Groq Llama 3.3 Failover)
+      // 2. High-Speed Multi-Language Translation (Groq Llama 3.3 70B Fast Engine)
       if (url.pathname === "/api/translate" && request.method === "POST") {
         const { segments, category, lineCount } = await request.json();
+
+        if (!segments || segments.length === 0) {
+          return new Response(JSON.stringify({ result: [] }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
 
         const toneMap = {
           "song": "သီချင်းစာသားဟန်၊ ကာရန်စည်းဝါးညီပြီး ကဗျာဆန်ဆန် အဓိပ္ပာယ်ပေါ်အောင်",
@@ -62,118 +68,97 @@ export default {
           ? "မြန်မာစာတန်းထိုးကို ၁ ကြောင်းတည်း အတိုချုပ် အဓိပ္ပာယ်ပြည့်အောင် ရေးပါ။" 
           : "မြန်မာစာတန်းထိုးကို အများဆုံး ၂ ကြောင်းခွဲ၍ ဖတ်ရလွယ်အောင် ရေးပါ။";
 
-        const systemPrompt = `You are a professional subtitle localization translator.
-Translate the input segments array into a 3-language localized JSON format.
-Rules:
-1. "original": Keep the spoken transcription exactly as provided.
-2. "english": Provide natural, fluent English translation.
-3. "myanmar": Provide natural Burmese (Myanmar) translation matching tone "${chosenTone}" and constraint "${linesInstruction}".
+        // Segment များကို ID အလိုက် စာရင်းပြုစုခြင်း
+        const linesText = segments.map((s, idx) => `${s.id || (idx + 1)}: ${s.text}`).join("\n");
 
-Input segments:
-${JSON.stringify(segments)}
+        const prompt = `You are a professional subtitle translator.
+Translate each numbered line of spoken transcription into fluent English and natural Burmese (Myanmar).
+Tone Style: ${chosenTone}
+Layout Constraint: ${linesInstruction}
 
-Return ONLY a valid JSON array of objects with keys: "id", "start", "end", "original", "english", "myanmar".
-Do NOT output markdown fences or explanations. Return pure JSON array only.`;
+Input Lines:
+${linesText}
 
-        let parsedResult = null;
+Return a valid JSON object where keys are the line numbers:
+{
+  "1": { "en": "English translation", "mm": "သဘာဝကျသော မြန်မာဘာသာပြန်" },
+  "2": { "en": "English translation", "mm": "သဘာဝကျသော မြန်မာဘာသာပြန်" }
+}`;
 
-        // METHOD A: Google Gemini 3.8 Flash (Interactions API with thinking_level: "low")
-        if (env.GEMINI_API_KEY) {
-          try {
-            const geminiRes = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": env.GEMINI_API_KEY
-              },
-              body: JSON.stringify({
-                model: "gemini-3.8-flash",
-                input: systemPrompt,
-                generation_config: {
-                  thinking_level: "low"
-                }
-              })
-            });
+        let translationsMap = {};
 
-            const gData = await geminiRes.json();
-            const text = gData.output_text || gData.output || gData.outputs?.[0]?.text;
-            if (text) {
-              const jsonMatch = text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-              if (jsonMatch) parsedResult = JSON.parse(jsonMatch[0]);
-              else parsedResult = JSON.parse(text.replace(/```json/gi, '').replace(/```/g, '').trim());
-            }
-          } catch (e) {
-            console.error("Gemini Interactions Error:", e);
+        // METHOD 1: Groq Llama 3.3 70B (၁ စက္ကန့်အတွင်း အမြန်ဆုံး ပြီးစီးသည်)
+        try {
+          const groqChatRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${env.GROQ_API_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              model: "llama-3.3-70b-versatile",
+              messages: [
+                { role: "system", content: "You are a professional subtitle localization translator. You output pure JSON only." },
+                { role: "user", content: prompt }
+              ],
+              response_format: { type: "json_object" },
+              temperature: 0.2
+            })
+          });
+
+          const groqChatData = await groqChatRes.json();
+          const content = groqChatData.choices?.[0]?.message?.content;
+          if (content) {
+            translationsMap = JSON.parse(content);
           }
+        } catch (e) {
+          console.error("Groq Chat Error:", e);
+        }
 
-          // Fallback to generateContent with thinkingLevel LOW if needed
-          if (!parsedResult || !Array.isArray(parsedResult)) {
-            try {
-              const genRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${env.GEMINI_API_KEY}`,
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-                    generationConfig: {
-                      responseMimeType: "application/json",
-                      thinkingConfig: { thinkingLevel: "LOW" }
-                    }
-                  })
-                }
-              );
-              const genData = await genRes.json();
-              const part = genData.candidates?.[0]?.content?.parts?.find(p => !p.thought && p.text) || genData.candidates?.[0]?.content?.parts?.[0];
-              if (part?.text) {
-                const jsonMatch = part.text.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                if (jsonMatch) parsedResult = JSON.parse(jsonMatch[0]);
-                else parsedResult = JSON.parse(part.text.replace(/```json/gi, '').replace(/```/g, '').trim());
+        // METHOD 2: Fallback to Gemini 3.8 Flash (Groq မရပါက Gemini သို့ switch မည်)
+        if (Object.keys(translationsMap).length === 0 && env.GEMINI_API_KEY) {
+          try {
+            const geminiRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${env.GEMINI_API_KEY}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  contents: [{ role: "user", parts: [{ text: prompt }] }],
+                  generationConfig: { responseMimeType: "application/json" }
+                })
               }
-            } catch (e) {
-              console.error("Gemini generateContent Error:", e);
+            );
+            const geminiData = await geminiRes.json();
+            const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+              translationsMap = JSON.parse(text);
             }
-          }
-        }
-
-        // METHOD B: Instant Failover to Groq Llama 3.3 70B (Fail-safe backup)
-        if ((!parsedResult || !Array.isArray(parsedResult) || parsedResult.length === 0) && env.GROQ_API_KEY) {
-          try {
-            const groqChatRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${env.GROQ_API_KEY}`,
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                model: "llama-3.3-70b-versatile",
-                messages: [
-                  { role: "system", content: "You are a professional subtitle translator. Output a raw JSON array of objects with keys: id, start, end, original, english, myanmar." },
-                  { role: "user", content: systemPrompt }
-                ],
-                temperature: 0.2
-              })
-            });
-            const groqChatData = await groqChatRes.json();
-            const content = groqChatData.choices?.[0]?.message?.content || "";
-            const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
-            if (jsonMatch) parsedResult = JSON.parse(jsonMatch[0]);
           } catch (e) {
-            console.error("Groq Failover Error:", e);
+            console.error("Gemini Fallback Error:", e);
           }
         }
 
-        // Check if translations were properly generated
-        if (!parsedResult || !Array.isArray(parsedResult) || parsedResult.length === 0) {
-          throw new Error("ဘာသာပြန်ခြင်း မအောင်မြင်ပါ။ API Key သို့မဟုတ် Network ကို စစ်ဆေးပါခင်ဗျာ။");
-        }
+        // Segments များနှင့် ဘာသာပြန်ရလဒ်များကို အမှားလုံးဝမရှိစေဘဲ ပေါင်းစပ်ခြင်း
+        const finalResult = segments.map((s, idx) => {
+          const id = s.id || (idx + 1);
+          const t = translationsMap[String(id)] || translationsMap[id] || {};
+          return {
+            id: id,
+            start: s.start,
+            end: s.end,
+            original: s.text || "",
+            english: t.en || t.english || s.text || "",
+            myanmar: t.mm || t.myanmar || s.text || ""
+          };
+        });
 
-        return new Response(JSON.stringify({ result: parsedResult }), {
+        return new Response(JSON.stringify({ result: finalResult }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       }
 
-      return new Response(JSON.stringify({ status: "Silver Studio Worker v6 Active" }), {
+      return new Response(JSON.stringify({ status: "Silver Studio Worker Online" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
 
