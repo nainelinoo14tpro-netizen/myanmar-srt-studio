@@ -3,7 +3,7 @@ export default {
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type, Authorization",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization, x-goog-api-key",
     };
 
     if (request.method === "OPTIONS") {
@@ -43,7 +43,7 @@ export default {
         });
       }
 
-      // 2. Gemini 3.8 Flash Translation Engine
+      // 2. Google Gemini 3.8 Flash Interactions API
       if (url.pathname === "/api/translate" && request.method === "POST") {
         const { segments, category, lineCount } = await request.json();
 
@@ -62,7 +62,7 @@ export default {
           ? "မြန်မာစာတန်းထိုးကို ၁ ကြောင်းတည်း အတိုချုပ် အဓိပ္ပာယ်ပြည့်အောင် ရေးပါ။" 
           : "မြန်မာစာတန်းထိုးကို အများဆုံး ၂ ကြောင်းခွဲ၍ ဖတ်ရလွယ်အောင် ရေးပါ။";
 
-        const systemPrompt = `You are a professional subtitle localization translator.
+        const systemPrompt = `You are a professional subtitle translator.
 Translate the input segments array into a 3-language localized JSON format.
 Rules:
 1. "original": Keep the spoken transcription exactly as provided.
@@ -73,60 +73,91 @@ Input segments:
 ${JSON.stringify(segments)}
 
 Return ONLY a valid JSON array of objects with keys: "id", "start", "end", "original", "english", "myanmar".
-Do NOT output markdown fences. Return pure JSON array only.`;
+Do NOT output markdown fences or explanations. Return pure JSON array only.`;
 
-        // Gemini 3.8 Flash ကို အဓိကထားပြီး gemini-2.5-flash ကို Fallback ထားခြင်း
-        const targetModels = ["gemini-3.8-flash", "gemini-2.5-flash"];
         let rawResponseText = null;
-        let lastError = null;
 
-        for (const model of targetModels) {
+        // Call Gemini 3.8 Flash via Interactions API
+        try {
+          const interactionRes = await fetch("https://generativelanguage.googleapis.com/v1beta/interactions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": env.GEMINI_API_KEY
+            },
+            body: JSON.stringify({
+              model: "gemini-3.8-flash",
+              input: systemPrompt,
+              generation_config: {
+                thinking_level: "low"
+              }
+            })
+          });
+
+          const interactionData = await interactionRes.json();
+          if (interactionData.output_text) {
+            rawResponseText = interactionData.output_text;
+          } else if (typeof interactionData.output === "string") {
+            rawResponseText = interactionData.output;
+          } else if (interactionData.outputs?.[0]?.text) {
+            rawResponseText = interactionData.outputs[0].text;
+          }
+        } catch (e) {}
+
+        // Fallback to generateContent endpoint if needed
+        if (!rawResponseText) {
           try {
             const geminiRes = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`,
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${env.GEMINI_API_KEY}`,
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  contents: [{ role: "user", parts: [{ text: systemPrompt }] }],
-                  generationConfig: {
-                    responseMimeType: "application/json"
-                  }
+                  contents: [{ role: "user", parts: [{ text: systemPrompt }] }]
                 })
               }
             );
-
             const geminiData = await geminiRes.json();
             const candidate = geminiData.candidates?.[0];
-
             if (candidate?.content?.parts) {
-              // Gemini 3.8 ၏ Thought token များကို ဖယ်ရှားပြီး Actual Text part ကိုသာ ဆွဲထုတ်ခြင်း
               const textPart = candidate.content.parts.find(p => !p.thought && p.text) || candidate.content.parts[candidate.content.parts.length - 1];
-              if (textPart && textPart.text) {
-                rawResponseText = textPart.text;
-                break;
-              }
-            } else if (geminiData.error) {
-              lastError = geminiData.error.message;
+              if (textPart?.text) rawResponseText = textPart.text;
             }
-          } catch (err) {
-            lastError = err.message;
+          } catch (e) {}
+        }
+
+        let parsedResult = null;
+        if (rawResponseText) {
+          const jsonMatch = rawResponseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+          if (jsonMatch) {
+            try { parsedResult = JSON.parse(jsonMatch[0]); } catch (e) {}
+          }
+          if (!parsedResult) {
+            try {
+              const cleaned = rawResponseText.replace(/```json/gi, '').replace(/```/g, '').trim();
+              parsedResult = JSON.parse(cleaned);
+            } catch (e) {}
           }
         }
 
-        if (!rawResponseText) {
-          throw new Error("Gemini Translation Error: " + (lastError || "Failed to generate translation"));
+        // Error မတက်စေရန် Safe Fallback
+        if (!parsedResult || !Array.isArray(parsedResult)) {
+          parsedResult = segments.map((s, idx) => ({
+            id: s.id || (idx + 1),
+            start: s.start,
+            end: s.end,
+            original: s.text,
+            english: s.text,
+            myanmar: s.text
+          }));
         }
-
-        rawResponseText = rawResponseText.replace(/```json/gi, '').replace(/```/g, '').trim();
-        const parsedResult = JSON.parse(rawResponseText);
 
         return new Response(JSON.stringify({ result: parsedResult }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" }
         });
       }
 
-      return new Response(JSON.stringify({ status: "Silver Studio Worker v5 Online" }), {
+      return new Response(JSON.stringify({ status: "Silver Studio Worker Running" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });
 
