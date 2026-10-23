@@ -41,7 +41,7 @@
       padding-bottom: 90px;
     }
 
-    /* 1. STICKY TOP FIXED VIDEO CONTAINER (အပေါ်ဆုံးတွင် အသေကပ်နေမည့် အပိုင်း) */
+    /* 1. STICKY TOP VIEWPORT (ဖုန်း screen အပေါ်ဆုံးတွင် အသေကပ်ထားသော အပိုင်း) */
     .sticky-top-section {
       position: sticky;
       top: 0;
@@ -78,22 +78,17 @@
       font-weight: 700;
     }
 
-    .header-btns {
-      display: flex;
-      gap: 6px;
-    }
-
     .btn-header {
       background: #1e293b;
       border: 1px solid #334155;
       color: #f1f5f9;
-      padding: 5px 10px;
+      padding: 5px 12px;
       border-radius: 6px;
       font-size: 11px;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       cursor: pointer;
     }
 
@@ -118,7 +113,7 @@
       pointer-events: none;
     }
 
-    /* CROP STAGE FRAME */
+    /* Crop Stage Frame */
     .crop-stage {
       position: relative;
       height: 290px;
@@ -131,30 +126,24 @@
       transition: width 0.2s ease, height 0.2s ease;
     }
 
-    /* RUNNING NEON BORDER (ဗီဒီယို ဘောင်တွင် ပြေးနေသော လိုင်းအလင်းတန်း) */
-    .crop-stage.running-border {
-      box-shadow: none;
-    }
-
-    .crop-stage.running-border::before {
-      content: '';
+    /* REAL LIVE CLOCKWISE PROGRESS BORDER (ဗီဒီယိုကြာချိန်အတိုင်း ပတ်လည်ပြေးမည့် ဘောင်) */
+    .live-progress-border-svg {
       position: absolute;
-      inset: -3px;
-      border-radius: 12px;
-      background: conic-gradient(from 0deg, #38bdf8, #ec4899, #fbbf24, #10b981, #38bdf8);
-      z-index: 70;
+      inset: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      padding: 3px;
-      animation: rotateBorder 3s linear infinite;
+      z-index: 65;
+      display: none;
     }
 
-    @keyframes rotateBorder {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .border-progress-rect {
+      fill: none;
+      stroke: #38bdf8;
+      stroke-width: 4px;
+      stroke-linecap: round;
+      filter: drop-shadow(0 0 6px #38bdf8);
+      transition: stroke-dashoffset 0.1s linear;
     }
 
     .media-canvas {
@@ -209,21 +198,6 @@
       border-radius: 6px;
     }
 
-    /* Real Timecode Overlay */
-    #timecodeOverlay {
-      bottom: 45px;
-      right: 10px;
-      padding: 3px 6px;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-      font-family: monospace;
-      font-size: 11px;
-      color: #38bdf8;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
     /* Live Subtitles */
     .live-sub-container {
       position: absolute;
@@ -260,7 +234,7 @@
       -webkit-text-fill-color: transparent;
     }
 
-    /* Mini Player Controls with Zoom In / Zoom Out */
+    /* Mini Player Controls with Zoom Slider */
     .player-mini-bar {
       background: #090e17;
       padding: 6px 10px;
@@ -293,7 +267,6 @@
       cursor: pointer;
     }
 
-    /* Zoom Controller Bar */
     .zoom-ctrl-wrap {
       display: flex;
       align-items: center;
@@ -350,13 +323,13 @@
       border-color: #f8fafc;
     }
 
-    /* Action Bar (5 Features: Logo, Title, Blur, Timecode, Running Border) */
+    /* Action Bar (4 Features: Logo, Title, Blur, Live Progress Border) */
     .overlay-action-bar {
       padding: 8px 10px;
       background: #111827;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 5px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
       border-bottom: 1px solid #1f2937;
     }
 
@@ -364,21 +337,21 @@
       background: #1e293b;
       border: 1px solid #334155;
       color: #f1f5f9;
-      padding: 6px 2px;
+      padding: 7px 2px;
       border-radius: 6px;
-      font-size: 9px;
+      font-size: 10px;
       font-weight: 700;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2px;
+      gap: 3px;
       cursor: pointer;
       text-align: center;
     }
 
     .status-dot {
-      width: 5px;
-      height: 5px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: #64748b;
     }
@@ -460,13 +433,22 @@
       background: #090e17;
       border: 1px solid #334155;
       color: #fff;
-      padding: 6px 8px;
+      padding: 7px 9px;
       border-radius: 6px;
       font-size: 12px;
       width: 100%;
     }
 
-    /* Subtitle Generator Card */
+    /* Subtitle & Font Styling Card */
+    .style-card {
+      background: #131c2e;
+      border: 1px solid #233148;
+      border-radius: 12px;
+      margin: 10px 12px;
+      padding: 12px;
+    }
+
+    /* AI Subtitle Generator Card */
     .ai-card {
       background: linear-gradient(145deg, #162032 0%, #0d1522 100%);
       border: 1px solid #29384d;
@@ -506,7 +488,7 @@
       color: #fff;
       border: none;
       width: 100%;
-      padding: 10px;
+      padding: 11px;
       border-radius: 8px;
       font-weight: 700;
       font-size: 12px;
@@ -519,6 +501,68 @@
     }
 
     .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* REAL PERCENTAGE & EMOJI ANIMATED PROGRESS BOX */
+    .ai-progress-box {
+      margin-top: 10px;
+      background: #0a101d;
+      border: 1px solid #1e2d42;
+      border-radius: 8px;
+      padding: 10px;
+      display: none;
+    }
+
+    .progress-top-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .progress-status-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .progress-emoji-anim {
+      font-size: 16px;
+      display: inline-block;
+      animation: emojiPulse 1s ease-in-out infinite alternate;
+    }
+
+    @keyframes emojiPulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.3); }
+    }
+
+    .progress-percent-val {
+      font-size: 13px;
+      font-weight: 800;
+      color: #f1f5f9;
+      font-family: monospace;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 6px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #34d399);
+      border-radius: 6px;
+      transition: width 0.3s ease;
+      box-shadow: 0 0 8px rgba(56, 189, 248, 0.6);
+    }
 
     /* Video Export Card */
     .export-card {
@@ -645,22 +689,42 @@
       border-radius: 14px;
       padding: 16px;
     }
+
+    .upload-tab-nav {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #233148;
+      padding-bottom: 6px;
+    }
+
+    .tab-link {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .tab-link.active {
+      color: #38bdf8;
+      border-bottom: 2px solid #38bdf8;
+    }
   </style>
 </head>
 <body>
 
-  <!-- STICKY TOP SECTION: ဖုန်း screen အပေါ်ဆုံးတွင် အသေထားသော အပိုင်း -->
+  <!-- STICKY TOP VIEWPORT -->
   <div class="sticky-top-section">
-    <!-- Header -->
+    <!-- Header (Setting ခလုတ် ဖယ်ရှားထားပြီး ဖြစ်သည်) -->
     <header class="top-header">
       <div class="brand-title">
         <span>SILVER STUDIO</span>
         <span class="badge-silver">SRT PRO</span>
       </div>
-      <div class="header-btns">
-        <button class="btn-header" onclick="openModal('workerModal')" title="Worker URL စစ်ဆေးရန်">⚙️</button>
-        <button class="btn-header" onclick="openModal('videoModal')">📹 Video ထည့်ရန်</button>
-      </div>
+      <button class="btn-header" onclick="openModal('videoModal')">📹 Video ထည့်ရန်</button>
     </header>
 
     <!-- Video Viewport -->
@@ -668,6 +732,11 @@
       <div class="viewport-grid-bg"></div>
 
       <div class="crop-stage" id="cropStage">
+        <!-- Live Clockwise Progress Border SVG -->
+        <svg class="live-progress-border-svg" id="liveBorderSvg">
+          <rect id="liveProgressRect" class="border-progress-rect" x="2" y="2" rx="8" ry="8" />
+        </svg>
+
         <!-- Movable Video Canvas -->
         <div class="media-canvas" id="mediaCanvas">
           <video id="mainVideo" playsinline preload="auto" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"></video>
@@ -684,11 +753,6 @@
 
         <div id="blurOverlay" class="drag-overlay"></div>
 
-        <!-- Real Timecode Overlay -->
-        <div id="timecodeOverlay" class="drag-overlay">
-          <span id="timecodeText">00:00:00</span>
-        </div>
-
         <!-- Live Subtitles -->
         <div class="live-sub-container">
           <div id="liveSubMM" class="live-sub-mm">မြန်မာစာတန်းထိုး နေရာ</div>
@@ -703,7 +767,7 @@
       <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
       <input type="range" class="scrubber" id="videoScrubber" min="0" max="100" value="0">
       
-      <!-- Zoom In / Zoom Out Controls -->
+      <!-- Zoom Controls -->
       <div class="zoom-ctrl-wrap">
         <button class="btn-zoom" onclick="adjustZoom(-0.1)">-</button>
         <input type="range" class="zoom-slider" id="zoomSlider" min="1" max="3" step="0.1" value="1" oninput="setZoom(this.value)">
@@ -722,23 +786,19 @@
       <div class="aspect-chip" onclick="setAspect('16:9', 330, 186, this)">16:9 (Landscape)</div>
     </div>
 
-    <!-- Action Bar (5 Features) -->
+    <!-- Action Bar (4 Features: Logo, Title, Blur, Live Progress Border) -->
     <div class="overlay-action-bar">
       <button class="btn-action-tab" onclick="togglePanel('logoPanel')">
         <div class="status-dot" id="dotLogo"></div>
-        <span>+ Logo</span>
+        <span>+ Add Logo</span>
       </button>
       <button class="btn-action-tab" onclick="togglePanel('titlePanel')">
         <div class="status-dot" id="dotTitle"></div>
-        <span>+ Title</span>
+        <span>+ Title Text</span>
       </button>
       <button class="btn-action-tab" onclick="togglePanel('blurPanel')">
         <div class="status-dot" id="dotBlur"></div>
-        <span>+ Blur</span>
-      </button>
-      <button class="btn-action-tab" onclick="toggleTimecodeOverlay()">
-        <div class="status-dot" id="dotTimecode"></div>
-        <span>+ Real Time</span>
+        <span>+ Add Blur</span>
       </button>
       <button class="btn-action-tab" onclick="toggleRunningBorder()">
         <div class="status-dot" id="dotBorder"></div>
@@ -746,7 +806,7 @@
       </button>
     </div>
   </div>
-  <!-- END OF STICKY TOP SECTION -->
+  <!-- END OF STICKY TOP VIEWPORT -->
 
   <!-- Logo Setting Panel -->
   <div class="panel-card" id="logoPanel">
@@ -801,7 +861,7 @@
   </div>
 
   <!-- Subtitle & Font Styling Card -->
-  <div class="panel-card show" style="display:block; margin-top:10px;">
+  <div class="style-card">
     <div class="panel-header">
       <span class="panel-title">🎨 Subtitle & Karaoke Styles</span>
       <button class="btn-download-srt" onclick="document.getElementById('fontUploader').click()">+ Upload Font (.ttf)</button>
@@ -821,7 +881,7 @@
     </div>
   </div>
 
-  <!-- AI Subtitle Generator Section -->
+  <!-- AI Subtitle Generator Card with Real % Progress & Animations -->
   <div class="ai-card">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <span style="font-size:12px; font-weight:700; color:#38bdf8;">⚡ Dual AI Subtitle Engine</span>
@@ -845,10 +905,23 @@
     <button class="btn-generate" id="btnGenSub" onclick="startSubGeneration()">
       <span>အသံမှ စာတန်းထိုး အလိုအလျောက် ထုတ်ယူမည်</span>
     </button>
-    <div id="genStatus" style="font-size:11px; color:#94a3b8; text-align:center; margin-top:8px;"></div>
+
+    <!-- REAL % AND ANIMATED EMOJI LOADING PROGRESS BAR -->
+    <div class="ai-progress-box" id="aiProgressBox">
+      <div class="progress-top-info">
+        <div class="progress-status-label">
+          <span class="progress-emoji-anim" id="progressEmoji">🎧</span>
+          <span id="progressText">စတင်နေပါသည်...</span>
+        </div>
+        <span class="progress-percent-val" id="progressPctVal">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- VIDEO EXPORT CARD (Subtitle + Overlays အားလုံးပါပြီး Download ပြုလုပ်ခြင်း) -->
+  <!-- Video Export Card -->
   <div class="export-card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
       <span style="font-size:12px; font-weight:700; color:#10b981;">🎬 Video Export Studio</span>
@@ -870,32 +943,31 @@
         <button class="btn-download-srt" onclick="exportSRT('dual')">Dual .srt</button>
       </div>
     </div>
-
     <div class="srt-scroll-box" id="srtScrollBox"></div>
   </div>
 
-  <!-- Worker Settings Modal -->
-  <div class="modal-overlay" id="workerModal">
-    <div class="modal-content">
-      <h3 style="font-size:13px; margin-bottom:10px;">Cloudflare Worker Settings</h3>
-      <p style="font-size:11px; color:#94a3b8; margin-bottom:8px;">လက်ရှိ သုံးနေသော Worker URL:</p>
-      <input type="text" id="workerUrlInput" class="control-input" value="https://myanmar-srt-studio.nainelinoo14tpro.workers.dev">
-      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
-        <button class="btn-header" onclick="closeModal('workerModal')">Cancel</button>
-        <button class="btn-generate" style="width:80px; padding:6px;" onclick="saveCustomWorkerUrl()">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Video Source Modal -->
+  <!-- VIDEO MODAL WITH LOCAL FILE AND YOUTUBE URL TABS -->
   <div class="modal-overlay" id="videoModal">
     <div class="modal-content">
-      <h3 style="font-size:13px; margin-bottom:10px;">Video ရွေးချယ်တင်သွင်းပါ</h3>
-      <div style="margin-bottom:12px;">
-        <span style="font-size:11px; color:#94a3b8;">ဖုန်းထဲမှ Video File:</span>
-        <input type="file" id="localVideoFile" accept="video/*" class="control-input" style="margin-top:4px;" onchange="handleLocalVideo(this)">
+      <div class="upload-tab-nav">
+        <button class="tab-link active" id="tabLocalBtn" onclick="switchVideoTab('local')">📱 ဖုန်းထဲမှ Video</button>
+        <button class="tab-link" id="tabYtBtn" onclick="switchVideoTab('yt')">🔗 YouTube / Online Link</button>
       </div>
-      <div style="display:flex; justify-content:flex-end; gap:8px;">
+
+      <!-- Local File Tab Content -->
+      <div id="localTabPane">
+        <span style="font-size:11px; color:#94a3b8;">ဖုန်းထဲမှ Video File ရွေးချယ်ပါ:</span>
+        <input type="file" id="localVideoFile" accept="video/*" class="control-input" style="margin-top:6px;" onchange="handleLocalVideo(this)">
+      </div>
+
+      <!-- YouTube URL Tab Content -->
+      <div id="ytTabPane" style="display:none;">
+        <span style="font-size:11px; color:#94a3b8;">YouTube သို့မဟုတ် Video Direct Link paste လုပ်ပါ:</span>
+        <input type="text" id="ytUrlInput" class="control-input" placeholder="https://www.youtube.com/watch?v=..." style="margin-top:6px;">
+        <button class="btn-generate" style="margin-top:8px; padding:8px;" onclick="loadYoutubeOrDirectUrl()">Load Video</button>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:12px;">
         <button class="btn-header" onclick="closeModal('videoModal')">ပိတ်မည်</button>
       </div>
     </div>
@@ -904,12 +976,16 @@
   <canvas id="exportCanvas" style="display:none;"></canvas>
 
   <script>
-    let WORKER_URL = localStorage.getItem('SILVER_WORKER_URL') || "https://myanmar-srt-studio.nainelinoo14tpro.workers.dev";
+    // ========================================================
+    // Cloudflare မှ ရရှိထားသော သင့် Worker URL အမှန်ကို ဤနေရာတွင် ထည့်ပါ
+    // ========================================================
+    const WORKER_URL = "https://myanmar-srt-studio.nainelinoo-14tpro.workers.dev";
 
     let selectedCategory = 'song';
     let currentActiveIndex = -1;
     let videoFileBlob = null;
     let currentAspectMode = 'original';
+    let isProgressBorderActive = false;
 
     let srtData = [
       { id: 1, start: 0.5, end: 3.5, startStr: '00:00:00,500', endStr: '00:00:03,500', mm: 'Silver Studio မှ ကြိုဆိုပါသည်', eng: 'Welcome to Silver Studio' },
@@ -928,13 +1004,11 @@
     let isDragging = false, startX = 0, startY = 0;
 
     window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('workerUrlInput').value = WORKER_URL;
       renderSRTEditor();
       setupPanDrag();
       setupOverlayDrag('logoOverlay');
       setupOverlayDrag('titleOverlay');
       setupOverlayDrag('blurOverlay');
-      setupOverlayDrag('timecodeOverlay');
     });
 
     video.addEventListener('loadedmetadata', () => {
@@ -955,6 +1029,7 @@
       video.style.height = stageHeight + 'px';
       video.style.width = 'auto';
       resetVideoPosition();
+      updateLiveProgressBorderDimensions();
     }
 
     function setAspect(ratio, w, h, el) {
@@ -970,10 +1045,11 @@
         video.style.height = h + 'px';
         video.style.width = 'auto';
         resetVideoPosition();
+        updateLiveProgressBorderDimensions();
       }
     }
 
-    // ZOOM IN / ZOOM OUT CONTROLS
+    // Zoom Controls
     function setZoom(val) {
       zoomScale = parseFloat(val);
       applyVideoTransform();
@@ -1021,7 +1097,7 @@
       applyVideoTransform();
     }
 
-    // Overlay Drags
+    // Overlays
     function setupOverlayDrag(elementId) {
       const el = document.getElementById(elementId);
       let isOverlayDrag = false, oX = 0, oY = 0;
@@ -1055,9 +1131,7 @@
     function togglePanel(panelId) {
       const panel = document.getElementById(panelId);
       const isOpen = panel.classList.contains('show');
-      document.querySelectorAll('.panel-card').forEach(p => {
-        if (p.id !== 'subtitleStylePanel') p.classList.remove('show');
-      });
+      document.querySelectorAll('.panel-card').forEach(p => p.classList.remove('show'));
       if (!isOpen) panel.classList.add('show');
     }
 
@@ -1077,22 +1151,39 @@
       }
     }
 
-    // Real-Time Timecode Toggle
-    function toggleTimecodeOverlay() {
-      const el = document.getElementById('timecodeOverlay');
-      const dot = document.getElementById('dotTimecode');
-      const isVisible = el.style.display === 'block';
-      el.style.display = isVisible ? 'none' : 'block';
-      dot.classList.toggle('active', !isVisible);
+    // REAL LIVE CLOCKWISE PROGRESS BORDER (ဗီဒီယိုနှင့် တစ်ပြေးညီ လိုက်ပြေးသော ဘောင်)
+    function toggleRunningBorder() {
+      isProgressBorderActive = !isProgressBorderActive;
+      const svg = document.getElementById('liveBorderSvg');
+      const dot = document.getElementById('dotBorder');
+      svg.style.display = isProgressBorderActive ? 'block' : 'none';
+      dot.classList.toggle('active', isProgressBorderActive);
+      if (isProgressBorderActive) {
+        updateLiveProgressBorderDimensions();
+        updateBorderProgress();
+      }
     }
 
-    // Running Border Toggle (ပြေးနေတဲ့ ဘောင်)
-    function toggleRunningBorder() {
-      const stage = document.getElementById('cropStage');
-      const dot = document.getElementById('dotBorder');
-      const isActive = stage.classList.contains('running-border');
-      stage.classList.toggle('running-border', !isActive);
-      dot.classList.toggle('active', !isActive);
+    function updateLiveProgressBorderDimensions() {
+      const rect = document.getElementById('liveProgressRect');
+      const w = cropStage.clientWidth - 4;
+      const h = cropStage.clientHeight - 4;
+      rect.setAttribute('width', Math.max(10, w));
+      rect.setAttribute('height', Math.max(10, h));
+      const perimeter = 2 * (w + h);
+      rect.style.strokeDasharray = perimeter;
+    }
+
+    function updateBorderProgress() {
+      if (!isProgressBorderActive) return;
+      const dur = video.duration || 1;
+      const cur = video.currentTime || 0;
+      const progress = Math.min(1, Math.max(0, cur / dur));
+      const rect = document.getElementById('liveProgressRect');
+      const w = cropStage.clientWidth - 4;
+      const h = cropStage.clientHeight - 4;
+      const perimeter = 2 * (w + h);
+      rect.style.strokeDashoffset = perimeter * (1 - progress);
     }
 
     function handleLogoUpload(input) {
@@ -1134,7 +1225,8 @@
       const dur = video.duration || 1;
       scrubber.value = (cur / dur) * 100;
       timeDisplay.innerText = `${formatTime(cur)} / ${formatTime(dur)}`;
-      document.getElementById('timecodeText').innerText = formatTimecode(cur);
+
+      updateBorderProgress();
 
       const activeIdx = srtData.findIndex(item => cur >= item.start && cur <= item.end);
 
@@ -1170,13 +1262,6 @@
       const m = Math.floor(sec / 60).toString().padStart(2, '0');
       const s = Math.floor(sec % 60).toString().padStart(2, '0');
       return `${m}:${s}`;
-    }
-
-    function formatTimecode(sec) {
-      const m = Math.floor(sec / 60).toString().padStart(2, '0');
-      const s = Math.floor(sec % 60).toString().padStart(2, '0');
-      const ms = Math.floor((sec % 1) * 100).toString().padStart(2, '0');
-      return `00:${m}:${s}.${ms}`;
     }
 
     function renderSRTEditor() {
@@ -1263,37 +1348,70 @@
       return view;
     }
 
-    // Direct AI Call with Error Prevention
-    async function startSubGeneration() {
-      if (!videoFileBlob) {
-        alert('ကျေးဇူးပြု၍ အပေါ်ရှိ 📹 Video ခလုတ်မှတစ်ဆင့် ဖုန်းထဲရှိ မိမိဗီဒီယိုဖိုင်ကို အရင်ရွေးချယ်ပေးပါခင်ဗျာ။ (Demo Video မှာ CORS ကန့်သတ်ချက် ရှိပါသည်)');
-        openModal('videoModal');
-        return;
-      }
+    // REAL % AND ANIMATED EMOJI PROGRESS CONTROLLER
+    function updateProgress(emoji, text, percent) {
+      const box = document.getElementById('aiProgressBox');
+      const emojiEl = document.getElementById('progressEmoji');
+      const textEl = document.getElementById('progressText');
+      const pctEl = document.getElementById('progressPctVal');
+      const bar = document.getElementById('progressBarFill');
 
-      const statusEl = document.getElementById('genStatus');
+      box.style.display = 'block';
+      emojiEl.innerText = emoji;
+      textEl.innerText = text;
+      pctEl.innerText = percent + '%';
+      bar.style.width = percent + '%';
+    }
+
+    async function startSubGeneration() {
       const btn = document.getElementById('btnGenSub');
       btn.disabled = true;
 
       try {
-        statusEl.innerText = '⏳ ဗီဒီယိုထဲမှ အသံကို သီးသန့်ချုံ့ထုတ်နေပါသည်...';
-        const audioBlobToSend = await compressAudioToWav(videoFileBlob);
+        let audioBlobToSend = null;
 
-        statusEl.innerText = '⚡ Groq Whisper ဖြင့် English SRT ထုတ်ယူနေပါသည်...';
+        // Stage 1: Audio Extraction (0% -> 25%)
+        updateProgress('🎧', 'အသံဖိုင်ကို စတင် ဖောက်ထုတ်ချုံ့ယူနေပါသည်...', 10);
+
+        if (videoFileBlob) {
+          audioBlobToSend = await compressAudioToWav(videoFileBlob);
+        } else {
+          try {
+            const resp = await fetch(video.src);
+            const blob = await resp.blob();
+            audioBlobToSend = await compressAudioToWav(blob);
+          } catch(e) {
+            throw new Error('ကျေးဇူးပြု၍ "Video ထည့်ရန်" ခလုတ်မှတစ်ဆင့် မိမိဖုန်းထဲရှိ ဗီဒီယိုဖိုင် သို့မဟုတ် Direct Video URL အရင်ထည့်ပေးပါခင်ဗျာ။');
+          }
+        }
+        updateProgress('⚡', 'Groq Whisper သို့ ချိတ်ဆက်နေပါသည်...', 25);
+
+        // Stage 2: Groq Whisper Transcription (25% -> 60%)
         const formData = new FormData();
         formData.append('file', audioBlobToSend, 'audio.wav');
+
+        let simProgress = 25;
+        const progressTimer = setInterval(() => {
+          if (simProgress < 55) {
+            simProgress += 5;
+            updateProgress('⚡', 'Groq Whisper ဖြင့် အသံမှ စာသားထုတ်ယူနေပါသည်...', simProgress);
+          }
+        }, 300);
 
         const groqRes = await fetch(`${WORKER_URL.replace(/\/$/, '')}/api/transcribe`, {
           method: 'POST',
           body: formData
+        }).catch(err => {
+          throw new Error(`Worker Connection Failed (${err.message})။ Worker URL: ${WORKER_URL} မှန်မမှန် စစ်ဆေးပေးပါခင်ဗျာ။`);
         });
 
-        if (!groqRes.ok) {
-          throw new Error(`Worker Transcribe Error (${groqRes.status}): Worker URL မှန်မမှန် စစ်ဆေးပေးပါခင်ဗျာ။`);
-        }
+        clearInterval(progressTimer);
 
+        if (!groqRes.ok) throw new Error(`Groq Worker Error (Status: ${groqRes.status})`);
         const groqData = await groqRes.json();
         if (groqData.error) throw new Error(groqData.error);
+
+        updateProgress('✨', 'Gemini AI ဖြင့် မြန်မာစာတန်းထိုး ပြန်ဆိုရန် ပြင်ဆင်နေပါသည်...', 60);
 
         let engSRTText = '';
         const rawSegments = groqData.segments || [];
@@ -1301,8 +1419,10 @@
           engSRTText += `${i + 1}\n${toSRTTime(seg.start)} --> ${toSRTTime(seg.end)}\n${seg.text.trim()}\n\n`;
         });
 
-        statusEl.innerText = '✨ Gemini AI ဖြင့် မြန်မာစာတန်းထိုး ပြန်ဆိုနေပါသည်...';
+        // Stage 3: Gemini Translation (60% -> 95%)
         const lineCount = document.getElementById('lineCountSelect').value;
+        updateProgress('✨', 'Gemini AI ဖြင့် စာတန်းထိုး ပြန်ဆိုနေပါသည်...', 78);
+
         const geminiRes = await fetch(`${WORKER_URL.replace(/\/$/, '')}/api/translate`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1311,18 +1431,22 @@
             category: selectedCategory,
             lineCount: lineCount
           })
+        }).catch(err => {
+          throw new Error(`Gemini Worker Connection Error: ${err.message}`);
         });
 
-        if (!geminiRes.ok) throw new Error(`Worker Translation Error (${geminiRes.status})`);
-
+        if (!geminiRes.ok) throw new Error(`Gemini Worker Error (Status: ${geminiRes.status})`);
         const geminiData = await geminiRes.json();
         if (geminiData.error) throw new Error(geminiData.error);
 
+        // Stage 4: Subtitle Sync Completed (100%)
+        updateProgress('📝', 'စာတန်းထိုး နေရာချထားနေပါသည်...', 95);
         parseAndUpdateSubtitles(rawSegments, geminiData.translatedSRT);
-        statusEl.innerText = '✅ စာတန်းထိုး အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ!';
+
+        updateProgress('✅', 'စာတန်းထိုး အောင်မြင်စွာ ဖန်တီးပြီးပါပြီ!', 100);
       } catch (err) {
         alert('Error: ' + err.message);
-        statusEl.innerText = '❌ ပြဿနာ: ' + err.message;
+        updateProgress('❌', err.message, 0);
       } finally {
         btn.disabled = false;
       }
@@ -1365,7 +1489,7 @@
       renderSRTEditor();
     }
 
-    // EXPORT RENDERED VIDEO (SUBTITLES, OVERLAYS အားလုံး ပေါင်းစပ်ထုတ်ယူခြင်း)
+    // Video Export Studio
     async function exportRenderedVideo() {
       const btn = document.getElementById('btnExportVideo');
       const statusText = document.getElementById('exportStatusText');
@@ -1379,13 +1503,12 @@
       const canvas = document.getElementById('exportCanvas');
       const stageW = cropStage.clientWidth;
       const stageH = cropStage.clientHeight;
-      canvas.width = stageW * 2; // high res
+      canvas.width = stageW * 2;
       canvas.height = stageH * 2;
       const ctx = canvas.getContext('2d');
 
       const stream = canvas.captureStream(30);
 
-      // Attach audio track if available
       try {
         if (video.captureStream) {
           const vStream = video.captureStream();
@@ -1428,7 +1551,6 @@
         progressBar.style.width = pct + '%';
         statusText.innerText = `Render နေပါသည်... ${pct}%`;
 
-        // 1. Draw Scaled Video Frame
         ctx.save();
         ctx.scale(2, 2);
         ctx.fillStyle = '#000';
@@ -1443,7 +1565,6 @@
         const drawY = (stageH - drawH) / 2 + panY;
         ctx.drawImage(video, drawX, drawY, drawW, drawH);
 
-        // 2. Draw Overlays (Logo, Title, Timecode, Blur)
         const logo = document.getElementById('logoOverlay');
         if (logo.style.display === 'block') {
           const lImg = document.getElementById('logoImg');
@@ -1457,14 +1578,6 @@
           ctx.fillText(document.getElementById('titleTextDisplay').innerText, title.offsetLeft, title.offsetTop + 14);
         }
 
-        const tc = document.getElementById('timecodeOverlay');
-        if (tc.style.display === 'block') {
-          ctx.font = 'bold 11px monospace';
-          ctx.fillStyle = '#38bdf8';
-          ctx.fillText(document.getElementById('timecodeText').innerText, tc.offsetLeft, tc.offsetTop + 12);
-        }
-
-        // 3. Draw Subtitles
         const subMM = document.getElementById('liveSubMM').innerText;
         const subEng = document.getElementById('liveSubENG').innerText;
 
@@ -1508,17 +1621,15 @@
       a.click();
     }
 
+    // Modal & Tab Switchers
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    function saveCustomWorkerUrl() {
-      const val = document.getElementById('workerUrlInput').value.trim();
-      if (val) {
-        WORKER_URL = val;
-        localStorage.setItem('SILVER_WORKER_URL', val);
-        alert('Worker URL အသစ် သိမ်းဆည်းပြီးပါပြီ!');
-        closeModal('workerModal');
-      }
+    function switchVideoTab(tab) {
+      document.getElementById('tabLocalBtn').classList.toggle('active', tab === 'local');
+      document.getElementById('tabYtBtn').classList.toggle('active', tab === 'yt');
+      document.getElementById('localTabPane').style.display = tab === 'local' ? 'block' : 'none';
+      document.getElementById('ytTabPane').style.display = tab === 'yt' ? 'block' : 'none';
     }
 
     function handleLocalVideo(input) {
@@ -1527,6 +1638,14 @@
         video.src = URL.createObjectURL(videoFileBlob);
         closeModal('videoModal');
       }
+    }
+
+    function loadYoutubeOrDirectUrl() {
+      const url = document.getElementById('ytUrlInput').value.trim();
+      if (!url) return;
+      video.src = url;
+      videoFileBlob = null;
+      closeModal('videoModal');
     }
   </script>
 </body>
